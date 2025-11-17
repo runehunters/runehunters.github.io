@@ -73,8 +73,8 @@
             position: absolute;
             bottom: 20px;
             right: 20px;
-            width: 200px;
-            height: 200px;
+            width: 300px;
+            height: 300px;
             border: 3px solid #8b6f47;
             background: rgba(26, 20, 16, 0.95);
             box-shadow: 0 2px 8px rgba(0,0,0,0.5);
@@ -706,8 +706,8 @@
         function resizeCanvas() {
             canvas.width = window.innerWidth;
             canvas.height = window.innerHeight;
-            minimapCanvas.width = 200;
-            minimapCanvas.height = 200;
+            minimapCanvas.width = 300;
+            minimapCanvas.height = 300;
         }
 
         // --- UPDATED: Map includes Home and Quest Room buildings ---
@@ -1475,8 +1475,26 @@
         }
 
         function draw() {
-            ctx.fillStyle = '#1a1410';
+            // --- NEW: Draw cloudy background instead of black ---
+            ctx.fillStyle = '#e8f4f8';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
+            
+            // Draw cloud pattern
+            for (let i = 0; i < 20; i++) {
+                const cloudX = (i * 150 + game.time.frameCounter * 0.1) % canvas.width;
+                const cloudY = (i * 80) % canvas.height;
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
+                ctx.beginPath();
+                ctx.arc(cloudX, cloudY, 40, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(cloudX + 30, cloudY, 50, 0, Math.PI * 2);
+                ctx.fill();
+                ctx.beginPath();
+                ctx.arc(cloudX + 60, cloudY, 40, 0, Math.PI * 2);
+                ctx.fill();
+            }
 
             if (game.state === 'town') {
                 if (game.scene === 'overworld') {
