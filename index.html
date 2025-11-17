@@ -286,6 +286,32 @@
             color: #ffd700;
             margin: 15px 0 10px 0;
         }
+        /* New styles for keybinds */
+        .keybinds-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 15px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        .keybind-setting {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            background: rgba(90, 74, 58, 0.5);
+            padding: 10px;
+            border-radius: 10px;
+            border: 1px solid #8b6f47;
+        }
+        .keybind-setting span {
+            font-size: 14px;
+            font-weight: bold;
+        }
+        .keybind-btn {
+            width: 100px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
 <body>
@@ -330,10 +356,38 @@
         <div id="settingsModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Game Settings</h2>
-                <p>Current In-Game Time Speed: <strong>1 hour = 30 seconds</strong></p>
-                <p style="font-size: 14px; margin-top: 10px;">Press 'R' to return from dig sites</p>
-                <button id="restartTutorialInModal" class="action-button red">Restart Tutorial</button>
+                
+                <h3>Keybinds</h3>
+                <div class="keybinds-grid">
+                    <div class="keybind-setting">
+                        <span>Move Up:</span>
+                        <button id="keybind-up-btn" class="action-button keybind-btn" onclick="startKeybindChange('up')">W</button>
+                    </div>
+                    <div class="keybind-setting">
+                        <span>Move Down:</span>
+                        <button id="keybind-down-btn" class="action-button keybind-btn" onclick="startKeybindChange('down')">S</button>
+                    </div>
+                    <div class="keybind-setting">
+                        <span>Move Left:</span>
+                        <button id="keybind-left-btn" class="action-button keybind-btn" onclick="startKeybindChange('left')">A</button>
+                    </div>
+                    <div class="keybind-setting">
+                        <span>Move Right:</span>
+                        <button id="keybind-right-btn" class="action-button keybind-btn" onclick="startKeybindChange('right')">D</button>
+                    </div>
+                    <div class="keybind-setting">
+                        <span>Interact:</span>
+                        <button id="keybind-interact-btn" class="action-button keybind-btn" onclick="startKeybindChange('interact')">E</button>
+                    </div>
+                    <div class="keybind-setting">
+                        <span>Return (Dig):</span>
+                        <button id="keybind-return-btn" class="action-button keybind-btn" onclick="startKeybindChange('return')">R</button>
+                    </div>
+                </div>
+
+                <button id="restartTutorialInModal" class="action-button">Restart Tutorial</button>
                 <button id="showCreditsButton" class="action-button">📜 Credits</button>
+                <button id="resetProgressButton" class="action-button red">Reset All Progress</button>
                 <button id="closeSettingsModal" class="action-button">Close</button>
             </div>
         </div>
@@ -412,8 +466,8 @@
                     
                     <h3>Development Team:</h3>
                     <p><strong>Designers:</strong> Coach Sanchit, Marcus, Alex, Adi, Swara</p>
-                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI</p>
-                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit</p>
+                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI, Gemini</p>
+                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit, Gemini</p>
                     
                     <h3>Special Thanks:</h3>
                     <p>Our coaches and mentors<br>
@@ -445,8 +499,8 @@
                     
                     <h3>Development Team:</h3>
                     <p><strong>Designers:</strong> Coach Sanchit, Marcus, Alex, Adi, Swara</p>
-                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI</p>
-                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit</p>
+                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI, Gemini</p>
+                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit, Gemini</p>
                 </div>
                 
                 <button id="continueExploringButton" class="action-button">Continue Exploring</button>
@@ -461,6 +515,17 @@
                 <p>It's 11 PM. You should head home to sleep.</p>
                 <p>Time is frozen until you rest.</p>
                 <button id="closeLateNightModal" class="action-button">Understood</button>
+            </div>
+        </div>
+
+        <!-- New Confirmation Modal -->
+        <div id="confirmModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>Reset Progress?</h2>
+                <p>Are you sure you want to reset all your progress?</p>
+                <p>This action cannot be undone and will restart the game.</p>
+                <button id="confirmResetBtn" class="action-button red">Confirm Reset</button>
+                <button id="cancelResetBtn" class="action-button">Cancel</button>
             </div>
         </div>
     </div>
@@ -645,13 +710,22 @@
             map: [],
             mapObjects: [],
             ambianceElements: [],
+            backgroundTrees: [],
             digsites: [],
             currentDigsite: null,
             inventory: {},
             studiedArtifacts: {},
             researchPoints: 0,
-            time: { hour: 7, minute: 0, day: 1, frameCounter: 0 },
+            time: { hour: 9, minute: 0, day: 1, frameCounter: 0 },
             keys: {},
+            keybinds: {
+                up: 'w',
+                down: 's',
+                left: 'a',
+                right: 'd',
+                interact: 'e',
+                return: 'r'
+            },
             tutorialActive: true,
             tutorialStep: 0,
             offsetX: 0,
@@ -676,7 +750,7 @@
         const TUTORIAL_STEPS = [
             { text: "Welcome to Rune Hunters! You're an archaeologist studying ancient civilizations. Your mission is to excavate artifacts and learn about past cultures." },
             { text: "Archaeology is the study of human history through excavation and analysis of artifacts, structures, and other physical remains. Each discovery helps us understand how people lived thousands of years ago." },
-            { text: "Move around using Arrow Keys or WASD. The map shows your research base and surrounding areas where dig sites will appear." },
+            { text: "Move around using your movement keys (default: WASD). The map shows your research base and surrounding areas where dig sites will appear." },
             { text: "Dig sites (marked in light brown) appear randomly each day at 7 AM. Visit them before 5 PM when they close for the day." },
             { text: "The central building is your Research Laboratory. During the day, bring artifacts here to document them. At night (after 6 PM), you can study artifacts in detail for bonus research points!" },
             { text: "When you're ready to sleep, enter your Home building at night. This will start a new day with fresh dig sites. Time to start your archaeological journey!" }
@@ -697,6 +771,7 @@
         const messageBox = document.getElementById('messageBox');
         const messageText = document.getElementById('messageText');
         const nightOverlay = document.getElementById('nightOverlay');
+        let keyToChange = null; // Variable to track keybinding change
 
         function resizeCanvas() {
             canvas.width = window.innerWidth;
@@ -771,7 +846,7 @@
             for (let i = 0; i < treeCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
+                if (game.map[y] && game.map[y][x] === 'g') {
                     game.mapObjects.push(new MapObject(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'tree', 'Tree'));
                 }
             }
@@ -783,7 +858,7 @@
             for (let i = 0; i < rockCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
+                if (game.map[y] && game.map[y][x] === 'g') {
                     game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'rock'));
                 }
             }
@@ -791,9 +866,30 @@
             for (let i = 0; i < bushCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
+                if (game.map[y] && game.map[y][x] === 'g') {
                     game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'bush'));
                 }
+            }
+        }
+
+        function generateBackgroundTrees() {
+            game.backgroundTrees = [];
+            for (let i = 0; i < 30; i++) {
+                game.backgroundTrees.push({
+                    x: Math.random() * (MAP_WIDTH * TILE_SIZE),
+                    y: Math.random() * (MAP_HEIGHT * TILE_SIZE * 0.5),
+                    height: 60 + Math.random() * 40,
+                    size: 20 + Math.random() * 10
+                });
+            }
+            
+            for (let i = 0; i < 20; i++) {
+                game.backgroundTrees.push({
+                    x: Math.random() * (MAP_WIDTH * TILE_SIZE),
+                    y: Math.random() * (MAP_HEIGHT * TILE_SIZE * 0.5),
+                    type: 'bush',
+                    size: 15 + Math.random() * 10
+                });
             }
         }
 
@@ -1347,24 +1443,34 @@
         }
 
         function updateGame() {
-            if (!game.timeFrozen) {
+            // MODIFICATION 1: Added '!game.tutorialActive' to pause time during the tutorial
+            if (!game.timeFrozen && !game.tutorialActive) {
                 game.time.frameCounter++;
-                if (game.time.frameCounter % 30 === 0) {
-                    game.time.hour++;
-                    game.time.frameCounter = 0;
-                }
+                
+                // NEW LOGIC FOR MINUTES
+                // 30 frames = 0.5 seconds (1 in-game minute)
+                if (game.time.frameCounter % 30 === 0) { 
+                    game.time.minute++;
+                    game.time.frameCounter = 0; // Reset counter here
 
-                if (game.time.hour >= 23) {
-                    game.time.hour = 23;
-                    game.timeFrozen = true;
-                    if (!game.lateNightWarningShown) {
-                        game.lateNightWarningShown = true;
-                        document.getElementById('lateNightModal').style.display = 'flex';
+                    if (game.time.minute >= 60) {
+                        game.time.minute = 0;
+                        game.time.hour++;
+
+                        if (game.time.hour >= 23) {
+                            game.time.hour = 23;
+                            game.time.minute = 0; // Freeze time at 11:00 PM
+                            game.timeFrozen = true;
+                            if (!game.lateNightWarningShown) {
+                                game.lateNightWarningShown = true;
+                                document.getElementById('lateNightModal').style.display = 'flex';
+                            }
+                        }
+
+                        if (game.time.hour >= 24) {
+                            game.time.hour = 0;
+                        }
                     }
-                }
-
-                if (game.time.hour >= 24) {
-                    game.time.hour = 0;
                 }
             }
 
@@ -1401,10 +1507,10 @@
             let newY = game.player.y;
             let moving = false;
 
-            if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) { newY -= game.player.speed; moving = true; }
-            if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) { newY += game.player.speed; moving = true; }
-            if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) { newX -= game.player.speed; moving = true; }
-            if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) { newX += game.player.speed; moving = true; }
+            if (game.keys[game.keybinds.up]) { newY -= game.player.speed; moving = true; }
+            if (game.keys[game.keybinds.down]) { newY += game.player.speed; moving = true; }
+            if (game.keys[game.keybinds.left]) { newX -= game.player.speed; moving = true; }
+            if (game.keys[game.keybinds.right]) { newX += game.player.speed; moving = true; }
 
             game.player.isWalking = moving;
 
@@ -1416,10 +1522,10 @@
             }
 
             if (moving) {
-                if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) { game.player.dy = -1; game.player.dx = 0; }
-                else if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) { game.player.dy = 1; game.player.dx = 0; }
-                else if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) { game.player.dx = -1; game.player.dy = 0; }
-                else if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) { game.player.dx = 1; game.player.dy = 0; }
+                if (game.keys[game.keybinds.up]) { game.player.dy = -1; game.player.dx = 0; }
+                else if (game.keys[game.keybinds.down]) { game.player.dy = 1; game.player.dx = 0; }
+                else if (game.keys[game.keybinds.left]) { game.player.dx = -1; game.player.dy = 0; }
+                else if (game.keys[game.keybinds.right]) { game.player.dx = 1; game.player.dy = 0; }
             }
         }
 
@@ -1439,7 +1545,8 @@
         }
 
         function updateHUD() {
-            const timeFormatted = `${(game.time.hour % 12) || 12}:00 ${game.time.hour < 12 ? 'AM' : 'PM'}`;
+            const minutesFormatted = game.time.minute.toString().padStart(2, '0');
+            const timeFormatted = `${(game.time.hour % 12) || 12}:${minutesFormatted} ${game.time.hour < 12 ? 'AM' : 'PM'}`;
             timeDisplay.textContent = `${timeFormatted}, Day ${game.time.day}`;
             moneyDisplay.textContent = game.researchPoints;
 
@@ -1463,24 +1570,48 @@
         }
 
         function draw() {
-            ctx.fillStyle = '#e8f4f8';
+            // Draw forested background
+            ctx.fillStyle = '#2d5016';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            for (let i = 0; i < 20; i++) {
-                const cloudX = (i * 150 + game.time.frameCounter * 0.1) % canvas.width;
-                const cloudY = (i * 80) % canvas.height;
+            // Draw distant tree silhouettes (fixed positions that scroll with camera)
+            game.backgroundTrees.forEach(tree => {
+                const drawX = tree.x + game.offsetX * 0.3;
+                const drawY = tree.y + game.offsetY * 0.3;
                 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.6)';
-                ctx.beginPath();
-                ctx.arc(cloudX, cloudY, 40, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(cloudX + 30, cloudY, 50, 0, Math.PI * 2);
-                ctx.fill();
-                ctx.beginPath();
-                ctx.arc(cloudX + 60, cloudY, 40, 0, Math.PI * 2);
-                ctx.fill();
-            }
+                if (tree.type === 'bush') {
+                    // Background bush
+                    ctx.fillStyle = 'rgba(40, 70, 30, 0.4)';
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY, tree.size, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(drawX - tree.size * 0.6, drawY + tree.size * 0.3, tree.size * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.beginPath();
+                    ctx.arc(drawX + tree.size * 0.6, drawY + tree.size * 0.3, tree.size * 0.8, 0, Math.PI * 2);
+                    ctx.fill();
+                } else {
+                    // Background tree
+                    ctx.fillStyle = 'rgba(60, 40, 30, 0.4)';
+                    ctx.fillRect(drawX - 5, drawY, 10, tree.height);
+                    
+                    ctx.fillStyle = 'rgba(45, 80, 35, 0.5)';
+                    ctx.beginPath();
+                    ctx.moveTo(drawX, drawY - tree.size);
+                    ctx.lineTo(drawX - tree.size, drawY + tree.size);
+                    ctx.lineTo(drawX + tree.size, drawY + tree.size);
+                    ctx.closePath();
+                    ctx.fill();
+                    
+                    ctx.beginPath();
+                    ctx.moveTo(drawX, drawY);
+                    ctx.lineTo(drawX - tree.size * 0.8, drawY + tree.size * 0.75);
+                    ctx.lineTo(drawX + tree.size * 0.8, drawY + tree.size * 0.75);
+                    ctx.closePath();
+                    ctx.fill();
+                }
+            });
 
             if (game.state === 'town') {
                 if (game.scene === 'overworld') {
@@ -1693,7 +1824,7 @@
         }
 
         function startNewDay() {
-            game.time.hour = 7;
+            game.time.hour = 9;
             game.time.day++;
             game.studiedArtifacts = {};
             game.timeFrozen = false;
@@ -1942,14 +2073,35 @@
         }
 
         function handleKeydown(e) {
-            game.keys[e.key] = true;
-            if (e.key === 'e' || e.key === 'E') {
+            const pressedKey = e.key.toLowerCase();
+
+            // Handle keybinding change
+            if (keyToChange) {
+                // Check if key is already used
+                if (Object.values(game.keybinds).includes(pressedKey)) {
+                    showMessage("Key already in use!");
+                } else if (pressedKey.length > 1 && pressedKey !== 'arrowup' && pressedKey !== 'arrowdown' && pressedKey !== 'arrowleft' && pressedKey !== 'arrowright' && pressedKey !== 'space') {
+                    // Basic filter for unwanted keys (like 'Shift', 'Control')
+                    // You can expand this logic if needed
+                    showMessage("Please choose a simpler key.");
+                } else {
+                    game.keybinds[keyToChange] = pressedKey;
+                    showMessage(`Set ${keyToChange} to ${pressedKey.toUpperCase()}`);
+                }
+                populateKeybinds(); // Reset button text
+                keyToChange = null;
+                e.preventDefault();
+                return;
+            }
+
+            game.keys[pressedKey] = true;
+            if (pressedKey === game.keybinds.interact) {
                 e.preventDefault();
                 if (!game.tutorialActive) {
                     handleInteraction();
                 }
             }
-            if (game.state === 'digsite' && (e.key === 'r' || e.key === 'R')) {
+            if (game.state === 'digsite' && (pressedKey === game.keybinds.return)) {
                 game.state = 'town';
                 game.currentLayer = 0;
                 showMessage("Returning to base camp.");
@@ -1957,7 +2109,7 @@
         }
 
         function handleKeyup(e) {
-            game.keys[e.key] = false;
+            game.keys[e.key.toLowerCase()] = false;
         }
 
         function handleMouseClick(e) {
@@ -1977,6 +2129,7 @@
         });
 
         document.getElementById('settingsButton').addEventListener('click', () => {
+            populateKeybinds();
             document.getElementById('settingsModal').style.display = 'flex';
         });
 
@@ -1989,6 +2142,21 @@
             game.tutorialStep = 0;
             document.getElementById('settingsModal').style.display = 'none';
             showMessage("Tutorial restarted.");
+        });
+
+        document.getElementById('resetProgressButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'none';
+            document.getElementById('confirmModal').style.display = 'flex';
+        });
+
+        document.getElementById('confirmResetBtn').addEventListener('click', () => {
+            // Easiest way to reset all progress is to reload the page
+            location.reload();
+        });
+
+        document.getElementById('cancelResetBtn').addEventListener('click', () => {
+            document.getElementById('confirmModal').style.display = 'none';
+            document.getElementById('settingsModal').style.display = 'flex';
         });
 
         document.getElementById('closeArtifactModal').addEventListener('click', () => {
@@ -2045,15 +2213,35 @@
             game.scene = 'overworld';
         });
 
+        // --- New Keybind Functions ---
+        function populateKeybinds() {
+            document.getElementById('keybind-up-btn').textContent = game.keybinds.up.toUpperCase();
+            document.getElementById('keybind-down-btn').textContent = game.keybinds.down.toUpperCase();
+            document.getElementById('keybind-left-btn').textContent = game.keybinds.left.toUpperCase();
+            document.getElementById('keybind-right-btn').textContent = game.keybinds.right.toUpperCase();
+            document.getElementById('keybind-interact-btn').textContent = game.keybinds.interact.toUpperCase();
+            document.getElementById('keybind-return-btn').textContent = game.keybinds.return.toUpperCase();
+        }
+
+        function startKeybindChange(action) {
+            keyToChange = action;
+            document.getElementById(`keybind-${action}-btn`).textContent = "...";
+            // Show a message to the user
+            showMessage(`Press any key to set new bind for: ${action.toUpperCase()}`);
+        }
+        // --- End New Keybind Functions ---
+
         window.studyArtifact = studyArtifact;
         window.unlockResearch = unlockResearch;
+        window.startKeybindChange = startKeybindChange; // Make accessible to HTML
 
         function initGame() {
             resizeCanvas();
             game.map = createMap();
+            generateDigsites();
             generateMapObjects();
             generateAmbiance();
-            generateDigsites();
+            generateBackgroundTrees();
             updateHUD();
             
             window.addEventListener('resize', resizeCanvas);
