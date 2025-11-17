@@ -407,15 +407,15 @@
                 <h2>📜 Game Credits</h2>
                 <div class="credits-section">
                     <h3>Created For:</h3>
-                    <p><strong>FIRST LEGO League (FLL) – 2024/2025 "Unearthed" Season</strong></p>
+                    <p><strong>FIRST LEGO League (FLL) – 2025/2026 "Unearthed" Season</strong></p>
                     
                     <h3>Innovation Project by:</h3>
                     <p><strong>Team 56913 — IDK R0B0B0ns</strong></p>
                     
                     <h3>Development Team:</h3>
-                    <p>Game Designer: [Team Member Name]<br>
-                    Lead Programmer: [Team Member Name]<br>
-                    Content Designer: [Team Member Name]</p>
+                    <p><strong>Designers:</strong> Coach Sanchit, Marcus, Alex, Adi, Swara</p>
+                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI</p>
+                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit</p>
                     
                     <h3>Special Thanks:</h3>
                     <p>Our coaches and mentors<br>
@@ -1524,7 +1524,7 @@
         }
 
         function drawMinimap() {
-            const scale = 4;
+            const scale = 6;
             const minimapW = MAP_WIDTH * scale;
             const minimapH = MAP_HEIGHT * scale;
             
@@ -1551,36 +1551,45 @@
                 }
             }
 
-            // --- NEW: Add building labels ---
-            minimapCtx.font = '8px Comfortaa';
+            // --- UPDATED: Larger text labels centered on buildings ---
+            minimapCtx.font = 'bold 13px Comfortaa';
             minimapCtx.textAlign = 'center';
             minimapCtx.fillStyle = '#f4e4c1';
             minimapCtx.strokeStyle = '#1a1410';
-            minimapCtx.lineWidth = 2;
+            minimapCtx.lineWidth = 3;
             
-            // Lab label (center)
+            // Lab label (center of building: y=10-14, x=18-26, center at 22, 12)
             const labX = offsetX + 22 * scale;
-            const labY = offsetY + 12 * scale;
+            const labY = offsetY + 12.5 * scale;
             minimapCtx.strokeText('Lab', labX, labY);
             minimapCtx.fillText('Lab', labX, labY);
             
-            // Home label (bottom left)
+            // Home label (center of building: y=35-39, x=5-9, center at 7, 37)
             const homeX = offsetX + 7 * scale;
-            const homeY = offsetY + 37 * scale;
+            const homeY = offsetY + 37.5 * scale;
             minimapCtx.strokeText('Home', homeX, homeY);
             minimapCtx.fillText('Home', homeX, homeY);
             
-            // Quest Room label (top right)
+            // Quest Room label (center of building: y=5-9, x=35-39, center at 37, 7)
             const questX = offsetX + 37 * scale;
-            const questY = offsetY + 7 * scale;
-            minimapCtx.strokeText('Quest', questX, questY);
-            minimapCtx.fillText('Quest', questX, questY);
+            const questY = offsetY + 7.5 * scale;
+            minimapCtx.strokeText('QuestRoom', questX, questY);
+            minimapCtx.fillText('QuestRoom', questX, questY);
+
+            // --- NEW: Label dig sites ---
+            minimapCtx.font = 'bold 11px Comfortaa';
+            game.digsites.forEach((site, index) => {
+                const digX = offsetX + site.x * scale;
+                const digY = offsetY + site.y * scale;
+                minimapCtx.strokeText('Dig', digX, digY);
+                minimapCtx.fillText('Dig', digX, digY);
+            });
 
             // Player position
             const playerX = Math.floor(game.player.x / TILE_SIZE);
             const playerY = Math.floor(game.player.y / TILE_SIZE);
             minimapCtx.fillStyle = '#ff4444';
-            minimapCtx.fillRect(offsetX + playerX * scale - 1, offsetY + playerY * scale - 1, scale + 2, scale + 2);
+            minimapCtx.fillRect(offsetX + playerX * scale - 1.5, offsetY + playerY * scale - 1.5, scale + 3, scale + 3);
         }
 
         // --- UPDATED: Handle interactions with all buildings ---
