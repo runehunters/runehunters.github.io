@@ -181,7 +181,6 @@
             font-size: 12px;
             line-height: 1.5;
         }
-        /* --- NEW: Night overlay with fade animation --- */
         #nightOverlay {
             position: absolute;
             top: 0;
@@ -207,7 +206,6 @@
             font-size: 12px;
             margin: 5px 5px 0 0;
         }
-        /* --- NEW: Research Tree styles --- */
         .research-tree {
             display: grid;
             gap: 15px;
@@ -245,7 +243,6 @@
             font-size: 12px;
             margin-top: 5px;
         }
-        /* --- NEW: Quest Board styles --- */
         .quest-pack {
             border: 2px solid #8b6f47;
             padding: 15px;
@@ -280,7 +277,6 @@
             height: 100%;
             transition: width 0.3s;
         }
-        /* --- NEW: Credits styles --- */
         .credits-section {
             text-align: left;
             line-height: 1.8;
@@ -334,7 +330,7 @@
         <div id="settingsModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>Game Settings</h2>
-                <p>Current In-Game Time Speed: <strong>3x Slower</strong></p>
+                <p>Current In-Game Time Speed: <strong>1 hour = 30 seconds</strong></p>
                 <p style="font-size: 14px; margin-top: 10px;">Press 'R' to return from dig sites</p>
                 <button id="restartTutorialInModal" class="action-button red">Restart Tutorial</button>
                 <button id="showCreditsButton" class="action-button">📜 Credits</button>
@@ -351,7 +347,7 @@
             </div>
         </div>
 
-        <!-- --- NEW: Documentation Modal (replaces in-lab UI) --- -->
+        <!-- Documentation Modal -->
         <div id="documentationModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>📋 Document Artifacts</h2>
@@ -381,7 +377,7 @@
             </div>
         </div>
 
-        <!-- --- NEW: Research Tree Modal --- -->
+        <!-- Research Tree Modal -->
         <div id="researchTreeModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>🔬 Research Tree</h2>
@@ -391,7 +387,7 @@
             </div>
         </div>
 
-        <!-- --- NEW: Quest Board Modal --- -->
+        <!-- Quest Board Modal -->
         <div id="questBoardModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>📋 Quest Board</h2>
@@ -401,16 +397,18 @@
             </div>
         </div>
 
-        <!-- --- NEW: Credits Modal --- -->
+        <!-- Credits Modal -->
         <div id="creditsModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>📜 Game Credits</h2>
                 <div class="credits-section">
+                    <p><strong>Version 2.0 - Released November 16, 2025</strong></p>
+                    
                     <h3>Created For:</h3>
                     <p><strong>FIRST LEGO League (FLL) – 2025/2026 "Unearthed" Season</strong></p>
                     
                     <h3>Innovation Project by:</h3>
-                    <p><strong>Team 56913 — IDK R0B0B0ns</strong></p>
+                    <p><strong>Team 56913 – IDK R0B0B0ns</strong></p>
                     
                     <h3>Development Team:</h3>
                     <p><strong>Designers:</strong> Coach Sanchit, Marcus, Alex, Adi, Swara</p>
@@ -429,7 +427,7 @@
             </div>
         </div>
 
-        <!-- --- NEW: Mission Complete Modal --- -->
+        <!-- Mission Complete Modal -->
         <div id="missionCompleteModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>🏆 Mission Complete!</h2>
@@ -437,16 +435,18 @@
                 <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
                 
                 <div class="credits-section">
+                    <p><strong>Version 2.0 - Released November 16, 2025</strong></p>
+                    
                     <h3>Created For:</h3>
                     <p><strong>FIRST LEGO League (FLL) – 2024/2025 "Unearthed" Season</strong></p>
                     
                     <h3>Innovation Project by:</h3>
-                    <p><strong>Team 56913 — IDK R0B0B0ns</strong></p>
+                    <p><strong>Team 56913 – IDK R0B0B0ns</strong></p>
                     
                     <h3>Development Team:</h3>
-                    <p>Game Designer: [Team Member Name]<br>
-                    Lead Programmer: [Team Member Name]<br>
-                    Content Designer: [Team Member Name]</p>
+                    <p><strong>Designers:</strong> Coach Sanchit, Marcus, Alex, Adi, Swara</p>
+                    <p><strong>Lead Programmers:</strong> Coach Sanchit, Claude AI</p>
+                    <p><strong>Content Designers:</strong> ChatGPT, Claude AI, Coach Sanchit</p>
                 </div>
                 
                 <button id="continueExploringButton" class="action-button">Continue Exploring</button>
@@ -454,7 +454,7 @@
             </div>
         </div>
 
-        <!-- --- NEW: Late Night Warning Modal --- -->
+        <!-- Late Night Warning Modal -->
         <div id="lateNightModal" class="modal-overlay" style="display: none;">
             <div class="modal-content">
                 <h2>🌙 It's Late...</h2>
@@ -472,7 +472,6 @@
         const DIGSITE_SIZE = 15;
         const DIGSITE_COUNT = 4;
 
-        // --- UPDATED: Artifact values rebalanced ---
         const ARTIFACTS = {
             pottery: {
                 name: "Ancient Pottery Shard",
@@ -538,7 +537,6 @@
 
         const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
 
-        // --- NEW: Research Tree upgrades with pun names ---
         const RESEARCH_TREE = {
             tier1: [
                 { id: 'brush1', name: 'Brush With Greatness', cost: 150, effect: '+10% dig speed', tier: 1, unlocked: false },
@@ -548,42 +546,41 @@
                 { id: 'questpack1', name: 'Open Sesame-Stone', cost: 100, effect: 'Unlock Quest Pack 1', tier: 1, unlocked: false }
             ],
             tier2: [
-                { id: 'brush2', name: 'Brush Hour 2: Even Brushier', cost: 400, effect: '+15% dig speed', tier: 2, requires: 2, unlocked: false },
-                { id: 'shovel2', name: 'Shovel With the Punches', cost: 600, effect: '+20% dig speed', tier: 2, requires: 2, unlocked: false },
-                { id: 'scan1', name: 'Scan-You-Dig-It?', cost: 700, effect: '10% reveal chance', tier: 2, requires: 2, unlocked: false },
-                { id: 'paperwork', name: 'Paperwork Makes the Dream Work', cost: 500, effect: '+15% documentation RP', tier: 2, requires: 2, unlocked: false },
-                { id: 'questpack2', name: 'Quest-ionable Methods', cost: 300, effect: 'Unlock Quest Pack 2', tier: 2, requires: 2, unlocked: false }
+                { id: 'brush2', name: 'Brush Hour 2: Even Brushier', cost: 400, effect: '+15% dig speed', tier: 2, unlocked: false },
+                { id: 'shovel2', name: 'Shovel With the Punches', cost: 600, effect: '+20% dig speed', tier: 2, unlocked: false },
+                { id: 'scan1', name: 'Scan-You-Dig-It?', cost: 700, effect: '10% reveal chance', tier: 2, unlocked: false },
+                { id: 'paperwork', name: 'Paperwork Makes the Dream Work', cost: 500, effect: '+15% documentation RP', tier: 2, unlocked: false },
+                { id: 'questpack2', name: 'Quest-ionable Methods', cost: 300, effect: 'Unlock Quest Pack 2', tier: 2, unlocked: false }
             ],
             radar: [
-                { id: 'radar1', name: 'Peek Performance', cost: 300, effect: 'See 2 layers', tier: 2, requires: 2, unlocked: false },
-                { id: 'radar2', name: 'Double-Down Depth Detector', cost: 600, effect: 'See 3 layers', tier: 2, requires: 2, unlocked: false },
-                { id: 'radar3', name: 'Depth Charge', cost: 1200, effect: 'See 4 layers, +25% detect', tier: 3, requires: 3, unlocked: false },
-                { id: 'radar4', name: 'All-Seeing Eye-chaeology', cost: 1800, effect: 'See 5 layers, +50% detect', tier: 3, requires: 3, unlocked: false }
+                { id: 'radar1', name: 'Peek Performance', cost: 300, effect: 'See 2 layers', tier: 2, unlocked: false },
+                { id: 'radar2', name: 'Double-Down Depth Detector', cost: 600, effect: 'See 3 layers', tier: 2, unlocked: false },
+                { id: 'radar3', name: 'Depth Charge', cost: 1200, effect: 'See 4 layers, +25% detect', tier: 3, unlocked: false },
+                { id: 'radar4', name: 'All-Seeing Eye-chaeology', cost: 1800, effect: 'See 5 layers, +50% detect', tier: 3, unlocked: false }
             ],
             tier3: [
-                { id: 'tools3', name: 'Dig-nificantly Better Tools', cost: 1200, effect: '+30% dig speed', tier: 3, requires: 3, unlocked: false },
-                { id: 'scan2', name: "Now We're Scannin' Business", cost: 1400, effect: '20% reveal chance', tier: 3, requires: 3, unlocked: false },
-                { id: 'keep', name: 'Keep It Together', cost: 1100, effect: '+20% artifact value', tier: 3, requires: 3, unlocked: false },
-                { id: 'map', name: 'Map-tastic Insights', cost: 900, effect: 'Show digsite contents', tier: 3, requires: 3, unlocked: false },
-                { id: 'questpack3', name: 'Quest For Success', cost: 900, effect: 'Unlock Quest Pack 3', tier: 3, requires: 3, unlocked: false }
+                { id: 'tools3', name: 'Dig-nificantly Better Tools', cost: 1200, effect: '+30% dig speed', tier: 3, unlocked: false },
+                { id: 'scan2', name: "Now We're Scannin' Business", cost: 1400, effect: '20% reveal chance', tier: 3, unlocked: false },
+                { id: 'keep', name: 'Keep It Together', cost: 1100, effect: '+20% artifact value', tier: 3, unlocked: false },
+                { id: 'map', name: 'Map-tastic Insights', cost: 900, effect: 'Show digsite contents', tier: 3, unlocked: false },
+                { id: 'questpack3', name: 'Quest For Success', cost: 900, effect: 'Unlock Quest Pack 3', tier: 3, unlocked: false }
             ],
             tier4: [
-                { id: 'dig4', name: 'Dig Like No Tomorrow', cost: 2500, effect: '+40% dig speed', tier: 4, requires: 4, unlocked: false },
-                { id: 'laser', name: 'Laser Focused', cost: 3000, effect: '30% reveal chance', tier: 4, requires: 4, unlocked: false },
-                { id: 'research', name: 'Research and Destroy', cost: 2400, effect: '+30% all RP', tier: 4, requires: 4, unlocked: false },
-                { id: 'labgo', name: 'Lab On the Go-pher', cost: 2800, effect: 'Field documentation', tier: 4, requires: 4, unlocked: false },
-                { id: 'questpack4', name: 'A Quest-ion of Time', cost: 1200, effect: 'Unlock Quest Pack 4', tier: 4, requires: 4, unlocked: false }
+                { id: 'dig4', name: 'Dig Like No Tomorrow', cost: 2500, effect: '+40% dig speed', tier: 4, unlocked: false },
+                { id: 'laser', name: 'Laser Focused', cost: 3000, effect: '30% reveal chance', tier: 4, unlocked: false },
+                { id: 'research', name: 'Research and Destroy', cost: 2400, effect: '+30% all RP', tier: 4, unlocked: false },
+                { id: 'labgo', name: 'Lab On the Go-pher', cost: 2800, effect: 'Field documentation', tier: 4, unlocked: false },
+                { id: 'questpack4', name: 'A Quest-ion of Time', cost: 1200, effect: 'Unlock Quest Pack 4', tier: 4, unlocked: false }
             ],
             tier5: [
-                { id: 'myth', name: 'Myth-Understandings', cost: 1000, effect: 'Storyline: Ancient myths', tier: 5, requires: 5, unlocked: false },
-                { id: 'runes', name: 'Read Between the Runes', cost: 1800, effect: 'Storyline: Decipher runes', tier: 5, requires: 5, unlocked: false },
-                { id: 'lost', name: 'Lost But Not Forgotten', cost: 2400, effect: 'Storyline: Lost civilization', tier: 5, requires: 5, unlocked: false },
-                { id: 'together', name: 'Putting It All Together', cost: 3000, effect: 'Storyline: Final pieces', tier: 5, requires: 5, unlocked: false },
-                { id: 'victory', name: 'Dig Victory', cost: 4000, effect: 'FINAL: Mission Complete!', tier: 5, requires: 5, unlocked: false }
+                { id: 'myth', name: 'Myth-Understandings', cost: 1000, effect: 'Storyline: Ancient myths', tier: 5, unlocked: false },
+                { id: 'runes', name: 'Read Between the Runes', cost: 1800, effect: 'Storyline: Decipher runes', tier: 5, unlocked: false },
+                { id: 'lost', name: 'Lost But Not Forgotten', cost: 2400, effect: 'Storyline: Lost civilization', tier: 5, unlocked: false },
+                { id: 'together', name: 'Putting It All Together', cost: 3000, effect: 'Storyline: Final pieces', tier: 5, unlocked: false },
+                { id: 'victory', name: 'Dig Victory', cost: 4000, effect: 'FINAL: Mission Complete!', tier: 5, unlocked: false }
             ]
         };
 
-        // --- NEW: Quest system with tiered packs ---
         const QUEST_PACKS = {
             pack1: {
                 name: "Beginner's Luck",
@@ -634,7 +631,7 @@
 
         let game = {
             state: 'town',
-            scene: 'overworld', // 'overworld', 'lab_interior', 'home_interior', 'quest_interior'
+            scene: 'overworld',
             player: { 
                 x: (MAP_WIDTH / 2) * TILE_SIZE, 
                 y: (MAP_HEIGHT / 2) * TILE_SIZE, 
@@ -664,7 +661,6 @@
             timeFrozen: false,
             lateNightWarningShown: false,
             labPopupShown: false,
-            // --- NEW: Quest tracking ---
             questProgress: {
                 totalCollected: 0,
                 totalStudied: 0,
@@ -673,7 +669,6 @@
                 epicCollected: 0,
                 legendaryCollected: 0
             },
-            // --- NEW: Layer-based digging ---
             visibleLayers: 1,
             currentLayer: 0
         };
@@ -710,47 +705,39 @@
             minimapCanvas.height = 300;
         }
 
-        // --- UPDATED: Map includes Home and Quest Room buildings ---
         function createMap() {
             const map = Array(MAP_HEIGHT).fill(null).map(() => Array(MAP_WIDTH).fill('g'));
 
-            // Central path
             for (let y = 5; y < 40; y++) {
                 for (let x = 20; x < 25; x++) {
                     map[y][x] = 'p';
                 }
             }
 
-            // Research Laboratory building (center)
             for (let y = 10; y < 15; y++) {
                 for (let x = 18; x < 27; x++) {
                     map[y][x] = 'b';
                 }
             }
 
-            // --- NEW: Home building (bottom left area) ---
             for (let y = 35; y < 40; y++) {
                 for (let x = 5; x < 10; x++) {
                     map[y][x] = 'h';
                 }
             }
 
-            // --- NEW: Quest Room building (top right area) ---
             for (let y = 5; y < 10; y++) {
                 for (let x = 35; x < 40; x++) {
                     map[y][x] = 'q';
                 }
             }
 
-            // Additional paths for accessibility
             for (let x = 5; x < 40; x++) {
                 map[22][x] = 'p';
             }
-            // Path to home
             for (let y = 22; y < 38; y++) {
                 map[y][7] = 'p';
             }
-            // Path to quest room
             for (let y = 5; y < 23; y++) {
                 map[y][37] = 'p';
             }
@@ -772,13 +759,19 @@
             this.type = type;
         }
 
+        function isPositionBlocked(x, y) {
+            if (x < 0 || x >= MAP_WIDTH || y < 0 || y >= MAP_HEIGHT) return true;
+            const tileType = game.map[y][x];
+            return tileType === 'b' || tileType === 'h' || tileType === 'q' || tileType === 'd';
+        }
+
         function generateMapObjects() {
             game.mapObjects = [];
             const treeCount = MAP_WIDTH * MAP_HEIGHT / 20;
             for (let i = 0; i < treeCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g') {
+                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
                     game.mapObjects.push(new MapObject(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'tree', 'Tree'));
                 }
             }
@@ -790,7 +783,7 @@
             for (let i = 0; i < rockCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g') {
+                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
                     game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'rock'));
                 }
             }
@@ -798,14 +791,13 @@
             for (let i = 0; i < bushCount; i++) {
                 const x = Math.floor(Math.random() * MAP_WIDTH);
                 const y = Math.floor(Math.random() * MAP_HEIGHT);
-                if (game.map[y] && game.map[y][x] === 'g') {
+                if (game.map[y] && game.map[y][x] === 'g' && !isPositionBlocked(x, y)) {
                     game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'bush'));
                 }
             }
         }
 
         function generateDigsites() {
-            // Clear old digsites from map
             for (let y = 0; y < MAP_HEIGHT; y++) {
                 for (let x = 0; x < MAP_WIDTH; x++) {
                     if (game.map[y][x] === 'd') {
@@ -851,7 +843,6 @@
             }
         }
 
-        // --- UPDATED: Layer-based digsite generation ---
         function generateDigsiteContent() {
             const rows = 3;
             const cols = 15;
@@ -893,7 +884,6 @@
             game.currentDigsite.dirtCount = (rows * cols) - game.currentDigsite.artifactCount;
         }
 
-        // --- UPDATED: Draw map with Home and Quest Room ---
         function drawMap() {
             const drawnDigsites = new Set();
             
@@ -917,20 +907,16 @@
                     ctx.fillStyle = color;
                     ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
                     
-                    // Add external texture to Research Lab
                     if (game.map[y][x] === 'b') {
-                        // Windows
                         ctx.fillStyle = '#5a8a8a';
                         if ((x + y) % 3 === 0) {
                             ctx.fillRect(tileX + 8, tileY + 8, 16, 16);
                         }
-                        // Bricks pattern
                         ctx.strokeStyle = '#6a5a3a';
                         ctx.lineWidth = 1;
                         ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
                         ctx.strokeRect(tileX, tileY + TILE_SIZE/2, TILE_SIZE, 1);
                         
-                        // Door marker on center tiles
                         if (x === 22 && y === 14) {
                             ctx.fillStyle = '#3a2a1a';
                             ctx.fillRect(tileX + 6, tileY + 10, 20, 20);
@@ -940,10 +926,45 @@
                             ctx.fill();
                         }
                     }
+                    
+                    if (game.map[y][x] === 'h') {
+                        ctx.fillStyle = '#4a3a2a';
+                        if ((x + y) % 2 === 0) {
+                            ctx.fillRect(tileX + 4, tileY + 4, 24, 24);
+                        }
+                        ctx.strokeStyle = '#3a2a1a';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                        
+                        if (x === 7 && y === 39) {
+                            ctx.fillStyle = '#8a4a4a';
+                            ctx.fillRect(tileX + 10, tileY + 12, 12, 16);
+                            ctx.fillStyle = '#d4a574';
+                            ctx.beginPath();
+                            ctx.arc(tileX + 18, tileY + 20, 2, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                    
+                    if (game.map[y][x] === 'q') {
+                        ctx.fillStyle = '#5a4a5a';
+                        if ((x + y) % 2 === 1) {
+                            ctx.fillRect(tileX + 6, tileY + 6, 20, 20);
+                        }
+                        ctx.strokeStyle = '#4a3a4a';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                        
+                        if (x === 37 && y === 9) {
+                            ctx.fillStyle = '#6a5a3a';
+                            ctx.fillRect(tileX + 8, tileY + 10, 16, 18);
+                            ctx.fillStyle = '#ffd700';
+                            ctx.fillRect(tileX + 10, tileY + 12, 12, 12);
+                        }
+                    }
                 }
             }
 
-            // --- UPDATED: Draw single label per digsite ---
             game.digsites.forEach(site => {
                 const centerX = site.x * TILE_SIZE + game.offsetX;
                 const centerY = site.y * TILE_SIZE + game.offsetY;
@@ -1067,25 +1088,21 @@
             ctx.fillRect(x + 2, y + 16 + rightLegOffset, 3, 4);
         }
 
-        // --- NEW: Draw interior scenes ---
         function drawLabInterior() {
             ctx.fillStyle = '#8a7a6a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
 
-            // Walls
             ctx.fillStyle = '#5a4a3a';
             ctx.fillRect(0, 0, canvas.width, 20);
             ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
             ctx.fillRect(0, 0, 20, canvas.height);
             ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
 
-            // Furniture - desks/tables
             ctx.fillStyle = '#4a3a2a';
             ctx.fillRect(100, 100, 80, 50);
             ctx.fillRect(canvas.width - 180, 100, 80, 50);
             ctx.fillRect(canvas.width / 2 - 60, canvas.height - 120, 120, 60);
 
-            // Equipment
             ctx.fillStyle = '#3a5a5a';
             ctx.fillRect(120, 110, 40, 30);
 
@@ -1096,7 +1113,6 @@
             ctx.font = '12px Comfortaa';
             ctx.fillText('Press E to exit', canvas.width / 2, canvas.height - 40);
             
-            // Auto-trigger documentation popup
             if (game.scene === 'lab_interior' && !game.labPopupShown) {
                 game.labPopupShown = true;
                 setTimeout(() => documentArtifacts(), 300);
@@ -1113,16 +1129,6 @@
             ctx.fillRect(0, 0, 20, canvas.height);
             ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
 
-            // Bed
-            ctx.fillStyle = '#6a3a3a';
-            ctx.fillRect(100, canvas.height / 2 - 40, 100, 80);
-            ctx.fillStyle = '#8a4a4a';
-            ctx.fillRect(100, canvas.height / 2 - 40, 100, 20);
-
-            // Furniture
-            ctx.fillStyle = '#4a3a2a';
-            ctx.fillRect(canvas.width - 150, 100, 60, 60);
-
             ctx.fillStyle = '#f4e4c1';
             ctx.font = '16px Comfortaa';
             ctx.textAlign = 'center';
@@ -1131,7 +1137,6 @@
             ctx.fillText('Press E to exit', canvas.width / 2, canvas.height - 40);
         }
 
-        // --- NEW: Draw Quest Room with NPC ---
         function drawQuestInterior() {
             ctx.fillStyle = '#7a7a6a';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
@@ -1142,7 +1147,6 @@
             ctx.fillRect(0, 0, 20, canvas.height);
             ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
 
-            // Quest board on wall
             ctx.fillStyle = '#4a3a2a';
             ctx.fillRect(canvas.width / 2 - 80, 80, 160, 120);
             ctx.fillStyle = '#f4e4c1';
@@ -1150,25 +1154,20 @@
             ctx.textAlign = 'center';
             ctx.fillText('Quest Board', canvas.width / 2, 140);
 
-            // Quest Master NPC (simple placeholder)
             const npcX = canvas.width / 2;
             const npcY = canvas.height / 2 + 40;
             
-            // Body
             ctx.fillStyle = '#5a3a6a';
             ctx.fillRect(npcX - 15, npcY - 20, 30, 40);
             
-            // Head
             ctx.fillStyle = '#d4a574';
             ctx.beginPath();
             ctx.arc(npcX, npcY - 30, 12, 0, Math.PI * 2);
             ctx.fill();
             
-            // Hat
             ctx.fillStyle = '#3a2a4a';
             ctx.fillRect(npcX - 14, npcY - 35, 28, 8);
             
-            // Label
             ctx.fillStyle = '#f4e4c1';
             ctx.font = '12px Comfortaa';
             ctx.fillText('Quest Master', npcX, npcY + 35);
@@ -1200,7 +1199,6 @@
             return false;
         }
 
-        // --- UPDATED: Get interaction target includes Home and Quest Room ---
         function getInteractionTarget() {
             if (game.scene !== 'overworld') {
                 return { type: 'exit', name: 'Exit Building' };
@@ -1230,7 +1228,6 @@
             return null;
         }
 
-        // --- UPDATED: Layer-based digsite drawing ---
         function drawDigsite() {
             const rows = 3;
             const cols = 15;
@@ -1240,7 +1237,6 @@
             const startX = (canvas.width - gridW) / 2;
             const startY = (canvas.height - gridH) / 2;
 
-            // Get visible layers based on research upgrades
             let visibleLayers = 1;
             if (getResearchUnlocked('radar1')) visibleLayers = 2;
             if (getResearchUnlocked('radar2')) visibleLayers = 3;
@@ -1266,7 +1262,6 @@
                     ctx.fillStyle = color;
                     ctx.fillRect(tileX, tileY, cellSize - 2, cellSize - 2);
 
-                    // Only show "?" on visible, unexcavated artifacts
                     if (cell !== null && cell !== 'dug' && isVisible) {
                         ctx.fillStyle = '#f4e4c1';
                         ctx.font = '20px Comfortaa';
@@ -1283,7 +1278,6 @@
             ctx.fillText(`Press 'R' to return to base`, canvas.width / 2, startY - 40);
         }
 
-        // --- UPDATED: Layer-based digging ---
         function dig(mouseX, mouseY) {
             const rows = 3;
             const cols = 15;
@@ -1299,7 +1293,6 @@
             if (gridX >= 0 && gridX < cols && gridY >= 0 && gridY < rows) {
                 const cell = game.currentDigsite.grid[gridY][gridX];
 
-                // Can only dig current layer
                 if (gridY !== game.currentLayer) {
                     showMessage("You must clear the current layer first!");
                     return;
@@ -1312,7 +1305,6 @@
                     game.currentDigsite.artifactCount--;
                     game.currentDigsite.dirtCount--;
                     
-                    // --- NEW: Update quest progress ---
                     game.questProgress.totalCollected++;
                     if (artifact.rarity === 'rare') game.questProgress.rareCollected++;
                     if (artifact.rarity === 'epic') game.questProgress.epicCollected++;
@@ -1325,7 +1317,6 @@
                     game.currentDigsite.dirtCount--;
                 }
 
-                // Check if current layer is complete
                 let layerComplete = true;
                 for (let x = 0; x < cols; x++) {
                     if (game.currentDigsite.grid[gridY][x] !== 'dug') {
@@ -1355,16 +1346,14 @@
             document.getElementById('artifactModal').style.display = 'flex';
         }
 
-        // --- UPDATED: Time system with freeze at 11 PM ---
         function updateGame() {
             if (!game.timeFrozen) {
                 game.time.frameCounter++;
-                if (game.time.frameCounter % 180 === 0) {
+                if (game.time.frameCounter % 30 === 0) {
                     game.time.hour++;
                     game.time.frameCounter = 0;
                 }
 
-                // Freeze time at 11 PM
                 if (game.time.hour >= 23) {
                     game.time.hour = 23;
                     game.timeFrozen = true;
@@ -1379,7 +1368,6 @@
                 }
             }
 
-            // --- UPDATED: Smooth night fade animation ---
             game.isNight = game.time.hour >= 18 || game.time.hour < 6;
             const targetOpacity = game.isNight ? 0.6 : 0;
             
@@ -1475,11 +1463,9 @@
         }
 
         function draw() {
-            // --- NEW: Draw cloudy background instead of black ---
             ctx.fillStyle = '#e8f4f8';
             ctx.fillRect(0, 0, canvas.width, canvas.height);
             
-            // Draw cloud pattern
             for (let i = 0; i < 20; i++) {
                 const cloudX = (i * 150 + game.time.frameCounter * 0.1) % canvas.width;
                 const cloudY = (i * 80) % canvas.height;
@@ -1551,32 +1537,27 @@
                 }
             }
 
-            // --- UPDATED: Larger text labels centered on buildings ---
             minimapCtx.font = 'bold 13px Comfortaa';
             minimapCtx.textAlign = 'center';
             minimapCtx.fillStyle = '#f4e4c1';
             minimapCtx.strokeStyle = '#1a1410';
             minimapCtx.lineWidth = 3;
             
-            // Lab label (center of building: y=10-14, x=18-26, center at 22, 12)
             const labX = offsetX + 22 * scale;
             const labY = offsetY + 12.5 * scale;
             minimapCtx.strokeText('Lab', labX, labY);
             minimapCtx.fillText('Lab', labX, labY);
             
-            // Home label (center of building: y=35-39, x=5-9, center at 7, 37)
             const homeX = offsetX + 7 * scale;
             const homeY = offsetY + 37.5 * scale;
             minimapCtx.strokeText('Home', homeX, homeY);
             minimapCtx.fillText('Home', homeX, homeY);
             
-            // Quest Room label (center of building: y=5-9, x=35-39, center at 37, 7)
             const questX = offsetX + 37 * scale;
             const questY = offsetY + 7.5 * scale;
             minimapCtx.strokeText('QuestRoom', questX, questY);
             minimapCtx.fillText('QuestRoom', questX, questY);
 
-            // --- NEW: Label dig sites ---
             minimapCtx.font = 'bold 11px Comfortaa';
             game.digsites.forEach((site, index) => {
                 const digX = offsetX + site.x * scale;
@@ -1585,14 +1566,12 @@
                 minimapCtx.fillText('Dig', digX, digY);
             });
 
-            // Player position
             const playerX = Math.floor(game.player.x / TILE_SIZE);
             const playerY = Math.floor(game.player.y / TILE_SIZE);
             minimapCtx.fillStyle = '#ff4444';
             minimapCtx.fillRect(offsetX + playerX * scale - 1.5, offsetY + playerY * scale - 1.5, scale + 3, scale + 3);
         }
 
-        // --- UPDATED: Handle interactions with all buildings ---
         function handleInteraction() {
             if (game.tutorialActive && game.tutorialStep < TUTORIAL_STEPS.length - 1) {
                 return;
@@ -1691,7 +1670,6 @@
                 const bonusPoints = Math.floor(artifact.value * 0.5);
                 game.researchPoints += bonusPoints;
                 
-                // --- NEW: Update quest progress ---
                 game.questProgress.totalStudied++;
                 updateQuestProgress();
                 
@@ -1714,7 +1692,6 @@
             document.getElementById('sleepModal').style.display = 'flex';
         }
 
-        // --- UPDATED: Sleep starts at 7 AM ---
         function startNewDay() {
             game.time.hour = 7;
             game.time.day++;
@@ -1742,7 +1719,6 @@
                     totalValue += value;
                     documentedItems.push(`${count}x ${artifact.name}`);
                     
-                    // Add to display
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'study-item';
                     itemDiv.innerHTML = `<strong>${count}x ${artifact.name}</strong><br><small>+${value} Research Points</small>`;
@@ -1764,7 +1740,6 @@
             document.getElementById('documentationModal').style.display = 'flex';
         }
 
-        // --- NEW: Research Tree functions ---
         function showResearchTree() {
             const content = document.getElementById('researchTreeContent');
             content.innerHTML = '';
@@ -1779,9 +1754,8 @@
             ];
 
             tiers.forEach(tierInfo => {
-                // Check if this tier should be visible
                 if (!isTierUnlocked(tierInfo.tier)) {
-                    return; // Skip this tier entirely
+                    return;
                 }
 
                 const tierDiv = document.createElement('div');
@@ -1798,7 +1772,7 @@
                         <small>${upgrade.effect}</small><br>
                         ${upgrade.unlocked ? '<span style="color: #4a8a4a;">✓ Unlocked</span>' : 
                           canUnlock ? `<button class="action-button" onclick="unlockResearch('${upgrade.id}')">Unlock</button>` :
-                          `<span style="color: #8a4a4a;">Requires ${upgrade.requires || 0} previous tier upgrades</span>`}
+                          `<span style="color: #8a4a4a;">Requires all previous tier upgrades</span>`}
                     `;
                     tierDiv.appendChild(upgradeDiv);
                 });
@@ -1810,42 +1784,44 @@
         }
 
         function isTierUnlocked(tier) {
-            if (tier === 1) return true; // Tier 1 always visible
+            if (tier === 1) return true;
             
-            // Check if previous tier has enough unlocks
             const previousTier = tier - 1;
+            let totalInPrevious = 0;
             let unlockedInPrevious = 0;
             
             for (const tierKey in RESEARCH_TREE) {
                 RESEARCH_TREE[tierKey].forEach(u => {
-                    if (u.tier === previousTier && u.unlocked) {
-                        unlockedInPrevious++;
+                    if (u.tier === previousTier) {
+                        totalInPrevious++;
+                        if (u.unlocked) unlockedInPrevious++;
                     }
                 });
             }
             
-            // Need at least 2 upgrades from previous tier to unlock next tier
-            return unlockedInPrevious >= 2;
+            return unlockedInPrevious === totalInPrevious && totalInPrevious > 0;
         }
 
         function canUnlockResearch(upgrade) {
             if (upgrade.unlocked) return false;
             if (game.researchPoints < upgrade.cost) return false;
             
-            if (!upgrade.requires) return true;
+            if (upgrade.tier === 1) return true;
             
             const previousTier = upgrade.tier - 1;
+            let totalInPrevious = 0;
             let unlockedInPrevious = 0;
             
             for (const tierKey in RESEARCH_TREE) {
                 RESEARCH_TREE[tierKey].forEach(u => {
-                    if (u.tier === previousTier && u.unlocked) {
-                        unlockedInPrevious++;
+                    if (u.tier === previousTier) {
+                        totalInPrevious++;
+                        if (u.unlocked) unlockedInPrevious++;
                     }
                 });
             }
             
-            return unlockedInPrevious >= upgrade.requires;
+            return unlockedInPrevious === totalInPrevious && totalInPrevious > 0;
         }
 
         function getResearchUnlocked(id) {
@@ -1865,7 +1841,6 @@
                     updateHUD();
                     showMessage(`Unlocked: ${upgrade.name}!`);
                     
-                    // --- NEW: Check for victory condition ---
                     if (id === 'victory') {
                         setTimeout(() => {
                             document.getElementById('missionCompleteModal').style.display = 'flex';
@@ -1878,7 +1853,6 @@
             }
         }
 
-        // --- NEW: Quest Board functions ---
         function showQuestBoard() {
             const content = document.getElementById('questBoardContent');
             content.innerHTML = '';
@@ -1992,7 +1966,6 @@
             }
         }
 
-        // Event Listeners
         nextTutorialButton.addEventListener('click', () => {
             if (!game.tutorialActive) return;
             game.tutorialStep++;
@@ -2034,7 +2007,6 @@
             document.getElementById('sleepModal').style.display = 'none';
         });
 
-        // --- NEW: Research Tree button ---
         document.getElementById('researchTreeButton').addEventListener('click', () => {
             showResearchTree();
         });
@@ -2043,12 +2015,10 @@
             document.getElementById('researchTreeModal').style.display = 'none';
         });
 
-        // --- NEW: Quest Board button ---
         document.getElementById('closeQuestBoardModal').addEventListener('click', () => {
             document.getElementById('questBoardModal').style.display = 'none';
         });
 
-        // --- NEW: Credits buttons ---
         document.getElementById('showCreditsButton').addEventListener('click', () => {
             document.getElementById('settingsModal').style.display = 'none';
             document.getElementById('creditsModal').style.display = 'flex';
@@ -2058,7 +2028,6 @@
             document.getElementById('creditsModal').style.display = 'none';
         });
 
-        // --- NEW: Mission Complete buttons ---
         document.getElementById('continueExploringButton').addEventListener('click', () => {
             document.getElementById('missionCompleteModal').style.display = 'none';
         });
@@ -2067,18 +2036,15 @@
             document.getElementById('missionCompleteModal').style.display = 'none';
         });
 
-        // --- NEW: Late night warning ---
         document.getElementById('closeLateNightModal').addEventListener('click', () => {
             document.getElementById('lateNightModal').style.display = 'none';
         });
 
-        // --- NEW: Documentation modal ---
         document.getElementById('closeDocumentationModal').addEventListener('click', () => {
             document.getElementById('documentationModal').style.display = 'none';
             game.scene = 'overworld';
         });
 
-        // Make functions available globally
         window.studyArtifact = studyArtifact;
         window.unlockResearch = unlockResearch;
 
