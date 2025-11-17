@@ -1,0 +1,2077 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rune Hunters</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: 'Comfortaa', cursive;
+            background: #1a1410;
+            color: #f4e4c1;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #gameContainer {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+        }
+        #gameCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+            image-rendering: pixelated;
+        }
+        #hud {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+        }
+        .hud-element {
+            pointer-events: all;
+            background: rgba(42, 24, 16, 0.9);
+            border: 2px solid #8b6f47;
+            padding: 10px 15px;
+            color: #f4e4c1;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+            border-radius: 15px;
+        }
+        .top-left {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            font-size: 14px;
+        }
+        .bottom-left {
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            font-size: 14px;
+            max-width: 350px;
+        }
+        .top-right {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+        }
+        .minimap {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 200px;
+            height: 200px;
+            border: 3px solid #8b6f47;
+            background: rgba(26, 20, 16, 0.95);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.5);
+        }
+        #minimapCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+        .action-button {
+            background: #5a4a3a;
+            color: #f4e4c1;
+            border: 1px solid #8b6f47;
+            padding: 8px 15px;
+            cursor: pointer;
+            border-radius: 10px;
+            transition: background 0.1s;
+            font-family: 'Comfortaa', cursive;
+        }
+        .action-button:hover {
+            background: #6a5a4a;
+        }
+        .action-button.red {
+            background: #a03030;
+            border-color: #f05050;
+        }
+        .action-button.red:hover {
+            background: #b04040;
+        }
+        .action-button:disabled {
+            background: #3a3a3a;
+            color: #6a6a6a;
+            cursor: not-allowed;
+        }
+        #tutorialBox {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            max-width: 500px;
+            width: 90%;
+            text-align: center;
+            padding: 20px;
+            font-size: 16px;
+            line-height: 1.6;
+            z-index: 10;
+        }
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.75);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+        .modal-content {
+            background: #2a1810;
+            border: 4px solid #8b6f47;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow-y: auto;
+            color: #f4e4c1;
+            text-align: center;
+        }
+        .modal-content h2 {
+            margin-bottom: 20px;
+            color: #ffd700;
+            font-size: 24px;
+        }
+        .modal-content p {
+            margin-bottom: 15px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .modal-content button {
+            margin: 10px auto;
+            display: block;
+            width: 90%;
+        }
+        #messageBox {
+            position: absolute;
+            bottom: 80px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(42, 24, 16, 0.95);
+            border: 2px solid #8b6f47;
+            padding: 15px 25px;
+            border-radius: 15px;
+            display: none;
+            max-width: 500px;
+            text-align: center;
+        }
+        .artifact-info {
+            text-align: left;
+            margin: 10px 0;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+        /* --- NEW: Night overlay with fade animation --- */
+        #nightOverlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 20, 0.6);
+            pointer-events: none;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        .study-item {
+            background: rgba(90, 74, 58, 0.5);
+            border: 1px solid #8b6f47;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .study-item button {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin: 5px 5px 0 0;
+        }
+        /* --- NEW: Research Tree styles --- */
+        .research-tree {
+            display: grid;
+            gap: 15px;
+            text-align: left;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+        .research-tier {
+            border: 2px solid #8b6f47;
+            padding: 15px;
+            border-radius: 15px;
+            background: rgba(90, 74, 58, 0.3);
+        }
+        .research-tier h3 {
+            color: #ffd700;
+            margin-bottom: 10px;
+        }
+        .research-upgrade {
+            background: rgba(42, 24, 16, 0.8);
+            border: 1px solid #8b6f47;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+        }
+        .research-upgrade.unlocked {
+            background: rgba(50, 100, 50, 0.3);
+            border-color: #4a8a4a;
+        }
+        .research-upgrade.locked {
+            opacity: 0.5;
+        }
+        .research-upgrade button {
+            width: auto;
+            padding: 6px 12px;
+            font-size: 12px;
+            margin-top: 5px;
+        }
+        /* --- NEW: Quest Board styles --- */
+        .quest-pack {
+            border: 2px solid #8b6f47;
+            padding: 15px;
+            margin: 10px 0;
+            border-radius: 15px;
+            background: rgba(90, 74, 58, 0.3);
+        }
+        .quest-pack.locked {
+            opacity: 0.5;
+        }
+        .quest-item {
+            background: rgba(42, 24, 16, 0.8);
+            border: 1px solid #8b6f47;
+            padding: 10px;
+            margin: 8px 0;
+            border-radius: 10px;
+            text-align: left;
+        }
+        .quest-item.completed {
+            background: rgba(50, 100, 50, 0.3);
+            border-color: #4a8a4a;
+        }
+        .quest-progress {
+            background: #3a2a1a;
+            height: 10px;
+            border-radius: 5px;
+            margin: 5px 0;
+            overflow: hidden;
+        }
+        .quest-progress-bar {
+            background: #ffd700;
+            height: 100%;
+            transition: width 0.3s;
+        }
+        /* --- NEW: Credits styles --- */
+        .credits-section {
+            text-align: left;
+            line-height: 1.8;
+            margin: 20px 0;
+        }
+        .credits-section h3 {
+            color: #ffd700;
+            margin: 15px 0 10px 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="gameContainer">
+        <canvas id="gameCanvas"></canvas>
+        <div id="nightOverlay"></div>
+        <div id="hud">
+            <div id="topLeftPanel" class="hud-element top-left">
+                Time: <span id="timeDisplay">7:00 AM, Day 1</span><br>
+                Research Points: <span id="moneyDisplay">0</span>
+            </div>
+
+            <div id="topRightPanel" class="hud-element top-right">
+                <button id="researchTreeButton" class="action-button">🔬 Research</button>
+                <button id="settingsButton" class="action-button">⚙️ Settings</button>
+            </div>
+
+            <div id="bottomLeftPanel" class="hud-element bottom-left" style="display: none;">
+                <strong>Collected Artifacts</strong><br>
+                <div id="inventoryDisplay"></div>
+            </div>
+
+            <div id="actionPrompt" class="hud-element bottom-center" style="display: none; position: absolute; bottom: 20px; left: 50%; transform: translateX(-50%);">
+                Press 'E' to <span id="promptText">...</span>
+            </div>
+
+            <div id="messageBox">
+                <p id="messageText"></p>
+            </div>
+
+            <div class="minimap">
+                <canvas id="minimapCanvas"></canvas>
+            </div>
+
+            <div id="tutorialBox" class="hud-element" style="display: none;">
+                <p id="tutorialText"></p>
+                <button id="nextTutorialButton" class="action-button" style="margin-top: 10px;">Next</button>
+            </div>
+        </div>
+
+        <!-- Settings Modal -->
+        <div id="settingsModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>Game Settings</h2>
+                <p>Current In-Game Time Speed: <strong>3x Slower</strong></p>
+                <p style="font-size: 14px; margin-top: 10px;">Press 'R' to return from dig sites</p>
+                <button id="restartTutorialInModal" class="action-button red">Restart Tutorial</button>
+                <button id="showCreditsButton" class="action-button">📜 Credits</button>
+                <button id="closeSettingsModal" class="action-button">Close</button>
+            </div>
+        </div>
+
+        <!-- Artifact Discovery Modal -->
+        <div id="artifactModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2 id="artifactName">Artifact Discovered!</h2>
+                <p id="artifactDescription"></p>
+                <button id="closeArtifactModal" class="action-button">Continue Digging</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Documentation Modal (replaces in-lab UI) --- -->
+        <div id="documentationModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>📋 Document Artifacts</h2>
+                <p id="documentationMessage">Processing your findings...</p>
+                <div id="documentationList"></div>
+                <button id="closeDocumentationModal" class="action-button">Return to Lab</button>
+            </div>
+        </div>
+
+        <!-- Study Modal -->
+        <div id="studyModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>📚 Research Laboratory - Night Study</h2>
+                <p>During the evening, you can study artifacts in detail to learn more and earn bonus research points.</p>
+                <div id="studyList"></div>
+                <button id="closeStudyModal" class="action-button">Close</button>
+            </div>
+        </div>
+
+        <!-- Sleep Modal -->
+        <div id="sleepModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>🛏️ End of Day</h2>
+                <p id="sleepMessage">It's getting late. Rest up for tomorrow's excavations?</p>
+                <button id="confirmSleep" class="action-button">Sleep (Start New Day)</button>
+                <button id="cancelSleep" class="action-button red">Stay Awake</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Research Tree Modal --- -->
+        <div id="researchTreeModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>🔬 Research Tree</h2>
+                <p>Unlock upgrades to improve your archaeological abilities</p>
+                <div id="researchTreeContent" class="research-tree"></div>
+                <button id="closeResearchTreeModal" class="action-button">Close</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Quest Board Modal --- -->
+        <div id="questBoardModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>📋 Quest Board</h2>
+                <p>Complete quests to unlock storyline discoveries and earn rewards!</p>
+                <div id="questBoardContent"></div>
+                <button id="closeQuestBoardModal" class="action-button">Close</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Credits Modal --- -->
+        <div id="creditsModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>📜 Game Credits</h2>
+                <div class="credits-section">
+                    <h3>Created For:</h3>
+                    <p><strong>FIRST LEGO League (FLL) – 2024/2025 "Unearthed" Season</strong></p>
+                    
+                    <h3>Innovation Project by:</h3>
+                    <p><strong>Team 56913 — IDK R0B0B0ns</strong></p>
+                    
+                    <h3>Development Team:</h3>
+                    <p>Game Designer: [Team Member Name]<br>
+                    Lead Programmer: [Team Member Name]<br>
+                    Content Designer: [Team Member Name]</p>
+                    
+                    <h3>Special Thanks:</h3>
+                    <p>Our coaches and mentors<br>
+                    FIRST LEGO League organizers<br>
+                    All archaeology educators and resources</p>
+                    
+                    <h3>Acknowledgements:</h3>
+                    <p>Inspired by real archaeological practices and the importance of preserving human history.</p>
+                </div>
+                <button id="closeCreditsModal" class="action-button">Close</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Mission Complete Modal --- -->
+        <div id="missionCompleteModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>🏆 Mission Complete!</h2>
+                <p style="font-size: 18px; color: #ffd700;"><strong>Congratulations!</strong></p>
+                <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
+                
+                <div class="credits-section">
+                    <h3>Created For:</h3>
+                    <p><strong>FIRST LEGO League (FLL) – 2024/2025 "Unearthed" Season</strong></p>
+                    
+                    <h3>Innovation Project by:</h3>
+                    <p><strong>Team 56913 — IDK R0B0B0ns</strong></p>
+                    
+                    <h3>Development Team:</h3>
+                    <p>Game Designer: [Team Member Name]<br>
+                    Lead Programmer: [Team Member Name]<br>
+                    Content Designer: [Team Member Name]</p>
+                </div>
+                
+                <button id="continueExploringButton" class="action-button">Continue Exploring</button>
+                <button id="closeMissionCompleteModal" class="action-button">Return to Game</button>
+            </div>
+        </div>
+
+        <!-- --- NEW: Late Night Warning Modal --- -->
+        <div id="lateNightModal" class="modal-overlay" style="display: none;">
+            <div class="modal-content">
+                <h2>🌙 It's Late...</h2>
+                <p>It's 11 PM. You should head home to sleep.</p>
+                <p>Time is frozen until you rest.</p>
+                <button id="closeLateNightModal" class="action-button">Understood</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const TILE_SIZE = 32;
+        const MAP_WIDTH = 45;
+        const MAP_HEIGHT = 45;
+        const DIGSITE_SIZE = 15;
+        const DIGSITE_COUNT = 4;
+
+        // --- UPDATED: Artifact values rebalanced ---
+        const ARTIFACTS = {
+            pottery: {
+                name: "Ancient Pottery Shard",
+                rarity: "common",
+                value: 15,
+                description: "Pottery shards are among the most common archaeological finds. They help archaeologists date sites and understand ancient cultures' daily life, diet, and trade networks. The style, decoration, and manufacturing technique can reveal when and where the pottery was made."
+            },
+            coin: {
+                name: "Ancient Coin",
+                rarity: "uncommon",
+                value: 45,
+                description: "Coins are valuable for dating archaeological layers precisely. They often bear portraits of rulers and inscriptions that provide historical dates. Coins also reveal information about ancient economies, trade routes, and political power."
+            },
+            tool: {
+                name: "Stone Tool",
+                rarity: "common",
+                value: 20,
+                description: "Stone tools are evidence of early human technology. Archaeologists study their manufacturing techniques, use-wear patterns, and raw material sources to understand ancient human behavior, migration patterns, and technological development."
+            },
+            jewelry: {
+                name: "Ancient Jewelry",
+                rarity: "rare",
+                value: 100,
+                description: "Jewelry items reflect social status, religious beliefs, and artistic expression. The materials used—like gold, silver, or precious stones—indicate trade networks and wealth. Design motifs can reveal cultural connections between different civilizations."
+            },
+            tablet: {
+                name: "Inscribed Tablet",
+                rarity: "epic",
+                value: 250,
+                description: "Written tablets are among archaeology's most valuable finds. They provide direct evidence of ancient languages, administrative systems, religious practices, and historical events. Deciphering these texts has unlocked entire civilizations' histories."
+            },
+            sculpture: {
+                name: "Stone Sculpture",
+                rarity: "rare",
+                value: 120,
+                description: "Sculptures reveal ancient artistic techniques, religious beliefs, and cultural values. The style and iconography help identify cultural periods and influences. Large-scale sculptures often marked important civic or religious spaces."
+            },
+            seal: {
+                name: "Official Seal",
+                rarity: "uncommon",
+                value: 50,
+                description: "Seals were used to mark official documents and secure containers. They bear symbols, names, or images that identify their owners. Seals help archaeologists understand ancient administrative systems, literacy, and social hierarchies."
+            },
+            weapon: {
+                name: "Bronze Weapon",
+                rarity: "rare",
+                value: 110,
+                description: "Ancient weapons reveal technological advancement, particularly in metallurgy. They provide evidence of warfare, hunting practices, and social organization. The distribution of weapons can indicate military sites or warrior burials."
+            },
+            mosaic: {
+                name: "Mosaic Fragment",
+                rarity: "epic",
+                value: 200,
+                description: "Mosaics decorated floors and walls of important buildings. Their intricate designs and expensive materials indicate wealth and cultural sophistication. The imagery often depicts mythology, daily life, or religious scenes, providing rich cultural information."
+            },
+            sarcophagus: {
+                name: "Decorated Sarcophagus Fragment",
+                rarity: "legendary",
+                value: 500,
+                description: "Sarcophagi are burial containers, often elaborately decorated with religious texts and imagery. They provide crucial information about burial practices, religious beliefs, social status, and artistic traditions. Inscriptions often identify the deceased and their accomplishments."
+            }
+        };
+
+        const RARITY_ORDER = ['common', 'uncommon', 'rare', 'epic', 'legendary'];
+
+        // --- NEW: Research Tree upgrades with pun names ---
+        const RESEARCH_TREE = {
+            tier1: [
+                { id: 'brush1', name: 'Brush With Greatness', cost: 150, effect: '+10% dig speed', tier: 1, unlocked: false },
+                { id: 'shovel1', name: 'Shovel Some Respect', cost: 250, effect: '+20% dig speed', tier: 1, unlocked: false },
+                { id: 'cardio', name: 'Cardio-facts Training', cost: 200, effect: '+10% movement speed', tier: 1, unlocked: false },
+                { id: 'file', name: 'File It Under History', cost: 150, effect: '+5% documentation RP', tier: 1, unlocked: false },
+                { id: 'questpack1', name: 'Open Sesame-Stone', cost: 100, effect: 'Unlock Quest Pack 1', tier: 1, unlocked: false }
+            ],
+            tier2: [
+                { id: 'brush2', name: 'Brush Hour 2: Even Brushier', cost: 400, effect: '+15% dig speed', tier: 2, requires: 2, unlocked: false },
+                { id: 'shovel2', name: 'Shovel With the Punches', cost: 600, effect: '+20% dig speed', tier: 2, requires: 2, unlocked: false },
+                { id: 'scan1', name: 'Scan-You-Dig-It?', cost: 700, effect: '10% reveal chance', tier: 2, requires: 2, unlocked: false },
+                { id: 'paperwork', name: 'Paperwork Makes the Dream Work', cost: 500, effect: '+15% documentation RP', tier: 2, requires: 2, unlocked: false },
+                { id: 'questpack2', name: 'Quest-ionable Methods', cost: 300, effect: 'Unlock Quest Pack 2', tier: 2, requires: 2, unlocked: false }
+            ],
+            radar: [
+                { id: 'radar1', name: 'Peek Performance', cost: 300, effect: 'See 2 layers', tier: 2, requires: 2, unlocked: false },
+                { id: 'radar2', name: 'Double-Down Depth Detector', cost: 600, effect: 'See 3 layers', tier: 2, requires: 2, unlocked: false },
+                { id: 'radar3', name: 'Depth Charge', cost: 1200, effect: 'See 4 layers, +25% detect', tier: 3, requires: 3, unlocked: false },
+                { id: 'radar4', name: 'All-Seeing Eye-chaeology', cost: 1800, effect: 'See 5 layers, +50% detect', tier: 3, requires: 3, unlocked: false }
+            ],
+            tier3: [
+                { id: 'tools3', name: 'Dig-nificantly Better Tools', cost: 1200, effect: '+30% dig speed', tier: 3, requires: 3, unlocked: false },
+                { id: 'scan2', name: "Now We're Scannin' Business", cost: 1400, effect: '20% reveal chance', tier: 3, requires: 3, unlocked: false },
+                { id: 'keep', name: 'Keep It Together', cost: 1100, effect: '+20% artifact value', tier: 3, requires: 3, unlocked: false },
+                { id: 'map', name: 'Map-tastic Insights', cost: 900, effect: 'Show digsite contents', tier: 3, requires: 3, unlocked: false },
+                { id: 'questpack3', name: 'Quest For Success', cost: 900, effect: 'Unlock Quest Pack 3', tier: 3, requires: 3, unlocked: false }
+            ],
+            tier4: [
+                { id: 'dig4', name: 'Dig Like No Tomorrow', cost: 2500, effect: '+40% dig speed', tier: 4, requires: 4, unlocked: false },
+                { id: 'laser', name: 'Laser Focused', cost: 3000, effect: '30% reveal chance', tier: 4, requires: 4, unlocked: false },
+                { id: 'research', name: 'Research and Destroy', cost: 2400, effect: '+30% all RP', tier: 4, requires: 4, unlocked: false },
+                { id: 'labgo', name: 'Lab On the Go-pher', cost: 2800, effect: 'Field documentation', tier: 4, requires: 4, unlocked: false },
+                { id: 'questpack4', name: 'A Quest-ion of Time', cost: 1200, effect: 'Unlock Quest Pack 4', tier: 4, requires: 4, unlocked: false }
+            ],
+            tier5: [
+                { id: 'myth', name: 'Myth-Understandings', cost: 1000, effect: 'Storyline: Ancient myths', tier: 5, requires: 5, unlocked: false },
+                { id: 'runes', name: 'Read Between the Runes', cost: 1800, effect: 'Storyline: Decipher runes', tier: 5, requires: 5, unlocked: false },
+                { id: 'lost', name: 'Lost But Not Forgotten', cost: 2400, effect: 'Storyline: Lost civilization', tier: 5, requires: 5, unlocked: false },
+                { id: 'together', name: 'Putting It All Together', cost: 3000, effect: 'Storyline: Final pieces', tier: 5, requires: 5, unlocked: false },
+                { id: 'victory', name: 'Dig Victory', cost: 4000, effect: 'FINAL: Mission Complete!', tier: 5, requires: 5, unlocked: false }
+            ]
+        };
+
+        // --- NEW: Quest system with tiered packs ---
+        const QUEST_PACKS = {
+            pack1: {
+                name: "Beginner's Luck",
+                unlock: 'questpack1',
+                quests: [
+                    { id: 'q1_1', name: 'First Steps', desc: 'Collect 5 artifacts', type: 'collect', target: 5, progress: 0, completed: false, reward: 50 },
+                    { id: 'q1_2', name: 'Eager Learner', desc: 'Study 3 artifacts', type: 'study', target: 3, progress: 0, completed: false, reward: 75 },
+                    { id: 'q1_3', name: 'Complete Excavation', desc: 'Complete 1 dig site', type: 'digsite', target: 1, progress: 0, completed: false, reward: 100 }
+                ]
+            },
+            pack2: {
+                name: "Intermediate Excavator",
+                unlock: 'questpack2',
+                quests: [
+                    { id: 'q2_1', name: 'Rare Finds', desc: 'Collect 3 rare artifacts', type: 'collectRare', target: 3, progress: 0, completed: false, reward: 150 },
+                    { id: 'q2_2', name: 'Research Focus', desc: 'Earn 500 research points', type: 'earnRP', target: 500, progress: 0, completed: false, reward: 200 },
+                    { id: 'q2_3', name: 'Thorough Study', desc: 'Study 10 artifacts', type: 'study', target: 10, progress: 0, completed: false, reward: 175 }
+                ]
+            },
+            pack3: {
+                name: "Deep Digs",
+                unlock: 'questpack3',
+                quests: [
+                    { id: 'q3_1', name: 'Master Excavator', desc: 'Complete 5 dig sites', type: 'digsite', target: 5, progress: 0, completed: false, reward: 300 },
+                    { id: 'q3_2', name: 'Epic Hunter', desc: 'Collect 2 epic artifacts', type: 'collectEpic', target: 2, progress: 0, completed: false, reward: 350 },
+                    { id: 'q3_3', name: 'Knowledge Seeker', desc: 'Earn 1500 research points', type: 'earnRP', target: 1500, progress: 0, completed: false, reward: 400 }
+                ]
+            },
+            pack4: {
+                name: "Legendary Discoveries",
+                unlock: 'questpack4',
+                quests: [
+                    { id: 'q4_1', name: 'Legendary Find', desc: 'Collect 1 legendary artifact', type: 'collectLegendary', target: 1, progress: 0, completed: false, reward: 500 },
+                    { id: 'q4_2', name: 'Complete Collection', desc: 'Collect 50 total artifacts', type: 'collect', target: 50, progress: 0, completed: false, reward: 600 },
+                    { id: 'q4_3', name: 'Research Master', desc: 'Earn 3000 research points', type: 'earnRP', target: 3000, progress: 0, completed: false, reward: 700 }
+                ]
+            },
+            pack5: {
+                name: "The Final Chapter",
+                unlock: 'victory',
+                quests: [
+                    { id: 'q5_1', name: 'Ancient Secrets', desc: 'Unlock all Tier 5 upgrades', type: 'unlockTier5', target: 5, progress: 0, completed: false, reward: 1000 },
+                    { id: 'q5_2', name: 'Complete Journey', desc: 'Complete 10 dig sites', type: 'digsite', target: 10, progress: 0, completed: false, reward: 1500 },
+                    { id: 'q5_3', name: 'Ultimate Discovery', desc: 'Earn 5000 research points', type: 'earnRP', target: 5000, progress: 0, completed: false, reward: 2000 }
+                ]
+            }
+        };
+
+        let game = {
+            state: 'town',
+            scene: 'overworld', // 'overworld', 'lab_interior', 'home_interior', 'quest_interior'
+            player: { 
+                x: (MAP_WIDTH / 2) * TILE_SIZE, 
+                y: (MAP_HEIGHT / 2) * TILE_SIZE, 
+                speed: 4, 
+                dx: 0, 
+                dy: 1,
+                walkFrame: 0,
+                walkCounter: 0,
+                isWalking: false
+            },
+            map: [],
+            mapObjects: [],
+            ambianceElements: [],
+            digsites: [],
+            currentDigsite: null,
+            inventory: {},
+            studiedArtifacts: {},
+            researchPoints: 0,
+            time: { hour: 7, minute: 0, day: 1, frameCounter: 0 },
+            keys: {},
+            tutorialActive: true,
+            tutorialStep: 0,
+            offsetX: 0,
+            offsetY: 0,
+            isNight: false,
+            nightOpacity: 0,
+            timeFrozen: false,
+            lateNightWarningShown: false,
+            labPopupShown: false,
+            // --- NEW: Quest tracking ---
+            questProgress: {
+                totalCollected: 0,
+                totalStudied: 0,
+                totalDigsites: 0,
+                rareCollected: 0,
+                epicCollected: 0,
+                legendaryCollected: 0
+            },
+            // --- NEW: Layer-based digging ---
+            visibleLayers: 1,
+            currentLayer: 0
+        };
+
+        const TUTORIAL_STEPS = [
+            { text: "Welcome to Rune Hunters! You're an archaeologist studying ancient civilizations. Your mission is to excavate artifacts and learn about past cultures." },
+            { text: "Archaeology is the study of human history through excavation and analysis of artifacts, structures, and other physical remains. Each discovery helps us understand how people lived thousands of years ago." },
+            { text: "Move around using Arrow Keys or WASD. The map shows your research base and surrounding areas where dig sites will appear." },
+            { text: "Dig sites (marked in light brown) appear randomly each day at 7 AM. Visit them before 5 PM when they close for the day." },
+            { text: "The central building is your Research Laboratory. During the day, bring artifacts here to document them. At night (after 6 PM), you can study artifacts in detail for bonus research points!" },
+            { text: "When you're ready to sleep, enter your Home building at night. This will start a new day with fresh dig sites. Time to start your archaeological journey!" }
+        ];
+
+        const canvas = document.getElementById('gameCanvas');
+        const ctx = canvas.getContext('2d');
+        const minimapCanvas = document.getElementById('minimapCanvas');
+        const minimapCtx = minimapCanvas.getContext('2d');
+        const timeDisplay = document.getElementById('timeDisplay');
+        const moneyDisplay = document.getElementById('moneyDisplay');
+        const inventoryDisplay = document.getElementById('inventoryDisplay');
+        const actionPrompt = document.getElementById('actionPrompt');
+        const promptText = document.getElementById('promptText');
+        const tutorialBox = document.getElementById('tutorialBox');
+        const tutorialText = document.getElementById('tutorialText');
+        const nextTutorialButton = document.getElementById('nextTutorialButton');
+        const messageBox = document.getElementById('messageBox');
+        const messageText = document.getElementById('messageText');
+        const nightOverlay = document.getElementById('nightOverlay');
+
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+            minimapCanvas.width = 200;
+            minimapCanvas.height = 200;
+        }
+
+        // --- UPDATED: Map includes Home and Quest Room buildings ---
+        function createMap() {
+            const map = Array(MAP_HEIGHT).fill(null).map(() => Array(MAP_WIDTH).fill('g'));
+
+            // Central path
+            for (let y = 5; y < 40; y++) {
+                for (let x = 20; x < 25; x++) {
+                    map[y][x] = 'p';
+                }
+            }
+
+            // Research Laboratory building (center)
+            for (let y = 10; y < 15; y++) {
+                for (let x = 18; x < 27; x++) {
+                    map[y][x] = 'b';
+                }
+            }
+
+            // --- NEW: Home building (bottom left area) ---
+            for (let y = 35; y < 40; y++) {
+                for (let x = 5; x < 10; x++) {
+                    map[y][x] = 'h';
+                }
+            }
+
+            // --- NEW: Quest Room building (top right area) ---
+            for (let y = 5; y < 10; y++) {
+                for (let x = 35; x < 40; x++) {
+                    map[y][x] = 'q';
+                }
+            }
+
+            // Additional paths for accessibility
+            for (let x = 5; x < 40; x++) {
+                map[22][x] = 'p';
+            }
+            // Path to home
+            for (let y = 22; y < 38; y++) {
+                map[y][7] = 'p';
+            }
+            // Path to quest room
+            for (let y = 5; y < 23; y++) {
+                map[y][37] = 'p';
+            }
+
+            return map;
+        }
+
+        function MapObject(x, y, type, name) {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+            this.name = name;
+            this.collider = { x: x - 10, y: y - 10, w: 20, h: 20 };
+        }
+
+        function AmbianceElement(x, y, type) {
+            this.x = x;
+            this.y = y;
+            this.type = type;
+        }
+
+        function generateMapObjects() {
+            game.mapObjects = [];
+            const treeCount = MAP_WIDTH * MAP_HEIGHT / 20;
+            for (let i = 0; i < treeCount; i++) {
+                const x = Math.floor(Math.random() * MAP_WIDTH);
+                const y = Math.floor(Math.random() * MAP_HEIGHT);
+                if (game.map[y] && game.map[y][x] === 'g') {
+                    game.mapObjects.push(new MapObject(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'tree', 'Tree'));
+                }
+            }
+        }
+
+        function generateAmbiance() {
+            game.ambianceElements = [];
+            const rockCount = MAP_WIDTH * MAP_HEIGHT / 30;
+            for (let i = 0; i < rockCount; i++) {
+                const x = Math.floor(Math.random() * MAP_WIDTH);
+                const y = Math.floor(Math.random() * MAP_HEIGHT);
+                if (game.map[y] && game.map[y][x] === 'g') {
+                    game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'rock'));
+                }
+            }
+            const bushCount = MAP_WIDTH * MAP_HEIGHT / 40;
+            for (let i = 0; i < bushCount; i++) {
+                const x = Math.floor(Math.random() * MAP_WIDTH);
+                const y = Math.floor(Math.random() * MAP_HEIGHT);
+                if (game.map[y] && game.map[y][x] === 'g') {
+                    game.ambianceElements.push(new AmbianceElement(x * TILE_SIZE + TILE_SIZE / 2, y * TILE_SIZE + TILE_SIZE / 2, 'bush'));
+                }
+            }
+        }
+
+        function generateDigsites() {
+            // Clear old digsites from map
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    if (game.map[y][x] === 'd') {
+                        game.map[y][x] = 'g';
+                    }
+                }
+            }
+
+            game.digsites = [];
+
+            for (let i = 0; i < DIGSITE_COUNT; i++) {
+                let placed = false;
+                let attempts = 0;
+                
+                while (!placed && attempts < 100) {
+                    const x = Math.floor(Math.random() * (MAP_WIDTH - 5)) + 2;
+                    const y = Math.floor(Math.random() * (MAP_HEIGHT - 5)) + 2;
+                    
+                    const distFromCenter = Math.sqrt(Math.pow(x - 22, 2) + Math.pow(y - 12, 2));
+                    let isClear = distFromCenter > 8;
+                    
+                    if (isClear) {
+                        for (let dy = 0; dy < 3; dy++) {
+                            for (let dx = 0; dx < 3; dx++) {
+                                if (game.map[y + dy] && game.map[y + dy][x + dx] !== 'g') {
+                                    isClear = false;
+                                }
+                            }
+                        }
+                    }
+                    
+                    if (isClear) {
+                        for (let dy = 0; dy < 3; dy++) {
+                            for (let dx = 0; dx < 3; dx++) {
+                                game.map[y + dy][x + dx] = 'd';
+                            }
+                        }
+                        game.digsites.push({ x: x + 1, y: y + 1 });
+                        placed = true;
+                    }
+                    attempts++;
+                }
+            }
+        }
+
+        // --- UPDATED: Layer-based digsite generation ---
+        function generateDigsiteContent() {
+            const rows = 3;
+            const cols = 15;
+            game.currentDigsite = {
+                grid: Array(rows).fill(null).map(() => Array(cols).fill(null)),
+                artifactCount: 0,
+                dirtCount: 0
+            };
+            game.currentLayer = 0;
+
+            const artifactDistribution = [
+                { type: 'pottery', count: 5 },
+                { type: 'tool', count: 4 },
+                { type: 'coin', count: 3 },
+                { type: 'seal', count: 2 },
+                { type: 'jewelry', count: 2 },
+                { type: 'sculpture', count: 1 },
+                { type: 'weapon', count: 1 },
+                { type: 'tablet', count: 1 },
+                { type: 'mosaic', count: 1 },
+                { type: 'sarcophagus', count: 1 }
+            ];
+
+            for (const dist of artifactDistribution) {
+                for (let i = 0; i < dist.count; i++) {
+                    let placed = false;
+                    while (!placed) {
+                        const x = Math.floor(Math.random() * cols);
+                        const y = Math.floor(Math.random() * rows);
+                        if (game.currentDigsite.grid[y][x] === null) {
+                            game.currentDigsite.grid[y][x] = dist.type;
+                            game.currentDigsite.artifactCount++;
+                            placed = true;
+                        }
+                    }
+                }
+            }
+
+            game.currentDigsite.dirtCount = (rows * cols) - game.currentDigsite.artifactCount;
+        }
+
+        // --- UPDATED: Draw map with Home and Quest Room ---
+        function drawMap() {
+            const drawnDigsites = new Set();
+            
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    const tileX = x * TILE_SIZE + game.offsetX;
+                    const tileY = y * TILE_SIZE + game.offsetY;
+
+                    if (tileX > canvas.width || tileY > canvas.height || tileX < -TILE_SIZE || tileY < -TILE_SIZE) continue;
+
+                    let color;
+                    switch (game.map[y][x]) {
+                        case 'g': color = '#4f834d'; break;
+                        case 'p': color = '#a08060'; break;
+                        case 'b': color = '#8b6f47'; break;
+                        case 'h': color = '#6a5a4a'; break;
+                        case 'q': color = '#7a6a5a'; break;
+                        case 'd': color = '#c4a574'; break;
+                        default: color = '#4f834d';
+                    }
+                    ctx.fillStyle = color;
+                    ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                    
+                    // Add external texture to Research Lab
+                    if (game.map[y][x] === 'b') {
+                        // Windows
+                        ctx.fillStyle = '#5a8a8a';
+                        if ((x + y) % 3 === 0) {
+                            ctx.fillRect(tileX + 8, tileY + 8, 16, 16);
+                        }
+                        // Bricks pattern
+                        ctx.strokeStyle = '#6a5a3a';
+                        ctx.lineWidth = 1;
+                        ctx.strokeRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+                        ctx.strokeRect(tileX, tileY + TILE_SIZE/2, TILE_SIZE, 1);
+                        
+                        // Door marker on center tiles
+                        if (x === 22 && y === 14) {
+                            ctx.fillStyle = '#3a2a1a';
+                            ctx.fillRect(tileX + 6, tileY + 10, 20, 20);
+                            ctx.fillStyle = '#d4a574';
+                            ctx.beginPath();
+                            ctx.arc(tileX + 20, tileY + 20, 3, 0, Math.PI * 2);
+                            ctx.fill();
+                        }
+                    }
+                }
+            }
+
+            // --- UPDATED: Draw single label per digsite ---
+            game.digsites.forEach(site => {
+                const centerX = site.x * TILE_SIZE + game.offsetX;
+                const centerY = site.y * TILE_SIZE + game.offsetY;
+                
+                ctx.fillStyle = 'rgba(0,0,0,0.3)';
+                ctx.fillRect(centerX - TILE_SIZE, centerY + TILE_SIZE / 2, TILE_SIZE * 3, TILE_SIZE);
+                ctx.fillStyle = '#f4e4c1';
+                ctx.font = '12px Comfortaa';
+                ctx.textAlign = 'center';
+                ctx.fillText('Dig Site', centerX + TILE_SIZE / 2, centerY + TILE_SIZE * 2 - 8);
+            });
+        }
+
+        function drawAmbiance() {
+            game.ambianceElements.forEach(ambiance => {
+                const drawX = ambiance.x + game.offsetX;
+                const drawY = ambiance.y + game.offsetY;
+
+                if (ambiance.type === 'rock') {
+                    ctx.fillStyle = '#6a6a6a';
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY, 4, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.fillStyle = '#5a5a5a';
+                    ctx.beginPath();
+                    ctx.arc(drawX + 3, drawY + 3, 3, 0, Math.PI * 2);
+                    ctx.fill();
+                } else if (ambiance.type === 'bush') {
+                    ctx.fillStyle = '#3a6a3a';
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY - 2, 8, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.arc(drawX - 5, drawY + 3, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                    ctx.arc(drawX + 5, drawY + 3, 6, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function drawMapObjects() {
+            game.mapObjects.sort((a, b) => a.y - b.y);
+
+            game.mapObjects.forEach(obj => {
+                const drawX = obj.x + game.offsetX;
+                const drawY = obj.y + game.offsetY;
+
+                if (obj.type === 'tree') {
+                    ctx.fillStyle = '#5a4a3a';
+                    ctx.fillRect(drawX - 4, drawY + 5, 8, 15);
+                    ctx.fillStyle = '#305f30';
+                    ctx.beginPath();
+                    ctx.arc(drawX, drawY, 15, 0, Math.PI * 2);
+                    ctx.fill();
+                }
+            });
+        }
+
+        function drawPlayer() {
+            if (game.state === 'digsite') return;
+
+            const size = 24;
+            const x = canvas.width / 2;
+            const y = canvas.height / 2;
+
+            if (game.player.isWalking) {
+                game.player.walkCounter++;
+                if (game.player.walkCounter >= 8) {
+                    game.player.walkFrame = (game.player.walkFrame + 1) % 4;
+                    game.player.walkCounter = 0;
+                }
+            } else {
+                game.player.walkFrame = 0;
+                game.player.walkCounter = 0;
+            }
+
+            let leftLegOffset = 0;
+            let rightLegOffset = 0;
+            if (game.player.walkFrame === 1) {
+                leftLegOffset = 3;
+                rightLegOffset = -3;
+            } else if (game.player.walkFrame === 3) {
+                leftLegOffset = -3;
+                rightLegOffset = 3;
+            }
+
+            let armSwing = 0;
+            if (game.player.walkFrame === 1) armSwing = 2;
+            else if (game.player.walkFrame === 3) armSwing = -2;
+
+            ctx.fillStyle = 'rgba(0,0,0,0.3)';
+            ctx.fillRect(x - 10, y + size - 2, 20, 4);
+
+            ctx.fillStyle = '#d4d4d4';
+            ctx.fillRect(x - 10, y - 12, 20, 18);
+            
+            ctx.fillStyle = '#6a4a3a';
+            ctx.fillRect(x - 12, y - 8, 24, 4);
+            ctx.fillStyle = '#4a3a2a';
+            ctx.fillRect(x - 10, y - 4, 20, 3);
+            
+            ctx.fillStyle = '#d4a574';
+            ctx.fillRect(x - 8, y + 6, 16, 10);
+            
+            ctx.fillStyle = '#c49564';
+            ctx.fillRect(x - 12, y + 8 - armSwing, 4, 6);
+            ctx.fillRect(x + 8, y + 8 + armSwing, 4, 6);
+            
+            ctx.fillStyle = '#4a5a6a';
+            ctx.fillRect(x - 4, y + 8, 2, 8);
+            if (leftLegOffset !== 0) {
+                ctx.fillRect(x - 4, y + 16, 2, leftLegOffset);
+            }
+            ctx.fillRect(x + 2, y + 8, 2, 8);
+            if (rightLegOffset !== 0) {
+                ctx.fillRect(x + 2, y + 16, 2, rightLegOffset);
+            }
+            
+            ctx.fillStyle = '#5a4a3a';
+            ctx.fillRect(x - 5, y + 16 + leftLegOffset, 3, 4);
+            ctx.fillRect(x + 2, y + 16 + rightLegOffset, 3, 4);
+        }
+
+        // --- NEW: Draw interior scenes ---
+        function drawLabInterior() {
+            ctx.fillStyle = '#8a7a6a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            // Walls
+            ctx.fillStyle = '#5a4a3a';
+            ctx.fillRect(0, 0, canvas.width, 20);
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+            ctx.fillRect(0, 0, 20, canvas.height);
+            ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
+
+            // Furniture - desks/tables
+            ctx.fillStyle = '#4a3a2a';
+            ctx.fillRect(100, 100, 80, 50);
+            ctx.fillRect(canvas.width - 180, 100, 80, 50);
+            ctx.fillRect(canvas.width / 2 - 60, canvas.height - 120, 120, 60);
+
+            // Equipment
+            ctx.fillStyle = '#3a5a5a';
+            ctx.fillRect(120, 110, 40, 30);
+
+            ctx.fillStyle = '#f4e4c1';
+            ctx.font = '16px Comfortaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('Research Laboratory', canvas.width / 2, 50);
+            ctx.font = '12px Comfortaa';
+            ctx.fillText('Press E to exit', canvas.width / 2, canvas.height - 40);
+            
+            // Auto-trigger documentation popup
+            if (game.scene === 'lab_interior' && !game.labPopupShown) {
+                game.labPopupShown = true;
+                setTimeout(() => documentArtifacts(), 300);
+            }
+        }
+
+        function drawHomeInterior() {
+            ctx.fillStyle = '#7a6a5a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#5a4a3a';
+            ctx.fillRect(0, 0, canvas.width, 20);
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+            ctx.fillRect(0, 0, 20, canvas.height);
+            ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
+
+            // Bed
+            ctx.fillStyle = '#6a3a3a';
+            ctx.fillRect(100, canvas.height / 2 - 40, 100, 80);
+            ctx.fillStyle = '#8a4a4a';
+            ctx.fillRect(100, canvas.height / 2 - 40, 100, 20);
+
+            // Furniture
+            ctx.fillStyle = '#4a3a2a';
+            ctx.fillRect(canvas.width - 150, 100, 60, 60);
+
+            ctx.fillStyle = '#f4e4c1';
+            ctx.font = '16px Comfortaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('Home', canvas.width / 2, 50);
+            ctx.font = '12px Comfortaa';
+            ctx.fillText('Press E to exit', canvas.width / 2, canvas.height - 40);
+        }
+
+        // --- NEW: Draw Quest Room with NPC ---
+        function drawQuestInterior() {
+            ctx.fillStyle = '#7a7a6a';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            ctx.fillStyle = '#5a4a3a';
+            ctx.fillRect(0, 0, canvas.width, 20);
+            ctx.fillRect(0, canvas.height - 20, canvas.width, 20);
+            ctx.fillRect(0, 0, 20, canvas.height);
+            ctx.fillRect(canvas.width - 20, 0, 20, canvas.height);
+
+            // Quest board on wall
+            ctx.fillStyle = '#4a3a2a';
+            ctx.fillRect(canvas.width / 2 - 80, 80, 160, 120);
+            ctx.fillStyle = '#f4e4c1';
+            ctx.font = '14px Comfortaa';
+            ctx.textAlign = 'center';
+            ctx.fillText('Quest Board', canvas.width / 2, 140);
+
+            // Quest Master NPC (simple placeholder)
+            const npcX = canvas.width / 2;
+            const npcY = canvas.height / 2 + 40;
+            
+            // Body
+            ctx.fillStyle = '#5a3a6a';
+            ctx.fillRect(npcX - 15, npcY - 20, 30, 40);
+            
+            // Head
+            ctx.fillStyle = '#d4a574';
+            ctx.beginPath();
+            ctx.arc(npcX, npcY - 30, 12, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Hat
+            ctx.fillStyle = '#3a2a4a';
+            ctx.fillRect(npcX - 14, npcY - 35, 28, 8);
+            
+            // Label
+            ctx.fillStyle = '#f4e4c1';
+            ctx.font = '12px Comfortaa';
+            ctx.fillText('Quest Master', npcX, npcY + 35);
+
+            ctx.font = '16px Comfortaa';
+            ctx.fillText('Quest Room', canvas.width / 2, 50);
+            ctx.font = '12px Comfortaa';
+            ctx.fillText('Press E to exit or talk to Quest Master', canvas.width / 2, canvas.height - 40);
+        }
+
+        function isWalkable(targetX, targetY) {
+            const tileX = Math.floor(targetX / TILE_SIZE);
+            const tileY = Math.floor(targetY / TILE_SIZE);
+
+            if (tileX < 0 || tileX >= MAP_WIDTH || tileY < 0 || tileY >= MAP_HEIGHT) return false;
+            const tileType = game.map[tileY][tileX];
+
+            if (tileType === 'g' || tileType === 'p' || tileType === 'd') {
+                for (const obj of game.mapObjects) {
+                    const dx = obj.x - targetX;
+                    const dy = obj.y - targetY;
+                    if (Math.abs(dx) < 15 && Math.abs(dy) < 15) {
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            return false;
+        }
+
+        // --- UPDATED: Get interaction target includes Home and Quest Room ---
+        function getInteractionTarget() {
+            if (game.scene !== 'overworld') {
+                return { type: 'exit', name: 'Exit Building' };
+            }
+
+            const interactX = game.player.x + (game.player.dx * TILE_SIZE);
+            const interactY = game.player.y + (game.player.dy * TILE_SIZE);
+            const tileX = Math.floor(interactX / TILE_SIZE);
+            const tileY = Math.floor(interactY / TILE_SIZE);
+
+            if (tileX >= 0 && tileX < MAP_WIDTH && tileY >= 0 && tileY < MAP_HEIGHT) {
+                const tileType = game.map[tileY][tileX];
+                if (tileType === 'b') {
+                    return { type: 'building', name: 'Research Laboratory', tileX, tileY };
+                }
+                if (tileType === 'h') {
+                    return { type: 'home', name: 'Home', tileX, tileY };
+                }
+                if (tileType === 'q') {
+                    return { type: 'quest', name: 'Quest Room', tileX, tileY };
+                }
+                if (tileType === 'd') {
+                    return { type: 'digsite', name: 'Archaeological Dig Site', tileX, tileY };
+                }
+            }
+
+            return null;
+        }
+
+        // --- UPDATED: Layer-based digsite drawing ---
+        function drawDigsite() {
+            const rows = 3;
+            const cols = 15;
+            const cellSize = 40;
+            const gridW = cols * cellSize;
+            const gridH = rows * cellSize;
+            const startX = (canvas.width - gridW) / 2;
+            const startY = (canvas.height - gridH) / 2;
+
+            // Get visible layers based on research upgrades
+            let visibleLayers = 1;
+            if (getResearchUnlocked('radar1')) visibleLayers = 2;
+            if (getResearchUnlocked('radar2')) visibleLayers = 3;
+            if (getResearchUnlocked('radar3')) visibleLayers = 4;
+            if (getResearchUnlocked('radar4')) visibleLayers = 5;
+
+            for (let y = 0; y < rows; y++) {
+                for (let x = 0; x < cols; x++) {
+                    const tileX = startX + x * cellSize;
+                    const tileY = startY + y * cellSize;
+
+                    const cell = game.currentDigsite.grid[y][x];
+                    const isVisible = y < game.currentLayer + visibleLayers;
+                    
+                    let color = '#5a3d2e';
+                    
+                    if (cell === 'dug') {
+                        color = '#a08060';
+                    } else if (cell !== null && cell !== 'dug' && isVisible) {
+                        color = '#8b6f47';
+                    }
+
+                    ctx.fillStyle = color;
+                    ctx.fillRect(tileX, tileY, cellSize - 2, cellSize - 2);
+
+                    // Only show "?" on visible, unexcavated artifacts
+                    if (cell !== null && cell !== 'dug' && isVisible) {
+                        ctx.fillStyle = '#f4e4c1';
+                        ctx.font = '20px Comfortaa';
+                        ctx.textAlign = 'center';
+                        ctx.fillText('?', tileX + cellSize / 2, tileY + cellSize / 2 + 7);
+                    }
+                }
+            }
+
+            ctx.fillStyle = '#f4e4c1';
+            ctx.font = '16px Comfortaa';
+            ctx.textAlign = 'center';
+            ctx.fillText(`Artifacts Remaining: ${game.currentDigsite.artifactCount} | Layer: ${game.currentLayer + 1}/${rows}`, canvas.width / 2, startY - 20);
+            ctx.fillText(`Press 'R' to return to base`, canvas.width / 2, startY - 40);
+        }
+
+        // --- UPDATED: Layer-based digging ---
+        function dig(mouseX, mouseY) {
+            const rows = 3;
+            const cols = 15;
+            const cellSize = 40;
+            const gridW = cols * cellSize;
+            const gridH = rows * cellSize;
+            const startX = (canvas.width - gridW) / 2;
+            const startY = (canvas.height - gridH) / 2;
+
+            const gridX = Math.floor((mouseX - startX) / cellSize);
+            const gridY = Math.floor((mouseY - startY) / cellSize);
+
+            if (gridX >= 0 && gridX < cols && gridY >= 0 && gridY < rows) {
+                const cell = game.currentDigsite.grid[gridY][gridX];
+
+                // Can only dig current layer
+                if (gridY !== game.currentLayer) {
+                    showMessage("You must clear the current layer first!");
+                    return;
+                }
+
+                if (cell !== null && cell !== 'dug') {
+                    const artifact = ARTIFACTS[cell];
+                    game.inventory[cell] = (game.inventory[cell] || 0) + 1;
+                    game.currentDigsite.grid[gridY][gridX] = 'dug';
+                    game.currentDigsite.artifactCount--;
+                    game.currentDigsite.dirtCount--;
+                    
+                    // --- NEW: Update quest progress ---
+                    game.questProgress.totalCollected++;
+                    if (artifact.rarity === 'rare') game.questProgress.rareCollected++;
+                    if (artifact.rarity === 'epic') game.questProgress.epicCollected++;
+                    if (artifact.rarity === 'legendary') game.questProgress.legendaryCollected++;
+                    updateQuestProgress();
+                    
+                    showArtifactInfo(artifact);
+                } else if (cell === null) {
+                    game.currentDigsite.grid[gridY][gridX] = 'dug';
+                    game.currentDigsite.dirtCount--;
+                }
+
+                // Check if current layer is complete
+                let layerComplete = true;
+                for (let x = 0; x < cols; x++) {
+                    if (game.currentDigsite.grid[gridY][x] !== 'dug') {
+                        layerComplete = false;
+                        break;
+                    }
+                }
+
+                if (layerComplete && game.currentLayer < rows - 1) {
+                    game.currentLayer++;
+                    showMessage(`Layer ${game.currentLayer} unlocked!`);
+                }
+
+                updateHUD();
+
+                if (game.currentDigsite.artifactCount === 0) {
+                    game.questProgress.totalDigsites++;
+                    updateQuestProgress();
+                    showMessage("All artifacts excavated! Return to the lab to document your findings.");
+                }
+            }
+        }
+
+        function showArtifactInfo(artifact) {
+            document.getElementById('artifactName').textContent = artifact.name;
+            document.getElementById('artifactDescription').textContent = artifact.description;
+            document.getElementById('artifactModal').style.display = 'flex';
+        }
+
+        // --- UPDATED: Time system with freeze at 11 PM ---
+        function updateGame() {
+            if (!game.timeFrozen) {
+                game.time.frameCounter++;
+                if (game.time.frameCounter % 180 === 0) {
+                    game.time.hour++;
+                    game.time.frameCounter = 0;
+                }
+
+                // Freeze time at 11 PM
+                if (game.time.hour >= 23) {
+                    game.time.hour = 23;
+                    game.timeFrozen = true;
+                    if (!game.lateNightWarningShown) {
+                        game.lateNightWarningShown = true;
+                        document.getElementById('lateNightModal').style.display = 'flex';
+                    }
+                }
+
+                if (game.time.hour >= 24) {
+                    game.time.hour = 0;
+                }
+            }
+
+            // --- UPDATED: Smooth night fade animation ---
+            game.isNight = game.time.hour >= 18 || game.time.hour < 6;
+            const targetOpacity = game.isNight ? 0.6 : 0;
+            
+            if (Math.abs(game.nightOpacity - targetOpacity) > 0.01) {
+                const fadeSpeed = 0.01;
+                if (game.nightOpacity < targetOpacity) {
+                    game.nightOpacity = Math.min(game.nightOpacity + fadeSpeed, targetOpacity);
+                } else {
+                    game.nightOpacity = Math.max(game.nightOpacity - fadeSpeed, targetOpacity);
+                }
+                nightOverlay.style.opacity = game.nightOpacity;
+            }
+
+            if (game.time.hour >= 17 && game.state === 'digsite') {
+                game.state = 'town';
+                showMessage("The dig site closed for the day! Return tomorrow.");
+            }
+
+            if (game.state === 'town' && game.scene === 'overworld') {
+                updatePlayerMovement();
+                updateCamera();
+                updateActionPrompt();
+            }
+
+            updateHUD();
+            draw();
+        }
+
+        function updatePlayerMovement() {
+            let newX = game.player.x;
+            let newY = game.player.y;
+            let moving = false;
+
+            if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) { newY -= game.player.speed; moving = true; }
+            if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) { newY += game.player.speed; moving = true; }
+            if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) { newX -= game.player.speed; moving = true; }
+            if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) { newX += game.player.speed; moving = true; }
+
+            game.player.isWalking = moving;
+
+            if (newX !== game.player.x && isWalkable(newX, game.player.y)) {
+                game.player.x = newX;
+            }
+            if (newY !== game.player.y && isWalkable(game.player.x, newY)) {
+                game.player.y = newY;
+            }
+
+            if (moving) {
+                if (game.keys['ArrowUp'] || game.keys['w'] || game.keys['W']) { game.player.dy = -1; game.player.dx = 0; }
+                else if (game.keys['ArrowDown'] || game.keys['s'] || game.keys['S']) { game.player.dy = 1; game.player.dx = 0; }
+                else if (game.keys['ArrowLeft'] || game.keys['a'] || game.keys['A']) { game.player.dx = -1; game.player.dy = 0; }
+                else if (game.keys['ArrowRight'] || game.keys['d'] || game.keys['D']) { game.player.dx = 1; game.player.dy = 0; }
+            }
+        }
+
+        function updateCamera() {
+            game.offsetX = canvas.width / 2 - game.player.x;
+            game.offsetY = canvas.height / 2 - game.player.y;
+        }
+
+        function updateActionPrompt() {
+            const target = getInteractionTarget();
+            if (target) {
+                actionPrompt.style.display = 'block';
+                promptText.textContent = `Interact with ${target.name}`;
+            } else {
+                actionPrompt.style.display = 'none';
+            }
+        }
+
+        function updateHUD() {
+            const timeFormatted = `${(game.time.hour % 12) || 12}:00 ${game.time.hour < 12 ? 'AM' : 'PM'}`;
+            timeDisplay.textContent = `${timeFormatted}, Day ${game.time.day}`;
+            moneyDisplay.textContent = game.researchPoints;
+
+            let inventoryHtml = '';
+            for (const artifactType in game.inventory) {
+                if (game.inventory[artifactType] > 0) {
+                    const artifact = ARTIFACTS[artifactType];
+                    inventoryHtml += `<div class="artifact-info">${artifact.name}: ${game.inventory[artifactType]}</div>`;
+                }
+            }
+            inventoryDisplay.innerHTML = inventoryHtml || 'No artifacts collected yet.';
+            document.getElementById('bottomLeftPanel').style.display = 'block';
+        }
+
+        function showMessage(message) {
+            messageText.textContent = message;
+            messageBox.style.display = 'block';
+            setTimeout(() => {
+                messageBox.style.display = 'none';
+            }, 4000);
+        }
+
+        function draw() {
+            ctx.fillStyle = '#1a1410';
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+            if (game.state === 'town') {
+                if (game.scene === 'overworld') {
+                    drawMap();
+                    drawAmbiance();
+                    drawMapObjects();
+                    drawPlayer();
+                    drawMinimap();
+                } else if (game.scene === 'lab_interior') {
+                    drawLabInterior();
+                } else if (game.scene === 'home_interior') {
+                    drawHomeInterior();
+                } else if (game.scene === 'quest_interior') {
+                    drawQuestInterior();
+                }
+            } else if (game.state === 'digsite') {
+                drawDigsite();
+            }
+
+            if (game.tutorialActive) {
+                tutorialBox.style.display = 'block';
+                tutorialText.textContent = TUTORIAL_STEPS[game.tutorialStep].text;
+                nextTutorialButton.textContent = (game.tutorialStep === TUTORIAL_STEPS.length - 1) ? 'Start Excavating!' : 'Next';
+            } else {
+                tutorialBox.style.display = 'none';
+            }
+        }
+
+        function drawMinimap() {
+            const scale = 4;
+            const minimapW = MAP_WIDTH * scale;
+            const minimapH = MAP_HEIGHT * scale;
+            
+            minimapCtx.fillStyle = '#1a1410';
+            minimapCtx.fillRect(0, 0, minimapCanvas.width, minimapCanvas.height);
+
+            const offsetX = (minimapCanvas.width - minimapW) / 2;
+            const offsetY = (minimapCanvas.height - minimapH) / 2;
+
+            for (let y = 0; y < MAP_HEIGHT; y++) {
+                for (let x = 0; x < MAP_WIDTH; x++) {
+                    let color;
+                    switch (game.map[y][x]) {
+                        case 'g': color = '#2a4a2a'; break;
+                        case 'p': color = '#705040'; break;
+                        case 'b': color = '#6a5a3a'; break;
+                        case 'h': color = '#5a4a3a'; break;
+                        case 'q': color = '#6a5a4a'; break;
+                        case 'd': color = '#d4a574'; break;
+                        default: color = '#2a4a2a';
+                    }
+                    minimapCtx.fillStyle = color;
+                    minimapCtx.fillRect(offsetX + x * scale, offsetY + y * scale, scale, scale);
+                }
+            }
+
+            // --- NEW: Add building labels ---
+            minimapCtx.font = '8px Comfortaa';
+            minimapCtx.textAlign = 'center';
+            minimapCtx.fillStyle = '#f4e4c1';
+            minimapCtx.strokeStyle = '#1a1410';
+            minimapCtx.lineWidth = 2;
+            
+            // Lab label (center)
+            const labX = offsetX + 22 * scale;
+            const labY = offsetY + 12 * scale;
+            minimapCtx.strokeText('Lab', labX, labY);
+            minimapCtx.fillText('Lab', labX, labY);
+            
+            // Home label (bottom left)
+            const homeX = offsetX + 7 * scale;
+            const homeY = offsetY + 37 * scale;
+            minimapCtx.strokeText('Home', homeX, homeY);
+            minimapCtx.fillText('Home', homeX, homeY);
+            
+            // Quest Room label (top right)
+            const questX = offsetX + 37 * scale;
+            const questY = offsetY + 7 * scale;
+            minimapCtx.strokeText('Quest', questX, questY);
+            minimapCtx.fillText('Quest', questX, questY);
+
+            // Player position
+            const playerX = Math.floor(game.player.x / TILE_SIZE);
+            const playerY = Math.floor(game.player.y / TILE_SIZE);
+            minimapCtx.fillStyle = '#ff4444';
+            minimapCtx.fillRect(offsetX + playerX * scale - 1, offsetY + playerY * scale - 1, scale + 2, scale + 2);
+        }
+
+        // --- UPDATED: Handle interactions with all buildings ---
+        function handleInteraction() {
+            if (game.tutorialActive && game.tutorialStep < TUTORIAL_STEPS.length - 1) {
+                return;
+            }
+
+            const target = getInteractionTarget();
+            
+            if (target && target.type === 'exit') {
+                game.scene = 'overworld';
+                game.labPopupShown = false;
+                return;
+            }
+
+            if (game.state === 'town' && game.scene === 'overworld') {
+                if (target) {
+                    if (target.type === 'building' && target.name === 'Research Laboratory') {
+                        if (game.isNight) {
+                            showNightLabOptions();
+                        } else {
+                            game.scene = 'lab_interior';
+                        }
+                        if (game.tutorialActive && game.tutorialStep === 4) {
+                            game.tutorialStep++;
+                        }
+                    } else if (target.type === 'home') {
+                        game.scene = 'home_interior';
+                        if (game.isNight) {
+                            setTimeout(() => showSleepModal(), 500);
+                        }
+                    } else if (target.type === 'quest') {
+                        game.scene = 'quest_interior';
+                        setTimeout(() => showQuestBoard(), 500);
+                    } else if (target.type === 'digsite') {
+                        if (game.time.hour >= 9 && game.time.hour < 17) {
+                            generateDigsiteContent();
+                            game.state = 'digsite';
+                            showMessage("Excavation site entered. Click carefully to uncover artifacts!");
+                        } else {
+                            showMessage("Dig sites are only open from 9 AM to 5 PM.");
+                        }
+                    }
+                }
+            }
+        }
+
+        function showNightLabOptions() {
+            const hasArtifacts = Object.keys(game.inventory).some(key => game.inventory[key] > 0);
+            
+            if (hasArtifacts) {
+                showStudyModal();
+            } else {
+                showMessage("No artifacts to study. Head home to sleep or continue exploring.");
+            }
+        }
+
+        function showStudyModal() {
+            const studyList = document.getElementById('studyList');
+            studyList.innerHTML = '';
+            
+            let hasUnstudied = false;
+            for (const artifactType in game.inventory) {
+                const count = game.inventory[artifactType];
+                const studied = game.studiedArtifacts[artifactType] || 0;
+                const unstudied = count - studied;
+                
+                if (unstudied > 0) {
+                    hasUnstudied = true;
+                    const artifact = ARTIFACTS[artifactType];
+                    const div = document.createElement('div');
+                    div.className = 'study-item';
+                    div.innerHTML = `
+                        <strong>${artifact.name}</strong><br>
+                        <small>${unstudied} unstudied specimen(s)</small><br>
+                        <button class="action-button" onclick="studyArtifact('${artifactType}')">
+                            Study (+${Math.floor(artifact.value * 0.5)} bonus points)
+                        </button>
+                    `;
+                    studyList.appendChild(div);
+                }
+            }
+            
+            if (!hasUnstudied) {
+                studyList.innerHTML = '<p>All artifacts have been studied!</p>';
+            }
+            
+            document.getElementById('studyModal').style.display = 'flex';
+        }
+
+        function studyArtifact(artifactType) {
+            const artifact = ARTIFACTS[artifactType];
+            const studied = game.studiedArtifacts[artifactType] || 0;
+            const unstudied = game.inventory[artifactType] - studied;
+            
+            if (unstudied > 0) {
+                game.studiedArtifacts[artifactType] = studied + 1;
+                const bonusPoints = Math.floor(artifact.value * 0.5);
+                game.researchPoints += bonusPoints;
+                
+                // --- NEW: Update quest progress ---
+                game.questProgress.totalStudied++;
+                updateQuestProgress();
+                
+                updateHUD();
+                showMessage(`Studied ${artifact.name} in detail! Earned ${bonusPoints} bonus research points.`);
+                showStudyModal();
+            }
+        }
+
+        function showSleepModal() {
+            const hasWork = Object.keys(game.inventory).some(key => {
+                const studied = game.studiedArtifacts[key] || 0;
+                return game.inventory[key] > studied;
+            });
+            
+            document.getElementById('sleepMessage').textContent = hasWork 
+                ? "You still have artifacts to study, but you can rest if you're ready for a new day."
+                : "Rest up for tomorrow's excavations?";
+            
+            document.getElementById('sleepModal').style.display = 'flex';
+        }
+
+        // --- UPDATED: Sleep starts at 7 AM ---
+        function startNewDay() {
+            game.time.hour = 7;
+            game.time.day++;
+            game.studiedArtifacts = {};
+            game.timeFrozen = false;
+            game.lateNightWarningShown = false;
+            generateDigsites();
+            document.getElementById('sleepModal').style.display = 'none';
+            game.scene = 'overworld';
+            showMessage(`Day ${game.time.day}: New dig sites have been discovered! Check your map.`);
+        }
+
+        function documentArtifacts() {
+            let totalValue = 0;
+            let documentedItems = [];
+            
+            const docList = document.getElementById('documentationList');
+            docList.innerHTML = '';
+            
+            for (const artifactType in game.inventory) {
+                const count = game.inventory[artifactType];
+                if (count > 0) {
+                    const artifact = ARTIFACTS[artifactType];
+                    const value = count * artifact.value;
+                    totalValue += value;
+                    documentedItems.push(`${count}x ${artifact.name}`);
+                    
+                    // Add to display
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'study-item';
+                    itemDiv.innerHTML = `<strong>${count}x ${artifact.name}</strong><br><small>+${value} Research Points</small>`;
+                    docList.appendChild(itemDiv);
+                    
+                    game.inventory[artifactType] = 0;
+                }
+            }
+            
+            if (totalValue > 0) {
+                game.researchPoints += totalValue;
+                updateQuestProgress();
+                document.getElementById('documentationMessage').textContent = `Successfully documented ${documentedItems.length} artifact type(s)!`;
+            } else {
+                document.getElementById('documentationMessage').textContent = 'No artifacts to document. Go excavate some dig sites!';
+            }
+            
+            updateHUD();
+            document.getElementById('documentationModal').style.display = 'flex';
+        }
+
+        // --- NEW: Research Tree functions ---
+        function showResearchTree() {
+            const content = document.getElementById('researchTreeContent');
+            content.innerHTML = '';
+
+            const tiers = [
+                { name: 'Tier 1', upgrades: RESEARCH_TREE.tier1, tier: 1 },
+                { name: 'Tier 2', upgrades: RESEARCH_TREE.tier2, tier: 2 },
+                { name: 'Radar Branch', upgrades: RESEARCH_TREE.radar, tier: 2 },
+                { name: 'Tier 3', upgrades: RESEARCH_TREE.tier3, tier: 3 },
+                { name: 'Tier 4', upgrades: RESEARCH_TREE.tier4, tier: 4 },
+                { name: 'Tier 5 - Storyline', upgrades: RESEARCH_TREE.tier5, tier: 5 }
+            ];
+
+            tiers.forEach(tierInfo => {
+                // Check if this tier should be visible
+                if (!isTierUnlocked(tierInfo.tier)) {
+                    return; // Skip this tier entirely
+                }
+
+                const tierDiv = document.createElement('div');
+                tierDiv.className = 'research-tier';
+                tierDiv.innerHTML = `<h3>${tierInfo.name}</h3>`;
+
+                tierInfo.upgrades.forEach(upgrade => {
+                    const canUnlock = canUnlockResearch(upgrade);
+                    const upgradeDiv = document.createElement('div');
+                    upgradeDiv.className = `research-upgrade ${upgrade.unlocked ? 'unlocked' : ''} ${!canUnlock ? 'locked' : ''}`;
+                    
+                    upgradeDiv.innerHTML = `
+                        <strong>${upgrade.name}</strong> - ${upgrade.cost} RP<br>
+                        <small>${upgrade.effect}</small><br>
+                        ${upgrade.unlocked ? '<span style="color: #4a8a4a;">✓ Unlocked</span>' : 
+                          canUnlock ? `<button class="action-button" onclick="unlockResearch('${upgrade.id}')">Unlock</button>` :
+                          `<span style="color: #8a4a4a;">Requires ${upgrade.requires || 0} previous tier upgrades</span>`}
+                    `;
+                    tierDiv.appendChild(upgradeDiv);
+                });
+
+                content.appendChild(tierDiv);
+            });
+
+            document.getElementById('researchTreeModal').style.display = 'flex';
+        }
+
+        function isTierUnlocked(tier) {
+            if (tier === 1) return true; // Tier 1 always visible
+            
+            // Check if previous tier has enough unlocks
+            const previousTier = tier - 1;
+            let unlockedInPrevious = 0;
+            
+            for (const tierKey in RESEARCH_TREE) {
+                RESEARCH_TREE[tierKey].forEach(u => {
+                    if (u.tier === previousTier && u.unlocked) {
+                        unlockedInPrevious++;
+                    }
+                });
+            }
+            
+            // Need at least 2 upgrades from previous tier to unlock next tier
+            return unlockedInPrevious >= 2;
+        }
+
+        function canUnlockResearch(upgrade) {
+            if (upgrade.unlocked) return false;
+            if (game.researchPoints < upgrade.cost) return false;
+            
+            if (!upgrade.requires) return true;
+            
+            const previousTier = upgrade.tier - 1;
+            let unlockedInPrevious = 0;
+            
+            for (const tierKey in RESEARCH_TREE) {
+                RESEARCH_TREE[tierKey].forEach(u => {
+                    if (u.tier === previousTier && u.unlocked) {
+                        unlockedInPrevious++;
+                    }
+                });
+            }
+            
+            return unlockedInPrevious >= upgrade.requires;
+        }
+
+        function getResearchUnlocked(id) {
+            for (const tierKey in RESEARCH_TREE) {
+                const upgrade = RESEARCH_TREE[tierKey].find(u => u.id === id);
+                if (upgrade) return upgrade.unlocked;
+            }
+            return false;
+        }
+
+        function unlockResearch(id) {
+            for (const tierKey in RESEARCH_TREE) {
+                const upgrade = RESEARCH_TREE[tierKey].find(u => u.id === id);
+                if (upgrade && canUnlockResearch(upgrade)) {
+                    upgrade.unlocked = true;
+                    game.researchPoints -= upgrade.cost;
+                    updateHUD();
+                    showMessage(`Unlocked: ${upgrade.name}!`);
+                    
+                    // --- NEW: Check for victory condition ---
+                    if (id === 'victory') {
+                        setTimeout(() => {
+                            document.getElementById('missionCompleteModal').style.display = 'flex';
+                        }, 1000);
+                    }
+                    
+                    showResearchTree();
+                    return;
+                }
+            }
+        }
+
+        // --- NEW: Quest Board functions ---
+        function showQuestBoard() {
+            const content = document.getElementById('questBoardContent');
+            content.innerHTML = '';
+
+            for (const packKey in QUEST_PACKS) {
+                const pack = QUEST_PACKS[packKey];
+                const isUnlocked = getResearchUnlocked(pack.unlock);
+                
+                const packDiv = document.createElement('div');
+                packDiv.className = `quest-pack ${!isUnlocked ? 'locked' : ''}`;
+                packDiv.innerHTML = `<h3>${pack.name} ${!isUnlocked ? '🔒' : ''}</h3>`;
+                
+                if (isUnlocked) {
+                    pack.quests.forEach(quest => {
+                        const questDiv = document.createElement('div');
+                        questDiv.className = `quest-item ${quest.completed ? 'completed' : ''}`;
+                        
+                        const progressPercent = Math.min(100, (quest.progress / quest.target) * 100);
+                        
+                        questDiv.innerHTML = `
+                            <strong>${quest.name}</strong><br>
+                            <small>${quest.desc}</small><br>
+                            <div class="quest-progress">
+                                <div class="quest-progress-bar" style="width: ${progressPercent}%"></div>
+                            </div>
+                            <small>Progress: ${quest.progress}/${quest.target}</small><br>
+                            <small>Reward: ${quest.reward} RP</small>
+                            ${quest.completed ? '<br><span style="color: #4a8a4a;">✓ Completed!</span>' : ''}
+                        `;
+                        packDiv.appendChild(questDiv);
+                    });
+                } else {
+                    packDiv.innerHTML += `<p>Unlock "${pack.unlock}" in the Research Tree to access these quests.</p>`;
+                }
+                
+                content.appendChild(packDiv);
+            }
+
+            document.getElementById('questBoardModal').style.display = 'flex';
+        }
+
+        function updateQuestProgress() {
+            for (const packKey in QUEST_PACKS) {
+                const pack = QUEST_PACKS[packKey];
+                if (!getResearchUnlocked(pack.unlock)) continue;
+                
+                pack.quests.forEach(quest => {
+                    if (quest.completed) return;
+                    
+                    let newProgress = 0;
+                    switch (quest.type) {
+                        case 'collect':
+                            newProgress = game.questProgress.totalCollected;
+                            break;
+                        case 'study':
+                            newProgress = game.questProgress.totalStudied;
+                            break;
+                        case 'digsite':
+                            newProgress = game.questProgress.totalDigsites;
+                            break;
+                        case 'collectRare':
+                            newProgress = game.questProgress.rareCollected;
+                            break;
+                        case 'collectEpic':
+                            newProgress = game.questProgress.epicCollected;
+                            break;
+                        case 'collectLegendary':
+                            newProgress = game.questProgress.legendaryCollected;
+                            break;
+                        case 'earnRP':
+                            newProgress = game.researchPoints;
+                            break;
+                        case 'unlockTier5':
+                            newProgress = RESEARCH_TREE.tier5.filter(u => u.unlocked).length;
+                            break;
+                    }
+                    
+                    quest.progress = newProgress;
+                    
+                    if (quest.progress >= quest.target && !quest.completed) {
+                        quest.completed = true;
+                        game.researchPoints += quest.reward;
+                        showMessage(`Quest completed: ${quest.name}! Earned ${quest.reward} RP!`);
+                    }
+                });
+            }
+        }
+
+        function handleKeydown(e) {
+            game.keys[e.key] = true;
+            if (e.key === 'e' || e.key === 'E') {
+                e.preventDefault();
+                if (!game.tutorialActive) {
+                    handleInteraction();
+                }
+            }
+            if (game.state === 'digsite' && (e.key === 'r' || e.key === 'R')) {
+                game.state = 'town';
+                game.currentLayer = 0;
+                showMessage("Returning to base camp.");
+            }
+        }
+
+        function handleKeyup(e) {
+            game.keys[e.key] = false;
+        }
+
+        function handleMouseClick(e) {
+            if (game.state === 'digsite') {
+                dig(e.clientX, e.clientY);
+            }
+        }
+
+        // Event Listeners
+        nextTutorialButton.addEventListener('click', () => {
+            if (!game.tutorialActive) return;
+            game.tutorialStep++;
+            if (game.tutorialStep >= TUTORIAL_STEPS.length) {
+                game.tutorialActive = false;
+                game.tutorialStep = 0;
+                tutorialBox.style.display = 'none';
+            }
+        });
+
+        document.getElementById('settingsButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'flex';
+        });
+
+        document.getElementById('closeSettingsModal').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'none';
+        });
+
+        document.getElementById('restartTutorialInModal').addEventListener('click', () => {
+            game.tutorialActive = true;
+            game.tutorialStep = 0;
+            document.getElementById('settingsModal').style.display = 'none';
+            showMessage("Tutorial restarted.");
+        });
+
+        document.getElementById('closeArtifactModal').addEventListener('click', () => {
+            document.getElementById('artifactModal').style.display = 'none';
+        });
+
+        document.getElementById('closeStudyModal').addEventListener('click', () => {
+            document.getElementById('studyModal').style.display = 'none';
+        });
+
+        document.getElementById('confirmSleep').addEventListener('click', () => {
+            startNewDay();
+        });
+
+        document.getElementById('cancelSleep').addEventListener('click', () => {
+            document.getElementById('sleepModal').style.display = 'none';
+        });
+
+        // --- NEW: Research Tree button ---
+        document.getElementById('researchTreeButton').addEventListener('click', () => {
+            showResearchTree();
+        });
+
+        document.getElementById('closeResearchTreeModal').addEventListener('click', () => {
+            document.getElementById('researchTreeModal').style.display = 'none';
+        });
+
+        // --- NEW: Quest Board button ---
+        document.getElementById('closeQuestBoardModal').addEventListener('click', () => {
+            document.getElementById('questBoardModal').style.display = 'none';
+        });
+
+        // --- NEW: Credits buttons ---
+        document.getElementById('showCreditsButton').addEventListener('click', () => {
+            document.getElementById('settingsModal').style.display = 'none';
+            document.getElementById('creditsModal').style.display = 'flex';
+        });
+
+        document.getElementById('closeCreditsModal').addEventListener('click', () => {
+            document.getElementById('creditsModal').style.display = 'none';
+        });
+
+        // --- NEW: Mission Complete buttons ---
+        document.getElementById('continueExploringButton').addEventListener('click', () => {
+            document.getElementById('missionCompleteModal').style.display = 'none';
+        });
+
+        document.getElementById('closeMissionCompleteModal').addEventListener('click', () => {
+            document.getElementById('missionCompleteModal').style.display = 'none';
+        });
+
+        // --- NEW: Late night warning ---
+        document.getElementById('closeLateNightModal').addEventListener('click', () => {
+            document.getElementById('lateNightModal').style.display = 'none';
+        });
+
+        // --- NEW: Documentation modal ---
+        document.getElementById('closeDocumentationModal').addEventListener('click', () => {
+            document.getElementById('documentationModal').style.display = 'none';
+            game.scene = 'overworld';
+        });
+
+        // Make functions available globally
+        window.studyArtifact = studyArtifact;
+        window.unlockResearch = unlockResearch;
+
+        function initGame() {
+            resizeCanvas();
+            game.map = createMap();
+            generateMapObjects();
+            generateAmbiance();
+            generateDigsites();
+            updateHUD();
+            
+            window.addEventListener('resize', resizeCanvas);
+            window.addEventListener('keydown', handleKeydown);
+            window.addEventListener('keyup', handleKeyup);
+            canvas.addEventListener('click', handleMouseClick);
+            
+            setInterval(updateGame, 1000 / 60);
+        }
+
+        initGame();
+    </script>
+</body>
+</html>
