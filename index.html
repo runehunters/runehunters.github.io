@@ -59,10 +59,9 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .help-section h3{color:#ffd700;margin-bottom:5px}
 #digsiteProgress{
     position:absolute;
-    /* top:50%;left:50%;transform:translate(-50%,-50%); */ /* Removed old positioning */
-    bottom: 330px; /* 300px minimap height + 20px bottom offset + 10px spacing */
+    bottom: 330px; 
     right: 20px;
-    width: 300px; /* Set width to match minimap */
+    width: 300px; 
     background:rgba(42,24,16,0.95);
     border:3px solid #8b6f47;
     padding:20px;
@@ -72,8 +71,7 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
     z-index:100
 }
 .progress-bar-container{
-    /* width:300px; */ /* Removed fixed width */
-    width: 100%; /* Fill new parent width */
+    width: 100%; 
     height:30px;
     background:#3a2a1a;
     border:2px solid #8b6f47;
@@ -116,13 +114,6 @@ Research Points: <span id="moneyDisplay">0</span>
 <p id="tutorialText"></p>
 <button id="nextTutorialButton" class="action-button" style="margin-top:10px" tabindex="3">Next</button>
 </div>
-</div>
-<div id="digsiteProgress">
-<h3>Excavating...</h3>
-<div class="progress-bar-container">
-<div class="progress-bar-fill" id="digProgressBar"></div>
-</div>
-<p id="digProgressText">0%</p>
 </div>
 <div id="settingsModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
@@ -180,14 +171,6 @@ Research Points: <span id="moneyDisplay">0</span>
 <p id="documentationMessage">Processing your findings...</p>
 <div id="documentationList"></div>
 <button id="closeDocumentationModal" class="action-button" tabindex="22">Return to Lab</button>
-</div>
-</div>
-<div id="studyModal" class="modal-overlay" style="display:none">
-<div class="modal-content">
-<h2>🔬 Research Laboratory - Night Study</h2>
-<p>Study artifacts to gain cultural insights and earn bonus research points.</p>
-<div id="studyList"></div>
-<button id="closeStudyModal" class="action-button" tabindex="23">Close</button>
 </div>
 </div>
 <div id="sleepModal" class="modal-overlay" style="display:none">
@@ -269,15 +252,11 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div class="help-section">
 <h3>Digging</h3>
-<p>Dig sites have 5-10 hidden layers. Only one layer is visible at a time. Click tiles to excavate them. Digging requires multiple clicks or time based on your upgrades. Clear all tiles in a layer to reveal the next layer.</p>
+<p>Dig sites have 5-10 hidden layers. Only one layer is visible at a time. Click tiles to excavate them instantly. Clear all tiles in a layer to reveal the next layer.</p>
 </div>
 <div class="help-section">
 <h3>Artifacts</h3>
 <p>Artifacts you collect appear in your inventory (bottom-left). They never disappear. Bring them to the Lab to document and earn research points.</p>
-</div>
-<div class="help-section">
-<h3>Studying</h3>
-<p>At night, visit the Lab to study artifacts. Studying reveals cultural insights, adds analysis notes, and grants bonus research points. Artifacts remain in your inventory after studying.</p>
 </div>
 <div class="help-section">
 <h3>Research Tree</h3>
@@ -285,7 +264,7 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div class="help-section">
 <h3>Camp & Lab</h3>
-<p>Camp: Sleep to start a new day and generate new dig sites.<br>Lab: Document artifacts (day) or study them (night).</p>
+<p>Camp: Sleep to start a new day and generate new dig sites.<br>Lab: Document artifacts to earn Research Points.</p>
 </div>
 <div class="help-section">
 <h3>Keybinds</h3>
@@ -354,49 +333,47 @@ book2:{name:"Papyrus Fragment",rarity:"epic",value:230,description:"Egyptian pap
 const RARITY_ORDER=['common','uncommon','rare','epic','legendary'];
 const RESEARCH_TREE={
 tier1:[
-{id:'brush1',name:'Brush With Greatness',cost:150,effect:'+10% dig speed',tier:1,unlocked:false,prereqs:[]},
-{id:'file',name:'File It Under History',cost:150,effect:'+5% documentation RP',tier:1,unlocked:false,prereqs:[]},
+{id:'brush1',name:'Brush With Greatness',cost:150,effect:'Improved excavation techniques',tier:1,unlocked:false,prereqs:[]},
+{id:'file',name:'File It Under History',cost:150,effect:'Advanced documentation methods',tier:1,unlocked:false,prereqs:[]},
 {id:'cardio',name:'Cardio-facts Training',cost:200,effect:'+10% movement speed',tier:1,unlocked:false,prereqs:[]},
 {id:'questpack1',name:'Open Sesame-Stone',cost:100,effect:'Unlock Quest Pack 1',tier:1,unlocked:false,prereqs:[]}
 ],
 tier2:[
-{id:'shovel1',name:'Shovel Some Respect',cost:250,effect:'+20% dig speed',tier:2,unlocked:false,prereqs:['brush1']},
+{id:'shovel1',name:'Shovel Some Respect',cost:250,effect:'Stronger digging tools',tier:2,unlocked:false,prereqs:['brush1']},
 {id:'radar1',name:'Peek Performance',cost:300,effect:'See 2 layers',tier:2,unlocked:false,prereqs:['brush1']},
-{id:'paperwork',name:'Paperwork Makes Dream Work',cost:500,effect:'+15% documentation RP',tier:2,unlocked:false,prereqs:['file']},
+{id:'paperwork',name:'Paperwork Makes Dream Work',cost:500,effect:'Efficient archival system',tier:2,unlocked:false,prereqs:['file']},
 {id:'questpack2',name:'Quest-ionable Methods',cost:300,effect:'Unlock Quest Pack 2',tier:2,unlocked:false,prereqs:['questpack1']}
 ],
 tier3:[
-{id:'brush2',name:'Brush Hour 2',cost:400,effect:'+15% dig speed',tier:3,unlocked:false,prereqs:['shovel1']},
+{id:'brush2',name:'Brush Hour 2',cost:400,effect:'Fine-detail analysis tools',tier:3,unlocked:false,prereqs:['shovel1']},
 {id:'scan1',name:'Scan-You-Dig-It?',cost:700,effect:'10% reveal chance',tier:3,unlocked:false,prereqs:['radar1']},
 {id:'radar2',name:'Double-Down Detector',cost:600,effect:'See 3 layers',tier:3,unlocked:false,prereqs:['radar1']},
-{id:'keep',name:'Keep It Together',cost:1100,effect:'+20% artifact value',tier:3,unlocked:false,prereqs:['paperwork']},
+{id:'keep',name:'Keep It Together',cost:1100,effect:'Artifact preservation training',tier:3,unlocked:false,prereqs:['paperwork']},
 {id:'questpack3',name:'Quest For Success',cost:900,effect:'Unlock Quest Pack 3',tier:3,unlocked:false,prereqs:['questpack2']}
 ],
 tier4:[
-{id:'shovel2',name:'Shovel With Punches',cost:600,effect:'+20% dig speed',tier:4,unlocked:false,prereqs:['brush2']},
+{id:'shovel2',name:'Shovel With Punches',cost:600,effect:'Reinforced excavation gear',tier:4,unlocked:false,prereqs:['brush2']},
 {id:'radar3',name:'Depth Charge',cost:1200,effect:'See 4 layers, +25% detect',tier:4,unlocked:false,prereqs:['scan1','radar2']},
 {id:'map',name:'Map-tastic Insights',cost:900,effect:'Show digsite contents',tier:4,unlocked:false,prereqs:['keep']},
 {id:'labgo',name:'Lab On the Go-pher',cost:2800,effect:'Field documentation',tier:4,unlocked:false,prereqs:['keep']},
 {id:'questpack4',name:'A Quest-ion of Time',cost:1200,effect:'Unlock Quest Pack 4',tier:4,unlocked:false,prereqs:['questpack3']}
 ],
 tier5:[
-{id:'tools3',name:'Dig-nificantly Better',cost:1200,effect:'+30% dig speed',tier:5,unlocked:false,prereqs:['shovel2']},
+{id:'tools3',name:'Dig-nificantly Better',cost:1200,effect:'Master excavation kit',tier:5,unlocked:false,prereqs:['shovel2']},
 {id:'radar4',name:'All-Seeing Eye-chaeology',cost:1800,effect:'See 5 layers, +50% detect',tier:5,unlocked:false,prereqs:['radar3']},
 {id:'laser',name:'Laser Focused',cost:3000,effect:'30% reveal chance',tier:5,unlocked:false,prereqs:['radar3']},
-{id:'research',name:'Research and Destroy',cost:2400,effect:'+30% all RP',tier:5,unlocked:false,prereqs:['map','labgo']},
+{id:'research',name:'Research and Destroy',cost:2400,effect:'Advanced research methodology',tier:5,unlocked:false,prereqs:['map','labgo']},
 {id:'victory',name:'Dig Victory',cost:4000,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research']}
 ]
 };
 const QUEST_PACKS={
 pack1:{name:"Beginner's Luck",unlock:'questpack1',quests:[
 {id:'q1_1',name:'First Steps',desc:'Collect 5 artifacts',type:'collect',target:5,progress:0,completed:false,reward:50},
-{id:'q1_2',name:'Eager Learner',desc:'Study 3 artifacts',type:'study',target:3,progress:0,completed:false,reward:75},
 {id:'q1_3',name:'Complete Excavation',desc:'Complete 1 dig site',type:'digsite',target:1,progress:0,completed:false,reward:100}
 ]},
 pack2:{name:"Intermediate Excavator",unlock:'questpack2',quests:[
 {id:'q2_1',name:'Rare Finds',desc:'Collect 3 rare artifacts',type:'collectRare',target:3,progress:0,completed:false,reward:150},
-{id:'q2_2',name:'Research Focus',desc:'Earn 500 research points',type:'earnRP',target:500,progress:0,completed:false,reward:200},
-{id:'q2_3',name:'Thorough Study',desc:'Study 10 artifacts',type:'study',target:10,progress:0,completed:false,reward:175}
+{id:'q2_2',name:'Research Focus',desc:'Earn 500 research points',type:'earnRP',target:500,progress:0,completed:false,reward:200}
 ]},
 pack3:{name:"Deep Digs",unlock:'questpack3',quests:[
 {id:'q3_1',name:'Master Excavator',desc:'Complete 5 dig sites',type:'digsite',target:5,progress:0,completed:false,reward:300},
@@ -414,7 +391,7 @@ const TUTORIAL_STEPS=[
 {text:"Archaeology is the study of human history through excavation and analysis of artifacts and structures. Each discovery helps us understand how people lived thousands of years ago."},
 {text:"Move around using your movement keys. The map shows your research base and surrounding areas where dig sites will appear."},
 {text:"Dig sites appear each day at 9 AM. Visit them during the day to excavate layered trenches."},
-{text:"The central building is your Research Laboratory. During the day, bring artifacts here to document them. At night, you can study artifacts for bonus research points!"},
+{text:"The central building is your Research Laboratory. Visit it to document your artifacts and earn Research Points!"},
 {text:"When ready to sleep, enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!"}
 ];
 let game={
@@ -429,8 +406,7 @@ digsites:[],
 paths:[],
 currentDigsite:null,
 inventory:{},
-studiedArtifacts:{},
-artifactInsights:{},
+documentedArtifacts:{},
 researchPoints:0,
 time:{hour:9,minute:0,day:1,frameCounter:0},
 keys:{},
@@ -444,10 +420,7 @@ nightOpacity:0,
 timeFrozen:false,
 lateNightWarningShown:false,
 labPopupShown:false,
-questProgress:{totalCollected:0,totalStudied:0,totalDigsites:0,rareCollected:0,epicCollected:0,legendaryCollected:0},
-diggingProgress:0,
-diggingTarget:0,
-diggingCell:null,
+questProgress:{totalCollected:0,totalDigsites:0,rareCollected:0,epicCollected:0,legendaryCollected:0},
 currentKeybindChange:null,
 currentKeybindSlot:null
 };
@@ -893,8 +866,6 @@ const tileX=Math.floor(targetX/TILE_SIZE);
 const tileY=Math.floor(targetY/TILE_SIZE);
 if(tileX<0||tileX>=MAP_WIDTH||tileY<0||tileY>=MAP_HEIGHT)return false;
 const tileType=game.map[tileY][tileX];
-// ### FIX HERE ###
-// Added 'g' (grass) to the list of walkable tiles.
 if(tileType==='g'||tileType==='p'||tileType==='d'){
 for(const obj of game.mapObjects){
 const dx=obj.x-targetX;
@@ -991,49 +962,15 @@ const startY=(canvas.height-gridH)/2;
 const gridX=Math.floor((mouseX-startX)/cellSize);
 const gridY=Math.floor((mouseY-startY)/cellSize);
 if(gridX>=0&&gridX<cols&&gridY>=0&&gridY<rows){
+if(digsite.dugCells[gridY][gridX]){
+return;
+}
 if(gridY!==digsite.currentLayer){
 showMessage("You must clear the current layer first!");
 return;
 }
-if(digsite.dugCells[gridY][gridX]){
-return;
-}
-/*
-if(game.diggingCell){
-return;
-}
-*/
-let digSpeed=1;
-if(getResearchUnlocked('brush1'))digSpeed*=1.1;
-if(getResearchUnlocked('shovel1'))digSpeed*=1.2;
-if(getResearchUnlocked('brush2'))digSpeed*=1.15;
-if(getResearchUnlocked('shovel2'))digSpeed*=1.2;
-if(getResearchUnlocked('tools3'))digSpeed*=1.3;
-game.diggingTarget=Math.max(20,Math.floor(100/digSpeed));
-game.diggingProgress=0;
-game.diggingCell={x:gridX,y:gridY};
-document.getElementById('digsiteProgress').style.display='block';
-document.getElementById('digProgressBar').style.width='0%';
-document.getElementById('digProgressText').textContent='0%';
-}
-}
-function updateDigging(){
-if(!game.diggingCell)return;
-game.diggingProgress++;
-const percent=Math.min(100, Math.floor((game.diggingProgress/game.diggingTarget)*100)); // Added Math.min
-document.getElementById('digProgressBar').style.width=percent+'%';
-document.getElementById('digProgressText').textContent=percent+'%';
-if(game.diggingProgress>=game.diggingTarget){
-// Force 100% display
-document.getElementById('digProgressBar').style.width='100%';
-document.getElementById('digProgressText').textContent='100%';
-completeDigging();
-}
-}
-function completeDigging(){
-const digsite=game.currentDigsite;
-const x=game.diggingCell.x;
-const y=game.diggingCell.y;
+const x=gridX;
+const y=gridY;
 const cell=digsite.grid[y][x];
 digsite.dugCells[y][x]=true;
 if(cell&&cell!=='dug'){
@@ -1068,15 +1005,7 @@ game.digsites[digsiteIndex].completed=true;
 }
 showMessage("All artifacts excavated! Return to the lab to document your findings.");
 }
-// Hide the bar after 200ms, but free up the digging lock immediately
-game.diggingCell=null; // Unlock digging immediately
-game.diggingProgress=0;
-setTimeout(() => {
-// Only hide the progress bar if a new dig hasn't already started
-if (game.diggingCell === null) {
-document.getElementById('digsiteProgress').style.display = 'none';
 }
-}, 200);
 }
 function showArtifactInfo(artifact){
 document.getElementById('artifactName').textContent=artifact.name;
@@ -1086,9 +1015,9 @@ document.getElementById('artifactModal').style.display='flex';
 function updateGame(){
 if(!game.timeFrozen&&!game.tutorialActive){
 game.time.frameCounter++;
-if(game.time.frameCounter%30===0){
-game.time.minute++;
+if(game.time.frameCounter>=30){
 game.time.frameCounter=0;
+game.time.minute++;
 if(game.time.minute>=60){
 game.time.minute=0;
 game.time.hour++;
@@ -1126,9 +1055,6 @@ if(game.state==='town'&&game.scene==='overworld'){
 updatePlayerMovement();
 updateCamera();
 updateActionPrompt();
-}
-if(game.state==='digsite'){
-updateDigging();
 }
 updateHUD();
 draw();
@@ -1316,11 +1242,7 @@ return;
 if(game.state==='town'&&game.scene==='overworld'){
 if(target){
 if(target.type==='building'&&target.name==='Research Laboratory'){
-if(game.isNight){
-showNightLabOptions();
-}else{
 game.scene='lab_interior';
-}
 }else if(target.type==='home'){
 game.scene='home_interior';
 if(game.isNight){
@@ -1357,77 +1279,8 @@ showQuestBoard();
 }
 }
 }
-function showNightLabOptions(){
-const hasArtifacts=Object.keys(game.inventory).some(key=>game.inventory[key]>0);
-if(hasArtifacts){
-showStudyModal();
-}else{
-showMessage("No artifacts to study. Head to camp to sleep or continue exploring.");
-}
-}
-function showStudyModal(){
-const studyList=document.getElementById('studyList');
-studyList.innerHTML='';
-let hasUnstudied=false;
-for(const artifactType in game.inventory){
-const count=game.inventory[artifactType];
-const studied=(game.studiedArtifacts[artifactType]||0);
-const unstudied=count-studied;
-if(unstudied>0){
-hasUnstudied=true;
-const artifact=ARTIFACTS[artifactType];
-const div=document.createElement('div');
-div.className='study-item';
-const insightIndex=(game.artifactInsights[artifactType]||0);
-const nextInsight=artifact.insights[insightIndex]||"No more insights available.";
-div.innerHTML=`
-<strong>${artifact.name}</strong><br>
-<small>${unstudied} unstudied specimen(s)</small><br>
-<small><em>Next insight: "${nextInsight}"</em></small><br>
-<button class="action-button" onclick="studyArtifact('${artifactType}')">
-Study (+${Math.floor(artifact.value*0.5)} bonus points)
-</button>
-`;
-studyList.appendChild(div);
-}
-}
-if(!hasUnstudied){
-studyList.innerHTML='<p>All artifacts have been studied!</p>';
-}
-document.getElementById('studyModal').style.display='flex';
-}
-function studyArtifact(artifactType){
-const artifact=ARTIFACTS[artifactType];
-const studied=game.studiedArtifacts[artifactType]||0;
-const unstudied=game.inventory[artifactType]-studied;
-if(unstudied>0){
-game.studiedArtifacts[artifactType]=studied+1;
-const insightIndex=game.artifactInsights[artifactType]||0;
-const insight=artifact.insights[insightIndex]||"Further study confirms previous findings.";
-game.artifactInsights[artifactType]=Math.min(insightIndex+1,artifact.insights.length-1);
-let bonusPoints=Math.floor(artifact.value*0.5);
-if(getResearchUnlocked('research'))bonusPoints=Math.floor(bonusPoints*1.3);
-game.researchPoints+=bonusPoints;
-game.questProgress.totalStudied++;
-updateQuestProgress();
-updateHUD();
-const studyList=document.getElementById('studyList');
-const note=document.createElement('div');
-note.className='analysis-notes';
-note.innerHTML=`<strong>Cultural Insight:</strong> ${insight}`;
-studyList.insertBefore(note,studyList.firstChild);
-showMessage(`Studied ${artifact.name}! Earned ${bonusPoints} research points.`);
-setTimeout(()=>showStudyModal(),2000);
-}
-}
 function showSleepModal(){
-const hasWork=Object.keys(game.inventory).some(key=>{
-const studied=game.studiedArtifacts[key]||0;
-return game.inventory[key]>studied;
-});
-document.getElementById('sleepMessage').textContent=hasWork?
-"You still have artifacts to study, but you can rest if you're ready for a new day.":
-"Rest up for tomorrow's excavations?";
+document.getElementById('sleepMessage').textContent = "Rest up for tomorrow's excavations?";
 document.getElementById('sleepModal').style.display='flex';
 }
 function startNewDay(){
@@ -1447,28 +1300,27 @@ let documentedItems=[];
 const docList=document.getElementById('documentationList');
 docList.innerHTML='';
 for(const artifactType in game.inventory){
-const count=game.inventory[artifactType];
-if(count>0){
+const inInventory=game.inventory[artifactType]||0;
+const alreadyDocumented=game.documentedArtifacts[artifactType]||0;
+const toDocument=inInventory-alreadyDocumented;
+if(toDocument>0){
 const artifact=ARTIFACTS[artifactType];
-let value=count*artifact.value;
-if(getResearchUnlocked('file'))value=Math.floor(value*1.05);
-if(getResearchUnlocked('paperwork'))value=Math.floor(value*1.15);
-if(getResearchUnlocked('keep'))value=Math.floor(value*1.2);
-if(getResearchUnlocked('research'))value=Math.floor(value*1.3);
+let value=toDocument*artifact.value;
 totalValue+=value;
-documentedItems.push(`${count}x ${artifact.name}`);
+game.documentedArtifacts[artifactType]=inInventory;
+documentedItems.push(`${toDocument}x ${artifact.name}`);
 const itemDiv=document.createElement('div');
 itemDiv.className='study-item';
-itemDiv.innerHTML=`<strong>${count}x ${artifact.name}</strong><br><small>+${value} Research Points</small>`;
+itemDiv.innerHTML=`<strong>${toDocument}x ${artifact.name}</strong><br><small>+${value} Research Points</small>`;
 docList.appendChild(itemDiv);
 }
 }
 if(totalValue>0){
 game.researchPoints+=totalValue;
 updateQuestProgress();
-document.getElementById('documentationMessage').textContent=`Successfully documented ${documentedItems.length} artifact type(s)!`;
+document.getElementById('documentationMessage').textContent=`Successfully documented ${documentedItems.length} new artifact type(s)!`;
 }else{
-document.getElementById('documentationMessage').textContent='No artifacts to document. Go excavate some dig sites!';
+document.getElementById('documentationMessage').textContent='No new artifacts to document. Go excavate some dig sites!';
 }
 updateHUD();
 document.getElementById('documentationModal').style.display='flex';
@@ -1578,9 +1430,6 @@ switch(quest.type){
 case'collect':
 newProgress=game.questProgress.totalCollected;
 break;
-case'study':
-newProgress=game.questProgress.totalStudied;
-break;
 case'digsite':
 newProgress=game.questProgress.totalDigsites;
 break;
@@ -1629,7 +1478,6 @@ game.keys[pressedKey]=true;
 if(game.keybinds.interact.includes(pressedKey)){
 e.preventDefault();
 if(game.state === 'digsite') {
-// If we are in a digsite, 'E' means exit
 game.state='town';
 game.currentDigsite=null;
 showMessage("Returning to base camp.");
@@ -1686,9 +1534,6 @@ document.getElementById('settingsModal').style.display='flex';
 });
 document.getElementById('closeArtifactModal').addEventListener('click',()=>{
 document.getElementById('artifactModal').style.display='none';
-});
-document.getElementById('closeStudyModal').addEventListener('click',()=>{
-document.getElementById('studyModal').style.display='none';
 });
 document.getElementById('confirmSleep').addEventListener('click',()=>{
 startNewDay();
@@ -1759,7 +1604,6 @@ game.currentKeybindSlot=slot;
 document.getElementById(`keybind-${action}${slot+1}-btn`).textContent="...";
 showMessage(`Press any key to set new bind for: ${action.toUpperCase()} slot ${slot+1}`);
 }
-window.studyArtifact=studyArtifact;
 window.unlockResearch=unlockResearch;
 window.startKeybindChange=startKeybindChange;
 function initGame(){
