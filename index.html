@@ -1202,13 +1202,19 @@ document.getElementById('tutorialBox').style.display='none';
 }
 }
 function drawMinimap(){
-const scale=6;
-const minimapW=MAP_WIDTH*scale;
-const minimapH=MAP_HEIGHT*scale;
 minimapCtx.fillStyle='#1a1410';
 minimapCtx.fillRect(0,0,minimapCanvas.width,minimapCanvas.height);
-const offsetX=(minimapCanvas.width-minimapW)/2;
-const offsetY=(minimapCanvas.height-minimapH)/2;
+
+// Scale the map to fit within the minimap canvas while maintaining aspect ratio
+const scaleX = minimapCanvas.width / MAP_WIDTH;
+const scaleY = minimapCanvas.height / MAP_HEIGHT;
+const scale = Math.min(scaleX, scaleY);
+const minimapW = MAP_WIDTH * scale;
+const minimapH = MAP_HEIGHT * scale;
+
+// Center the scaled map within the minimap canvas
+const offsetX = (minimapCanvas.width - minimapW) / 2;
+const offsetY = (minimapCanvas.height - minimapH) / 2;
 for(let y=0;y<MAP_HEIGHT;y++){
 for(let x=0;x<MAP_WIDTH;x++){
 let color;
