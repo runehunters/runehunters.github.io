@@ -449,21 +449,34 @@ function getTutorialText(stepIndex) {
 }
 
 function handleDpadPress(direction) {
-  const key = game.keybinds[direction][0];
-  game.keys[key] = true;
+  if (direction === 'interact') {
+    // Directly trigger interaction for touch controls
+    if (!game.tutorialActive) {
+      handleInteraction();
+    }
+  } else {
+    // Set key state for movement buttons
+    const key = game.keybinds[direction][0];
+    game.keys[key] = true;
+  }
 }
 
 function handleDpadRelease(direction) {
-  const key = game.keybinds[direction][0];
-  game.keys[key] = false;
+  if (direction !== 'interact') {
+    // Clear key state for movement buttons (interact doesn't need this)
+    const key = game.keybinds[direction][0];
+    game.keys[key] = false;
+  }
 }
 
 function updateDpadVisibility() {
   const dpad = document.getElementById('dpad');
   if (game.controlScheme === 'touch') {
     dpad.style.display = 'block';
+    game.zoomScale = 0.5; // 50% zoom for touch controls
   } else {
     dpad.style.display = 'none';
+    game.zoomScale = 1.0; // 100% zoom for keyboard controls
   }
 }
 
@@ -503,7 +516,8 @@ labPopupShown:false,
 questProgress:{totalCollected:0,totalDigsites:0,rareCollected:0,epicCollected:0,legendaryCollected:0, totalRPEarned: 0},
 currentKeybindChange:null,
 currentKeybindSlot:null,
-controlScheme:'keyboard'
+controlScheme:'keyboard',
+zoomScale:1.0
 };
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -1091,8 +1105,8 @@ else if(game.keys[game.keybinds.right[0]]||game.keys[game.keybinds.right[1]]){ga
 }
 }
 function updateCamera(){
-game.offsetX=canvas.width/2-game.player.x;
-game.offsetY=canvas.height/2-game.player.y;
+game.offsetX=canvas.width/2-game.player.x*game.zoomScale;
+game.offsetY=canvas.height/2-game.player.y*game.zoomScale;
 }
 function updateActionPrompt(){
 const target=getInteractionTarget();
