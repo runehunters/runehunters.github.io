@@ -87,7 +87,8 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .dpad-down{grid-area:down}
 .dpad-left{grid-area:left}
 .dpad-right{grid-area:right}
-.dpad-grid{display:grid;grid-template-areas:'. up .''left . right''. down .';grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:5px}
+.dpad-grid{display:grid;grid-template-areas:'. up .''left center right''. down .';grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:5px}
+.dpad-center{grid-area:center}
 .control-scheme-option{display:flex;align-items:center;justify-content:center;margin:15px 0}
 .control-scheme-option input[type="radio"]{margin-right:10px;transform:scale(1.2)}
 .control-scheme-option label{font-size:16px;cursor:pointer}
@@ -128,7 +129,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <div id="settingsModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
 <h2>Game Settings</h2>
-<h3>Control Scheme</h3>
+<h3>Controls</h3>
 <div class="control-scheme-option">
 <input type="radio" id="settingsKeyboardControl" name="settingsControlScheme" value="keyboard" checked>
 <label for="settingsKeyboardControl">🎹 Keyboard Controls</label>
@@ -137,7 +138,6 @@ Research Points: <span id="moneyDisplay">0</span>
 <input type="radio" id="settingsTouchControl" name="settingsControlScheme" value="touch">
 <label for="settingsTouchControl">📱 Touch Controls (D-Pad)</label>
 </div>
-<h3>Keybinds</h3>
 <div class="keybinds-grid">
 <div class="keybind-setting">
 <span>Move Up:</span>
@@ -306,10 +306,11 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="dpad" class="dpad">
 <div class="dpad-grid">
-<button id="dpad-up" class="dpad-button dpad-up" ontouchstart="handleDpadPress('up')" ontouchend="handleDpadRelease('up')">↑</button>
-<button id="dpad-down" class="dpad-button dpad-down" ontouchstart="handleDpadPress('down')" ontouchend="handleDpadRelease('down')">↓</button>
-<button id="dpad-left" class="dpad-button dpad-left" ontouchstart="handleDpadPress('left')" ontouchend="handleDpadRelease('left')">←</button>
-<button id="dpad-right" class="dpad-button dpad-right" ontouchstart="handleDpadPress('right')" ontouchend="handleDpadRelease('right')">→</button>
+<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress('up')" onpointerup="handleDpadRelease('up')">↑</button>
+<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress('left')" onpointerup="handleDpadRelease('left')">←</button>
+<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress('interact')" onpointerup="handleDpadRelease('interact')">●</button>
+<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress('right')" onpointerup="handleDpadRelease('right')">→</button>
+<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress('down')" onpointerup="handleDpadRelease('down')">↓</button>
 </div>
 </div>
 <script>
