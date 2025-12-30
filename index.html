@@ -485,6 +485,57 @@ function updateDpadVisibility() {
   game.zoomScale = 1.0; // Always 100% zoom
 }
 
+function saveGame() {
+  const saveData = {
+    player: game.player,
+    inventory: game.inventory,
+    documentedArtifacts: game.documentedArtifacts,
+    researchPoints: game.researchPoints,
+    time: game.time,
+    keybinds: game.keybinds,
+    tutorialActive: game.tutorialActive,
+    tutorialStep: game.tutorialStep,
+    questProgress: game.questProgress,
+    controlScheme: game.controlScheme,
+    zoomScale: game.zoomScale,
+    unlockedResearches: []
+  };
+  for(const tierKey in RESEARCH_TREE){
+    RESEARCH_TREE[tierKey].forEach(upgrade => {
+      if(upgrade.unlocked){
+        saveData.unlockedResearches.push(upgrade.id);
+      }
+    });
+  }
+  localStorage.setItem('runehunters_save', JSON.stringify(saveData));
+}
+
+function loadGame() {
+  const saved = localStorage.getItem('runehunters_save');
+  if(saved){
+    const saveData = JSON.parse(saved);
+    Object.assign(game.player, saveData.player);
+    game.inventory = saveData.inventory || {};
+    game.documentedArtifacts = saveData.documentedArtifacts || {};
+    game.researchPoints = saveData.researchPoints || 0;
+    Object.assign(game.time, saveData.time);
+    game.keybinds = saveData.keybinds || game.keybinds;
+    game.tutorialActive = saveData.tutorialActive || false;
+    game.tutorialStep = saveData.tutorialStep || 0;
+    game.questProgress = saveData.questProgress || game.questProgress;
+    game.controlScheme = saveData.controlScheme || 'keyboard';
+    game.zoomScale = saveData.zoomScale || 1.0;
+    if(saveData.unlockedResearches){
+      saveData.unlockedResearches.forEach(id => {
+        const upgrade = findResearchById(id);
+        if(upgrade){
+          upgrade.unlocked = true;
+        }
+      });
+    }
+  }
+}
+
 function showControlSchemeSelector() {
   document.getElementById('controlSchemeModal').style.display = 'flex';
   const selectedRadio = document.querySelector(`input[name="controlScheme"][value="${game.controlScheme}"]`);
@@ -1312,6 +1363,7 @@ game.time.day++;
 game.timeFrozen=false;
 game.lateNightWarningShown=false;
 generateDigsites();
+saveGame();
 document.getElementById('sleepModal').style.display='none';
 game.scene='overworld';
 showMessage(`Day ${game.time.day}: New dig sites have been discovered! Check your map.`);
@@ -1347,6 +1399,7 @@ if(totalValue>0){
   game.researchPoints+=totalValue;
   game.questProgress.totalRPEarned += totalValue; // Add to total earned
   updateQuestProgress();
+  saveGame();
   document.getElementById('documentationMessage').textContent=`Successfully documented ${documentedItems.length} new artifact type(s)!`;
 }else{
   document.getElementById('documentationMessage').textContent='No new artifacts to document. Go excavate some dig sites!';
@@ -1415,6 +1468,7 @@ upgrade.unlocked=true;
 game.researchPoints-=upgrade.cost;
 updateHUD();
 showMessage(`Unlocked: ${upgrade.name}!`);
+saveGame();
 if(id==='victory'){
 setTimeout(()=>{
 document.getElementById('missionCompleteModal').style.display='flex';
@@ -1578,6 +1632,7 @@ document.getElementById('settingsModal').style.display='none';
 document.getElementById('confirmModal').style.display='flex';
 });
 document.getElementById('confirmResetBtn').addEventListener('click',()=>{
+localStorage.removeItem('runehunters_save');
 location.reload();
 });
 document.getElementById('cancelResetBtn').addEventListener('click',()=>{
@@ -1673,12 +1728,14 @@ window.unlockResearch=unlockResearch;
 window.startKeybindChange=startKeybindChange;
 function initGame(){
 resizeCanvas();
+loadGame();
 game.map=createMap();
 generateDigsites();
 generateMapObjects();
 generateAmbiance();
 generateBackgroundElements();
 updateHUD();
+updateDpadVisibility();
 window.addEventListener('resize',resizeCanvas);
 window.addEventListener('keydown',handleKeydown);
 window.addEventListener('keyup',handleKeyup);
