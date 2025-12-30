@@ -478,12 +478,11 @@ function updateDpadVisibility() {
   if (game.controlScheme === 'touch') {
     dpad.style.display = 'block';
     minimap.classList.add('touch');
-    game.zoomScale = 0.5; // 50% zoom for touch controls
   } else {
     dpad.style.display = 'none';
     minimap.classList.remove('touch');
-    game.zoomScale = 1.0; // 100% zoom for keyboard controls
   }
+  game.zoomScale = 1.0; // Always 100% zoom
 }
 
 function showControlSchemeSelector() {
