@@ -82,7 +82,7 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .progress-bar-fill{height:100%;background:#ffd700;transition:width 0.3s}
 .analysis-notes{background:rgba(60,50,40,0.5);padding:10px;margin:10px 0;border-left:3px solid #ffd700;border-radius:5px;text-align:left;font-size:13px;line-height:1.5}
 .dpad{position:fixed;bottom:20px;left:20px;z-index:100;display:none}
-.dpad-button{width:60px;height:60px;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:10px;margin:5px;display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;cursor:pointer;user-select:none;touch-action:manipulation}
+.dpad-button{width:60px;height:60px;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:10px;margin:5px;display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none}
 .dpad-button:active{background:rgba(120,100,80,0.9)}
 .dpad-up{grid-area:up}
 .dpad-down{grid-area:down}
@@ -307,11 +307,11 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="dpad" class="dpad">
 <div class="dpad-grid">
-<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress('up')" onpointerup="handleDpadRelease('up')">↑</button>
-<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress('left')" onpointerup="handleDpadRelease('left')">←</button>
-<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress('interact')" onpointerup="handleDpadRelease('interact')">●</button>
-<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress('right')" onpointerup="handleDpadRelease('right')">→</button>
-<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress('down')" onpointerup="handleDpadRelease('down')">↓</button>
+<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress(event, 'up')" onpointerup="handleDpadRelease(event, 'up')" oncontextmenu="return false;">↑</button>
+<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress(event, 'left')" onpointerup="handleDpadRelease(event, 'left')" oncontextmenu="return false;">←</button>
+<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress(event, 'interact')" onpointerup="handleDpadRelease(event, 'interact')" oncontextmenu="return false;">●</button>
+<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress(event, 'right')" onpointerup="handleDpadRelease(event, 'right')" oncontextmenu="return false;">→</button>
+<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress(event, 'down')" onpointerup="handleDpadRelease(event, 'down')" oncontextmenu="return false;">↓</button>
 </div>
 </div>
 <script>
@@ -449,7 +449,8 @@ function getTutorialText(stepIndex) {
   return baseText;
 }
 
-function handleDpadPress(direction) {
+function handleDpadPress(event, direction) {
+  event.preventDefault();
   if (direction === 'interact') {
     // Directly trigger interaction for touch controls
     if (!game.tutorialActive) {
@@ -462,7 +463,8 @@ function handleDpadPress(direction) {
   }
 }
 
-function handleDpadRelease(direction) {
+function handleDpadRelease(event, direction) {
+  event.preventDefault();
   if (direction !== 'interact') {
     // Clear key state for movement buttons (interact doesn't need this)
     const key = game.keybinds[direction][0];
@@ -1386,6 +1388,14 @@ for(const prereqId of upgrade.prereqs){
 const prereq=findResearchById(prereqId);
 if(!prereq||!prereq.unlocked)return false;
 }
+if(upgrade.tier > 1){
+  const prevTier = 'tier' + (upgrade.tier - 1);
+  if(RESEARCH_TREE[prevTier]){
+    for(const prevUpgrade of RESEARCH_TREE[prevTier]){
+      if(!prevUpgrade.unlocked) return false;
+    }
+  }
+}
 return true;
 }
 function findResearchById(id){
@@ -1520,6 +1530,11 @@ else if(game.state==='digsite'&&game.keybinds.return.includes(pressedKey)){
 game.state='town';
 game.currentDigsite=null;
 showMessage("Returning to base camp.");
+}
+if(game.currentKeybindChange !== null){
+populateKeybinds();
+game.currentKeybindChange = null;
+game.currentKeybindSlot = null;
 }
 }
 function handleKeyup(e){
