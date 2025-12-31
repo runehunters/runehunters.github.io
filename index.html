@@ -17,6 +17,7 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .top-left{position:absolute;top:20px;left:20px;font-size:14px}
 .bottom-left{position:absolute;bottom:20px;left:20px;font-size:14px;max-width:350px;max-height:400px;overflow-y:auto}
 .top-right{position:absolute;top:20px;right:20px}
+.top-right.touch{position:absolute;top:70px;left:20px}
 .minimap{position:absolute;bottom:20px;right:20px;width:300px;height:300px;border:3px solid #8b6f47;background:rgba(26,20,16,0.95);box-shadow:0 2px 8px rgba(0,0,0,0.5)}
 .minimap.touch{width:150px;height:150px}
 #minimapCanvas{width:100%;height:100%;display:block}
@@ -113,9 +114,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <strong>Collected Artifacts</strong><br>
 <div id="inventoryDisplay"></div>
 </div>
-<div id="actionPrompt" class="hud-element bottom-center" style="display:none;position:absolute;bottom:20px;left:50%;transform:translateX(-50%)">
-<span id="promptText">...</span>
-</div>
+
 <div id="messageBox">
 <p id="messageText"></p>
 </div>
@@ -130,6 +129,18 @@ Research Points: <span id="moneyDisplay">0</span>
 <div id="settingsModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
 <h2>Game Settings</h2>
+<button id="controlsButton" class="action-button">Controls</button>
+
+<button id="howToPlayButton" class="action-button" tabindex="16">📖 How To Play</button>
+<button id="restartTutorialInModal" class="action-button" tabindex="17">Restart Tutorial</button>
+<button id="showCreditsButton" class="action-button" tabindex="18">📜 Credits</button>
+<button id="resetProgressButton" class="action-button red" tabindex="19">Reset All Progress</button>
+<button id="closeSettingsModal" class="action-button" tabindex="20">Close</button>
+</div>
+</div>
+<div id="controlsModal" class="modal-overlay" style="display:none">
+<div class="modal-content">
+<h2>Controls</h2>
 <h3>Controls</h3>
 <div class="control-scheme-option">
 <input type="radio" id="settingsKeyboardControl" name="settingsControlScheme" value="keyboard" checked>
@@ -171,11 +182,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <button id="keybind-return2-btn" class="action-button keybind-btn" onclick="startKeybindChange('return',1)" tabindex="15">-</button>
 </div>
 </div>
-<button id="howToPlayButton" class="action-button" tabindex="16">📖 How To Play</button>
-<button id="restartTutorialInModal" class="action-button" tabindex="17">Restart Tutorial</button>
-<button id="showCreditsButton" class="action-button" tabindex="18">📜 Credits</button>
-<button id="resetProgressButton" class="action-button red" tabindex="19">Reset All Progress</button>
-<button id="closeSettingsModal" class="action-button" tabindex="20">Close</button>
+<button id="closeControlsModal" class="action-button">Back to Settings</button>
 </div>
 </div>
 <div id="artifactModal" class="modal-overlay" style="display:none">
@@ -221,9 +228,15 @@ Research Points: <span id="moneyDisplay">0</span>
 <div class="modal-content">
 <h2>📜 Game Credits</h2>
 <div class="credits-section">
-<p><strong>Version 3</strong></p>
+<p><strong>Version 3.2</strong></p>
 <h3>Developer:</h3>
-<p>FLL Team 56913 - IDK R0b0c0ns, Claude Sonnet 4.5, Gemini 2.5 Pro, Gemini 3 Pro, devstral, Grok Code</p>
+<p>FLL Team 56913</p>
+<p>IDK R0b0c0ns</p>
+<p>Claude Sonnet 4.5</p>
+<p>Gemini 2.5 Pro</p>
+<p>Gemini 3 Pro</p>
+<p>devstral</p>
+<p>Grok Code</p>
 </div>
 <button id="closeCreditsModal" class="action-button" tabindex="28">Close</button>
 </div>
@@ -234,9 +247,15 @@ Research Points: <span id="moneyDisplay">0</span>
 <p style="font-size:18px;color:#ffd700"><strong>Congratulations!</strong></p>
 <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
 <div class="credits-section">
-<p><strong>Version 3</strong></p>
+<p><strong>Version 3.2</strong></p>
 <h3>Developer:</h3>
-<p>FLL Team 56913 - IDK R0b0c0ns, Claude Sonnet 4.5, Gemini 2.5 Pro, Gemini 3 Pro, devstral, Grok Code</p>
+<p>FLL Team 56913</p>
+<p>IDK R0b0c0ns</p>
+<p>Claude Sonnet 4.5</p>
+<p>Gemini 2.5 Pro</p>
+<p>Gemini 3 Pro</p>
+<p>devstral</p>
+<p>Grok Code</p>
 </div>
 <button id="continueExploringButton" class="action-button" tabindex="29">Continue Exploring</button>
 <button id="closeMissionCompleteModal" class="action-button" tabindex="30">Return to Game</button>
@@ -475,12 +494,15 @@ function handleDpadRelease(event, direction) {
 function updateDpadVisibility() {
   const dpad = document.getElementById('dpad');
   const minimap = document.querySelector('.minimap');
+  const topRightPanel = document.getElementById('topRightPanel');
   if (game.controlScheme === 'touch') {
     dpad.style.display = 'block';
     minimap.classList.add('touch');
+    topRightPanel.classList.add('touch');
   } else {
     dpad.style.display = 'none';
     minimap.classList.remove('touch');
+    topRightPanel.classList.remove('touch');
   }
   game.zoomScale = 1.0; // Always 100% zoom
 }
@@ -573,7 +595,9 @@ questProgress:{totalCollected:0,totalDigsites:0,rareCollected:0,epicCollected:0,
 currentKeybindChange:null,
 currentKeybindSlot:null,
 controlScheme:'keyboard',
-zoomScale:1.0
+zoomScale:1.0,
+lampsVisible:false,
+previousIsNight:false
 };
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -651,13 +675,31 @@ if(x<0||x>=MAP_WIDTH||y<0||y>=MAP_HEIGHT)return true;
 const tileType=game.map[y][x];
 return tileType==='b'||tileType==='h'||tileType==='q'||tileType==='d'||tileType==='w';
 }
+function isBlockedForObject(x,y){
+if(game.map[y][x] !== 'g') return true;
+// Check buildings
+if(game.map[y][x] === 'b' || game.map[y][x] === 'h' || game.map[y][x] === 'q') return true;
+// Check distance to other trees and rocks
+for(const obj of game.mapObjects){
+if(Math.abs(obj.x/TILE_SIZE - x) <=1 && Math.abs(obj.y/TILE_SIZE - y) <=1) return true;
+}
+for(const amb of game.ambianceElements){
+if(Math.abs(amb.x/TILE_SIZE - x) <=1 && Math.abs(amb.y/TILE_SIZE - y) <=1) return true;
+}
+return false;
+}
 function generateMapObjects(){
 game.mapObjects=[];
 const treeCount=MAP_WIDTH*MAP_HEIGHT/30;
 for(let i=0;i<treeCount;i++){
-const x=Math.floor(Math.random()*MAP_WIDTH);
-const y=Math.floor(Math.random()*MAP_HEIGHT);
-if(game.map[y]&&game.map[y][x]==='g'){
+let x,y,attempts=0;
+do{
+x= Math.floor(Math.random()*MAP_WIDTH);
+y= Math.floor(Math.random()*MAP_HEIGHT);
+attempts++;
+if(attempts>1000)break;
+}while(game.map[y][x]!=='g' || isBlockedForObject(x,y));
+if(game.map[y][x]==='g' && !isBlockedForObject(x,y)){
 game.mapObjects.push(new MapObject(x*TILE_SIZE+TILE_SIZE/2,y*TILE_SIZE+TILE_SIZE/2,'tree','Tree'));
 }
 }
@@ -666,9 +708,14 @@ function generateAmbiance(){
 game.ambianceElements=[];
 const rockCount=MAP_WIDTH*MAP_HEIGHT/35;
 for(let i=0;i<rockCount;i++){
-const x=Math.floor(Math.random()*MAP_WIDTH);
-const y=Math.floor(Math.random()*MAP_HEIGHT);
-if(game.map[y]&&game.map[y][x]==='g'){
+let x,y,attempts=0;
+do{
+x= Math.floor(Math.random()*MAP_WIDTH);
+y= Math.floor(Math.random()*MAP_HEIGHT);
+attempts++;
+if(attempts>1000)break;
+}while(game.map[y][x]!=='g' || isBlockedForObject(x,y));
+if(game.map[y][x]==='g' && !isBlockedForObject(x,y)){
 game.ambianceElements.push({x:x*TILE_SIZE+TILE_SIZE/2,y:y*TILE_SIZE+TILE_SIZE/2,type:'rock'});
 }
 }
@@ -701,10 +748,15 @@ while(!placed&&attempts<100){
 const x=Math.floor(Math.random()*(MAP_WIDTH-5))+2;
 const y=Math.floor(Math.random()*(MAP_HEIGHT-5))+2;
 const distFromCenter=Math.sqrt(Math.pow(x-21,2)+Math.pow(y-12,2));
+let width = 3, height = 3;
+if(game.controlScheme === 'touch'){
+width = Math.floor(Math.random()*5)+2;
+height = Math.floor(Math.random()*5)+2;
+}
 let isClear=distFromCenter>10;
 if(isClear){
-for(let dy=0;dy<3;dy++){
-for(let dx=0;dx<3;dx++){
+for(let dy=0;dy<height;dy++){
+for(let dx=0;dx<width;dx++){
 if(game.map[y+dy]&&game.map[y+dy][x+dx]!=='g'){
 isClear=false;
 }
@@ -712,13 +764,13 @@ isClear=false;
 }
 }
 if(isClear){
-for(let dy=0;dy<3;dy++){
-for(let dx=0;dx<3;dx++){
+for(let dy=0;dy<height;dy++){
+for(let dx=0;dx<width;dx++){
 game.map[y+dy][x+dx]='d';
 }
 }
 const layers=5+Math.floor(Math.random()*6);
-game.digsites.push({x:x+1,y:y+1,completed:false,grid:null,layers:layers});
+game.digsites.push({x:x+1,y:y+1,completed:false,grid:null,layers:layers,width:width,height:height});
 placed=true;
 }
 attempts++;
@@ -831,6 +883,7 @@ ctx.font='12px Comfortaa';
 ctx.textAlign='center';
 ctx.fillText('Dig Site',centerX+TILE_SIZE/2,centerY+TILE_SIZE*2-8);
 });
+if(game.lampsVisible){
 for(let i=0;i<5;i++){
 const lampX=(10+i*8)*TILE_SIZE+game.offsetX;
 const lampY=22*TILE_SIZE+game.offsetY;
@@ -840,7 +893,6 @@ ctx.fillStyle='#ffd700';
 ctx.beginPath();
 ctx.arc(lampX+2,lampY,6,0,Math.PI*2);
 ctx.fill();
-if(game.isNight){
 const grad=ctx.createRadialGradient(lampX+2,lampY,0,lampX+2,lampY,30);
 grad.addColorStop(0,'rgba(255,215,0,0.3)');
 grad.addColorStop(1,'rgba(255,215,0,0)');
@@ -1114,6 +1166,10 @@ game.time.hour=0;
 }
 }
 game.isNight=game.time.hour>=18||game.time.hour<6;
+if(game.isNight !== game.previousIsNight){
+game.lampsVisible = game.isNight;
+game.previousIsNight = game.isNight;
+}
 const targetOpacity=game.isNight?0.6:0;
 if(Math.abs(game.nightOpacity-targetOpacity)>0.01){
 const fadeSpeed=0.01;
@@ -1131,7 +1187,6 @@ showMessage("The dig site closed for the day! Return tomorrow.");
 if(game.state==='town'&&game.scene==='overworld'){
 updatePlayerMovement();
 updateCamera();
-updateActionPrompt();
 }
 updateHUD();
 draw();
@@ -1606,20 +1661,30 @@ game.tutorialActive=false;
 game.tutorialStep=0;
 }
 });
-document.getElementById('settingsButton').addEventListener('click',()=>{
+document.getElementById('controlsButton').addEventListener('click',()=>{
 populateKeybinds();
+document.getElementById('controlsModal').style.display='flex';
+});
+document.getElementById('closeControlsModal').addEventListener('click',()=>{
+const selectedScheme = document.querySelector('input[name="settingsControlScheme"]:checked')?.value;
+if (selectedScheme && selectedScheme !== game.controlScheme) {
+game.controlScheme = selectedScheme;
+updateDpadVisibility();
+if (game.tutorialActive) {
+document.getElementById('tutorialText').textContent = getTutorialText(game.tutorialStep);
+}
+}
+document.getElementById('controlsModal').style.display='none';
+});
+document.getElementById('settingsButton').addEventListener('click',()=>{
 document.getElementById('settingsModal').style.display='flex';
 });
 document.getElementById('closeSettingsModal').addEventListener('click',()=>{
-  const selectedScheme = document.querySelector('input[name="settingsControlScheme"]:checked')?.value;
-  if (selectedScheme && selectedScheme !== game.controlScheme) {
-    game.controlScheme = selectedScheme;
-    updateDpadVisibility();
-    if (game.tutorialActive) {
-      document.getElementById('tutorialText').textContent = getTutorialText(game.tutorialStep);
-    }
-  }
-  document.getElementById('settingsModal').style.display='none';
+if(document.getElementById('controlsModal').style.display === 'flex'){
+document.getElementById('controlsModal').style.display='none';
+return;
+}
+document.getElementById('settingsModal').style.display='none';
 });
 document.getElementById('restartTutorialInModal').addEventListener('click',()=>{
 game.tutorialActive=true;
