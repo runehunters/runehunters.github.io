@@ -107,8 +107,8 @@ Time: <span id="timeDisplay">9:00 AM, Day 1</span><br>
 Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="topRightPanel" class="hud-element top-right">
-<button id="researchTreeButton" class="action-button" tabindex="1">🔬 Research</button>
-<button id="settingsButton" class="action-button" tabindex="2">⚙️ Settings</button>
+<button id="researchTreeButton" class="action-button" tabindex="1">Research Tree</button>
+<button id="settingsButton" class="action-button" tabindex="2">Settings</button>
 </div>
 <div id="bottomLeftPanel" class="hud-element bottom-left" style="display:none">
 <strong>Collected Artifacts</strong><br>
@@ -131,9 +131,9 @@ Research Points: <span id="moneyDisplay">0</span>
 <h2>Game Settings</h2>
 <button id="controlsButton" class="action-button">Controls</button>
 
-<button id="howToPlayButton" class="action-button" tabindex="16">📖 How To Play</button>
+<button id="howToPlayButton" class="action-button" tabindex="16">How To Play</button>
 <button id="restartTutorialInModal" class="action-button" tabindex="17">Restart Tutorial</button>
-<button id="showCreditsButton" class="action-button" tabindex="18">📜 Credits</button>
+<button id="showCreditsButton" class="action-button" tabindex="18">Credits</button>
 <button id="resetProgressButton" class="action-button red" tabindex="19">Reset All Progress</button>
 <button id="closeSettingsModal" class="action-button" tabindex="20">Close</button>
 </div>
@@ -210,7 +210,7 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="researchTreeModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
-<h2>🔬 Research Tree</h2>
+<h2>Research Tree</h2>
 <p>Unlock upgrades to improve your archaeological abilities</p>
 <div id="researchTreeContent" class="research-tree"></div>
 <button id="closeResearchTreeModal" class="action-button" tabindex="26">Close</button>
@@ -326,11 +326,11 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="dpad" class="dpad">
 <div class="dpad-grid">
-<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress(event, 'up')" onpointerup="handleDpadRelease(event, 'up')" oncontextmenu="return false;">↑</button>
-<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress(event, 'left')" onpointerup="handleDpadRelease(event, 'left')" oncontextmenu="return false;">←</button>
-<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress(event, 'interact')" onpointerup="handleDpadRelease(event, 'interact')" oncontextmenu="return false;">●</button>
-<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress(event, 'right')" onpointerup="handleDpadRelease(event, 'right')" oncontextmenu="return false;">→</button>
-<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress(event, 'down')" onpointerup="handleDpadRelease(event, 'down')" oncontextmenu="return false;">↓</button>
+<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress(event, 'up')" onpointerup="handleDpadRelease(event, 'up')" onpointercancel="handleDpadRelease(event, 'up')" onmouseleave="handleDpadRelease(event, 'up')" oncontextmenu="return false;">↑</button>
+<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress(event, 'left')" onpointerup="handleDpadRelease(event, 'left')" onpointercancel="handleDpadRelease(event, 'left')" onmouseleave="handleDpadRelease(event, 'left')" oncontextmenu="return false;">←</button>
+<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress(event, 'interact')" onpointerup="handleDpadRelease(event, 'interact')" onpointercancel="handleDpadRelease(event, 'interact')" onmouseleave="handleDpadRelease(event, 'interact')" oncontextmenu="return false;">●</button>
+<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress(event, 'right')" onpointerup="handleDpadRelease(event, 'right')" onpointercancel="handleDpadRelease(event, 'right')" onmouseleave="handleDpadRelease(event, 'right')" oncontextmenu="return false;">→</button>
+<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress(event, 'down')" onpointerup="handleDpadRelease(event, 'down')" onpointercancel="handleDpadRelease(event, 'down')" onmouseleave="handleDpadRelease(event, 'down')" oncontextmenu="return false;">↓</button>
 </div>
 </div>
 <script>
@@ -597,7 +597,8 @@ currentKeybindSlot:null,
 controlScheme:'keyboard',
 zoomScale:1.0,
 lampsVisible:false,
-previousIsNight:false
+previousIsNight:false,
+interactPressed:false
 };
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -644,23 +645,87 @@ return map;
 }
 function generatePaths(){
 game.paths=[];
+// Clear old paths
+for(let y=0; y<MAP_HEIGHT; y++) {
+for(let x=0; x<MAP_WIDTH; x++) {
+if(game.map[y][x] === 'p') game.map[y][x] = 'g';
+}
+}
+// Generate new paths using BFS
 for(let i=0;i<game.digsites.length;i++){
 const site=game.digsites[i];
-const pathCells=[];
-let startX=21,startY=22;
-let endX=site.x,endY=site.y;
-let currentX=startX,currentY=startY;
-while(currentX!==endX||currentY!==endY){
-if(currentX<endX)currentX++;
-else if(currentX>endX)currentX--;
-else if(currentY<endY)currentY++;
-else if(currentY>endY)currentY--;
-if(game.map[currentY]&&game.map[currentY][currentX]==='g'){
-game.map[currentY][currentX]='p';
-pathCells.push({x:currentX,y:currentY});
+const pathCells = [];
+const start = {x:21, y:22};
+const end = {x:site.x, y:site.y};
+const queue = [{...start, path: []}];
+const visited = new Set();
+visited.add(`${start.x},${start.y}`);
+let found = false;
+let finalPath = [];
+while(queue.length > 0 && !found){
+const current = queue.shift();
+const {x, y, path} = current;
+if(x === end.x && y === end.y){
+finalPath = [...path, {x, y}];
+found = true;
+continue;
+}
+// 8 directions
+const directions = [
+{x:0, y:-1}, // up
+{x:1, y:-1}, // up-right
+{x:1, y:0}, // right
+{x:1, y:1}, // down-right
+{x:0, y:1}, // down
+{x:-1, y:1}, // down-left
+{x:-1, y:0}, // left
+{x:-1, y:-1} // up-left
+];
+for(const dir of directions){
+const nx = x + dir.x;
+const ny = y + dir.y;
+if(nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT && !visited.has(`${nx},${ny}`)){
+// Check walkable
+if(game.map[ny][nx] === 'g' || game.map[ny][nx] === 'p'){
+// For diagonals, check no corner cutting
+if(dir.x !== 0 && dir.y !== 0){
+const adj1 = game.map[y][nx] === 'g' || game.map[y][nx] === 'p';
+const adj2 = game.map[ny][x] === 'g' || game.map[ny][x] === 'p';
+if(!adj1 || !adj2) continue;
+}
+visited.add(`${nx},${ny}`);
+queue.push({x: nx, y: ny, path: [...path, {x, y}]});
+}
+}
+}
+}
+if(finalPath.length > 0){
+for(const cell of finalPath){
+if(game.map[cell.y][cell.x] === 'g'){
+game.map[cell.y][cell.x] = 'p';
+}
+pathCells.push(cell);
 }
 }
 game.paths.push(pathCells);
+}
+// Check for unique paths (no overlaps)
+let overlaps = false;
+let usedCells = new Set();
+for(const path of game.paths){
+for(const cell of path){
+const key = `${cell.x},${cell.y}`;
+if(usedCells.has(key)){
+overlaps = true;
+break;
+}
+usedCells.add(key);
+}
+if(overlaps) break;
+}
+if(overlaps){
+generateDigsites(); // Regenerate digsites to avoid overlaps
+generatePaths(); // Recurse
 }
 }
 function MapObject(x,y,type,name){
@@ -1188,6 +1253,13 @@ if(game.state==='town'&&game.scene==='overworld'){
 updatePlayerMovement();
 updateCamera();
 }
+if(game.state === 'digsite' && (game.keys[game.keybinds.interact[0]] || game.keys[game.keybinds.interact[1]]) && !game.interactPressed) {
+game.state='town';
+game.currentDigsite=null;
+game.interactPressed = true;
+} else if(!game.keys[game.keybinds.interact[0]] && !game.keys[game.keybinds.interact[1]]) {
+game.interactPressed = false;
+}
 updateHUD();
 draw();
 }
@@ -1628,7 +1700,6 @@ e.preventDefault();
 if(game.state === 'digsite') { // This is for exiting digsite
 game.state='town';
 game.currentDigsite=null;
-showMessage("Returning to base camp.");
 }
 else if(!game.tutorialActive){ // This is for overworld interaction
 handleInteraction();
