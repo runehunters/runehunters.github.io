@@ -470,25 +470,15 @@ function getTutorialText(stepIndex) {
 
 function handleDpadPress(event, direction) {
   event.preventDefault();
-  if (direction === 'interact') {
-    // Directly trigger interaction for touch controls
-    if (!game.tutorialActive) {
-      handleInteraction();
-    }
-  } else {
-    // Set key state for movement buttons
-    const key = game.keybinds[direction][0];
-    game.keys[key] = true;
-  }
+  // Set key state for all buttons including interact
+  const key = game.keybinds[direction][0];
+  game.keys[key] = true;
 }
 
 function handleDpadRelease(event, direction) {
   event.preventDefault();
-  if (direction !== 'interact') {
-    // Clear key state for movement buttons (interact doesn't need this)
-    const key = game.keybinds[direction][0];
-    game.keys[key] = false;
-  }
+  const key = game.keybinds[direction][0];
+  game.keys[key] = false;
 }
 
 function updateDpadVisibility() {
