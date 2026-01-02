@@ -602,121 +602,41 @@ minimapCanvas.height=300;
 }
 function createMap(){
 const map=Array(MAP_HEIGHT).fill(null).map(()=>Array(MAP_WIDTH).fill('g'));
-for(let y=5;y<40;y++){
-for(let x=20;x<23;x++){
-map[y][x]='p';
+const buildings = [
+{type: 'b', width: 7, height: 5}, // lab
+{type: 'h', width: 5, height: 5}, // camp
+{type: 'q', width: 5, height: 5}  // quest
+];
+for(const building of buildings){
+let placed = false;
+let attempts = 0;
+while(!placed && attempts < 100){
+const x = Math.floor(Math.random() * (MAP_WIDTH - building.width - 4)) + 2;
+const y = Math.floor(Math.random() * (MAP_HEIGHT - building.height - 4)) + 2;
+const distFromCenter = Math.sqrt(Math.pow(x + building.width/2 - MAP_WIDTH/2, 2) + Math.pow(y + building.height/2 - MAP_HEIGHT/2, 2));
+if(distFromCenter < 15){
+let clear = true;
+for(let dy = 0; dy < building.height; dy++){
+for(let dx = 0; dx < building.width; dx++){
+if(map[y + dy][x + dx] !== 'g') clear = false;
 }
 }
-for(let y=10;y<15;y++){
-for(let x=18;x<25;x++){
-map[y][x]='b';
+if(clear){
+for(let dy = 0; dy < building.height; dy++){
+for(let dx = 0; dx < building.width; dx++){
+map[y + dy][x + dx] = building.type;
 }
 }
-for(let y=35;y<40;y++){
-for(let x=5;x<10;x++){
-map[y][x]='h';
+placed = true;
 }
 }
-for(let y=5;y<10;y++){
-for(let x=35;x<40;x++){
-map[y][x]='q';
+attempts++;
 }
-}
-for(let x=5;x<40;x++){
-map[22][x]='p';
-}
-for(let y=22;y<38;y++){
-map[y][7]='p';
-}
-for(let y=5;y<23;y++){
-map[y][37]='p';
 }
 return map;
 }
 function generatePaths(){
-game.paths=[];
-// Clear old paths
-for(let y=0; y<MAP_HEIGHT; y++) {
-for(let x=0; x<MAP_WIDTH; x++) {
-if(game.map[y][x] === 'p') game.map[y][x] = 'g';
-}
-}
-// Generate new paths using BFS
-for(let i=0;i<game.digsites.length;i++){
-const site=game.digsites[i];
-const pathCells = [];
-const start = {x:21, y:22};
-const end = {x:site.x, y:site.y};
-const queue = [{...start, path: []}];
-const visited = new Set();
-visited.add(`${start.x},${start.y}`);
-let found = false;
-let finalPath = [];
-while(queue.length > 0 && !found){
-const current = queue.shift();
-const {x, y, path} = current;
-if(x === end.x && y === end.y){
-finalPath = [...path, {x, y}];
-found = true;
-continue;
-}
-// 8 directions
-const directions = [
-{x:0, y:-1}, // up
-{x:1, y:-1}, // up-right
-{x:1, y:0}, // right
-{x:1, y:1}, // down-right
-{x:0, y:1}, // down
-{x:-1, y:1}, // down-left
-{x:-1, y:0}, // left
-{x:-1, y:-1} // up-left
-];
-for(const dir of directions){
-const nx = x + dir.x;
-const ny = y + dir.y;
-if(nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT && !visited.has(`${nx},${ny}`)){
-// Check walkable
-if(game.map[ny][nx] === 'g' || game.map[ny][nx] === 'p'){
-// For diagonals, check no corner cutting
-if(dir.x !== 0 && dir.y !== 0){
-const adj1 = game.map[y][nx] === 'g' || game.map[y][nx] === 'p';
-const adj2 = game.map[ny][x] === 'g' || game.map[ny][x] === 'p';
-if(!adj1 || !adj2) continue;
-}
-visited.add(`${nx},${ny}`);
-queue.push({x: nx, y: ny, path: [...path, {x, y}]});
-}
-}
-}
-}
-if(finalPath.length > 0){
-for(const cell of finalPath){
-if(game.map[cell.y][cell.x] === 'g'){
-game.map[cell.y][cell.x] = 'p';
-}
-pathCells.push(cell);
-}
-}
-game.paths.push(pathCells);
-}
-// Check for unique paths (no overlaps)
-let overlaps = false;
-let usedCells = new Set();
-for(const path of game.paths){
-for(const cell of path){
-const key = `${cell.x},${cell.y}`;
-if(usedCells.has(key)){
-overlaps = true;
-break;
-}
-usedCells.add(key);
-}
-if(overlaps) break;
-}
-if(overlaps){
-generateDigsites(); // Regenerate digsites to avoid overlaps
-generatePaths(); // Recurse
-}
+game.paths = [];
 }
 function MapObject(x,y,type,name){
 this.x=x;
@@ -884,14 +804,6 @@ ctx.fillRect(tileX+8,tileY+8,16,16);
 ctx.strokeStyle='#5a4a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
-if(x===21&&y===14){
-ctx.fillStyle='#4a3a2a';
-ctx.fillRect(tileX+6,tileY+10,20,20);
-ctx.fillStyle='#d4a574';
-ctx.beginPath();
-ctx.arc(tileX+20,tileY+20,3,0,Math.PI*2);
-ctx.fill();
-}
 }
 if(game.map[y][x]==='h'){
 ctx.fillStyle='#5a4a3a';
@@ -901,14 +813,6 @@ ctx.fillRect(tileX+4,tileY+4,24,24);
 ctx.strokeStyle='#4a3a2a';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
-if(x===7&&y===39){
-ctx.fillStyle='#8a5a4a';
-ctx.fillRect(tileX+10,tileY+12,12,16);
-ctx.fillStyle='#d4a574';
-ctx.beginPath();
-ctx.arc(tileX+18,tileY+20,2,0,Math.PI*2);
-ctx.fill();
-}
 }
 if(game.map[y][x]==='q'){
 ctx.fillStyle='#6a5a5a';
@@ -918,12 +822,6 @@ ctx.fillRect(tileX+6,tileY+6,20,20);
 ctx.strokeStyle='#5a4a4a';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
-if(x===37&&y===9){
-ctx.fillStyle='#7a6a4a';
-ctx.fillRect(tileX+8,tileY+10,16,18);
-ctx.fillStyle='#ffd700';
-ctx.fillRect(tileX+10,tileY+12,12,12);
-}
 }
 }
 }
@@ -1243,9 +1141,13 @@ if(game.state==='town'&&game.scene==='overworld'){
 updatePlayerMovement();
 updateCamera();
 }
-if(game.state === 'digsite' && (game.keys[game.keybinds.interact[0]] || game.keys[game.keybinds.interact[1]]) && !game.interactPressed) {
+if((game.keys[game.keybinds.interact[0]] || game.keys[game.keybinds.interact[1]]) && !game.interactPressed){
+if(game.state === 'digsite'){
 game.state='town';
 game.currentDigsite=null;
+}else if(!game.tutorialActive){
+handleInteraction();
+}
 game.interactPressed = true;
 } else if(!game.keys[game.keybinds.interact[0]] && !game.keys[game.keybinds.interact[1]]) {
 game.interactPressed = false;
@@ -1405,18 +1307,32 @@ minimapCtx.textAlign='center';
 minimapCtx.fillStyle='#f4e4c1';
 minimapCtx.strokeStyle='#1a1410';
 minimapCtx.lineWidth=3;
-const labX=offsetX+21*scale;
-const labY=offsetY+12.5*scale;
-minimapCtx.strokeText('Lab',labX,labY);
-minimapCtx.fillText('Lab',labX,labY);
-const homeX=offsetX+7*scale;
-const homeY=offsetY+37.5*scale;
-minimapCtx.strokeText('Camp',homeX,homeY);
-minimapCtx.fillText('Camp',homeX,homeY);
-const questX=offsetX+37*scale;
-const questY=offsetY+7.5*scale;
-minimapCtx.strokeText('Quest',questX,questY);
-minimapCtx.fillText('Quest',questX,questY);
+let labPos = null, homePos = null, questPos = null;
+for(let y=0; y<MAP_HEIGHT; y++){
+for(let x=0; x<MAP_WIDTH; x++){
+if(game.map[y][x] === 'b' && !labPos) labPos = {x, y};
+if(game.map[y][x] === 'h' && !homePos) homePos = {x, y};
+if(game.map[y][x] === 'q' && !questPos) questPos = {x, y};
+}
+}
+if(labPos){
+const labX = offsetX + labPos.x * scale;
+const labY = offsetY + labPos.y * scale;
+minimapCtx.strokeText('Lab', labX, labY);
+minimapCtx.fillText('Lab', labX, labY);
+}
+if(homePos){
+const homeX = offsetX + homePos.x * scale;
+const homeY = offsetY + homePos.y * scale;
+minimapCtx.strokeText('Camp', homeX, homeY);
+minimapCtx.fillText('Camp', homeX, homeY);
+}
+if(questPos){
+const questX = offsetX + questPos.x * scale;
+const questY = offsetY + questPos.y * scale;
+minimapCtx.strokeText('Quest', questX, questY);
+minimapCtx.fillText('Quest', questX, questY);
+}
 minimapCtx.font='bold 11px Comfortaa';
 game.digsites.forEach((site,index)=>{
 if(site.completed)return;
@@ -1479,7 +1395,10 @@ game.time.minute=0;
 game.time.day++;
 game.timeFrozen=false;
 game.lateNightWarningShown=false;
+game.map = createMap();
 generateDigsites();
+generateMapObjects();
+generateAmbiance();
 saveGame();
 document.getElementById('sleepModal').style.display='none';
 game.scene='overworld';
@@ -1685,17 +1604,7 @@ e.preventDefault();
 return;
 }
 game.keys[pressedKey]=true;
-if(game.keybinds.interact.includes(pressedKey)){
-e.preventDefault();
-if(game.state === 'digsite') { // This is for exiting digsite
-game.state='town';
-game.currentDigsite=null;
-}
-else if(!game.tutorialActive){ // This is for overworld interaction
-handleInteraction();
-}
-}
-else if(game.state==='digsite'&&game.keybinds.return.includes(pressedKey)){
+if(game.state==='digsite'&&game.keybinds.return.includes(pressedKey)){
 game.state='town';
 game.currentDigsite=null;
 showMessage("Returning to base camp.");
