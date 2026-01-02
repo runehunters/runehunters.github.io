@@ -731,7 +731,7 @@ for(let dx=0;dx<width;dx++){
 game.map[y+dy][x+dx]='d';
 }
 }
-const layers=5+Math.floor(Math.random()*6);
+const layers = game.controlScheme === 'touch' ? 5 : 5 + Math.floor(Math.random() * 6);
 game.digsites.push({x:x+1,y:y+1,completed:false,grid:null,layers:layers,width:width,height:height});
 placed=true;
 }
@@ -742,7 +742,7 @@ generatePaths();
 }
 function generateDigsiteContent(digsite){
 const rows=digsite.layers;
-const cols=15;
+const cols = game.controlScheme === 'touch' ? 5 : 15;
 digsite.grid=Array(rows).fill(null).map(()=>Array(cols).fill(null));
 digsite.artifactCount=0;
 digsite.dirtCount=0;
@@ -1036,7 +1036,7 @@ function drawDigsite(){
 const digsite=game.currentDigsite;
 if(!digsite)return;
 const rows=digsite.layers;
-const cols=15;
+const cols=digsite.grid[0].length;
 const cellSize=40;
 const gridW=cols*cellSize;
 const gridH=rows*cellSize;
@@ -1082,7 +1082,7 @@ function dig(mouseX,mouseY){
 const digsite=game.currentDigsite;
 if(!digsite)return;
 const rows=digsite.layers;
-const cols=15;
+const cols=digsite.grid[0].length;
 const cellSize=40;
 const gridW=cols*cellSize;
 const gridH=rows*cellSize;
@@ -1114,7 +1114,7 @@ updateQuestProgress();
 showArtifactInfo(artifact);
 }
 let layerComplete=true;
-for(let cx=0;cx<15;cx++){
+for(let cx=0;cx<cols;cx++){
 if(!digsite.dugCells[y][cx]){
 layerComplete=false;
 break;
