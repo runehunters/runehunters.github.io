@@ -772,8 +772,8 @@ ctx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='b'){
 const top = (y === 0 || game.map[y-1][x] !== 'b');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'b');
-const wallColor = '#8B4513'; // brown
-const roofColor = '#8B0000'; // red
+const wallColor = '#A09070'; // pale tan
+const roofColor = '#B06060'; // muted red
 if (top) {
 ctx.fillStyle=roofColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -802,8 +802,8 @@ ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='h'){
 const top = (y === 0 || game.map[y-1][x] !== 'h');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'h');
-const wallColor = '#228B22'; // green
-const roofColor = '#8B4513'; // brown
+const wallColor = '#708070'; // pale sage
+const roofColor = '#907060'; // muted brown
 if (top) {
 ctx.fillStyle=roofColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -832,8 +832,8 @@ ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='q'){
 const top = (y === 0 || game.map[y-1][x] !== 'q');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'q');
-const wallColor = '#4169E1'; // blue
-const roofColor = '#696969'; // gray
+const wallColor = '#708090'; // pale blue
+const roofColor = '#808080'; // muted gray
 if (top) {
 ctx.fillStyle=roofColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
