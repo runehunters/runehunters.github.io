@@ -771,79 +771,91 @@ ctx.fillStyle=color;
 ctx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='b'){
 const top = (y === 0 || game.map[y-1][x] !== 'b');
-const wallY = top ? tileY + 6 : tileY;
-const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
-// Uniform building color
-ctx.fillStyle='#8b6f47';
-// Wall
-ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'b');
+const wallColor = '#8B4513'; // brown
+const roofColor = '#8B0000'; // red
 if (top) {
-// Roof
-ctx.fillStyle='#a89070';
-ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
-}
-// Windows only on non-top tiles
-if (!top) {
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+} else if (bottom) {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Door
+ctx.fillStyle='#654321';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
+} else {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Windows
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+6, tileY+12, 5,4);
-ctx.fillRect(tileX+18, tileY+14, 4,6);
-ctx.fillRect(tileX+8, tileY+20, 6,3);
-ctx.fillRect(tileX+22, tileY+16, 3,5);
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-ctx.strokeStyle='#6a5a35';
+ctx.strokeStyle='#654321';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='h'){
 const top = (y === 0 || game.map[y-1][x] !== 'h');
-const wallY = top ? tileY + 6 : tileY;
-const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
-// Uniform building color
-ctx.fillStyle='#8b6f47';
-// Wall
-ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'h');
+const wallColor = '#228B22'; // green
+const roofColor = '#8B4513'; // brown
 if (top) {
-// Roof
-ctx.fillStyle='#a89070';
-ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
-}
-// Windows only on non-top tiles
-if (!top) {
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+} else if (bottom) {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Door
+ctx.fillStyle='#0F5132';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
+} else {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Windows
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+6, tileY+12, 5,4);
-ctx.fillRect(tileX+18, tileY+14, 4,6);
-ctx.fillRect(tileX+8, tileY+20, 6,3);
-ctx.fillRect(tileX+22, tileY+16, 3,5);
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-ctx.strokeStyle='#6a5a35';
+ctx.strokeStyle='#0F5132';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='q'){
 const top = (y === 0 || game.map[y-1][x] !== 'q');
-const wallY = top ? tileY + 6 : tileY;
-const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
-// Uniform building color
-ctx.fillStyle='#8b6f47';
-// Wall
-ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'q');
+const wallColor = '#4169E1'; // blue
+const roofColor = '#696969'; // gray
 if (top) {
-// Roof
-ctx.fillStyle='#a89070';
-ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
-}
-// Windows only on non-top tiles
-if (!top) {
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+} else if (bottom) {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Door
+ctx.fillStyle='#1E3A8A';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
+} else {
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Windows
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+6, tileY+12, 5,4);
-ctx.fillRect(tileX+18, tileY+14, 4,6);
-ctx.fillRect(tileX+8, tileY+20, 6,3);
-ctx.fillRect(tileX+22, tileY+16, 3,5);
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-ctx.strokeStyle='#6a5a35';
+ctx.strokeStyle='#1E3A8A';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
