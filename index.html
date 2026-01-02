@@ -18,8 +18,8 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .bottom-left{position:absolute;bottom:20px;left:20px;font-size:14px;max-width:350px;max-height:400px;overflow-y:auto}
 .top-right{position:absolute;top:20px;right:20px}
 .top-right.touch{position:absolute;top:70px;left:20px}
-.minimap{position:absolute;bottom:20px;right:20px;width:300px;height:300px;border:3px solid #8b6f47;background:rgba(26,20,16,0.95);box-shadow:0 2px 8px rgba(0,0,0,0.5)}
-.minimap.touch{width:150px;height:150px}
+.minimap{position:absolute;bottom:20px;right:20px;width:300px;height:300px;border:3px solid #8b6f47;background:rgba(26,20,16,0.95);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:none}
+.minimap.touch{width:150px;height:150px;display:none}
 #minimapCanvas{width:100%;height:100%;display:block}
 .action-button{background:#5a4a3a;color:#f4e4c1;border:1px solid #8b6f47;padding:8px 15px;cursor:pointer;border-radius:10px;transition:background 0.1s;font-family:'Comfortaa',cursive;font-size:14px}
 .action-button:hover{background:#6a5a4a}
@@ -228,7 +228,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <div class="modal-content">
 <h2>📜 Game Credits</h2>
 <div class="credits-section">
-<p><strong>Version 3.2</strong></p>
+<p><strong>Version 3.5</strong></p>
 <h3>Developer:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
@@ -247,7 +247,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <p style="font-size:18px;color:#ffd700"><strong>Congratulations!</strong></p>
 <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
 <div class="credits-section">
-<p><strong>Version 3.2</strong></p>
+<p><strong>Version 3.5</strong></p>
 <h3>Developer:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
@@ -810,6 +810,12 @@ ctx.strokeStyle='#5a4a4a';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
+ctx.fillStyle='#f4e4c1';
+ctx.font='14px Comfortaa';
+ctx.textAlign='center';
+if(game.map[y][x]==='b') ctx.fillText('Lab', tileX + TILE_SIZE*3.5, tileY + TILE_SIZE*2.5);
+else if(game.map[y][x]==='h') ctx.fillText('Camp', tileX + TILE_SIZE*2.5, tileY + TILE_SIZE*2.5);
+else if(game.map[y][x]==='q') ctx.fillText('Quest', tileX + TILE_SIZE*2.5, tileY + TILE_SIZE*2.5);
 }
 }
 game.digsites.forEach(site=>{
@@ -1110,6 +1116,7 @@ document.getElementById('nightOverlay').style.opacity=game.nightOpacity;
 if(game.time.hour>=17&&game.state==='digsite'){
 game.state='town';
 showMessage("The dig site closed for the day! Return tomorrow.");
+document.getElementById('artifactModal').style.display='none';
 }
 if(game.state==='town'&&game.scene==='overworld'){
 updatePlayerMovement();
@@ -1119,6 +1126,7 @@ if((game.keys[game.keybinds.interact[0]] || game.keys[game.keybinds.interact[1]]
 if(game.state === 'digsite'){
 game.state='town';
 game.currentDigsite=null;
+document.getElementById('artifactModal').style.display='none';
 }else if(!game.tutorialActive){
 handleInteraction();
 }
@@ -1231,7 +1239,7 @@ drawMap();
 drawAmbiance();
 drawMapObjects();
 drawPlayer();
-drawMinimap();
+// drawMinimap();
 }
 }else if(game.state==='digsite'){
 drawDigsite();
@@ -1582,6 +1590,7 @@ if(game.state==='digsite'&&game.keybinds.return.includes(pressedKey)){
 game.state='town';
 game.currentDigsite=null;
 showMessage("Returning to base camp.");
+document.getElementById('artifactModal').style.display='none';
 }
 if(game.currentKeybindChange !== null){
 populateKeybinds();
@@ -1745,9 +1754,30 @@ resizeCanvas();
 loadGame();
 game.map=createMap();
 generateDigsites();
+generateBackgroundElements();
 generateMapObjects();
 generateAmbiance();
-generateBackgroundElements();
+// Adjust player spawn if blocked
+let playerTileX = Math.floor(game.player.x / TILE_SIZE);
+let playerTileY = Math.floor(game.player.y / TILE_SIZE);
+if (!isWalkable(game.player.x, game.player.y)) {
+  let found = false;
+  for (let radius = 1; radius < 10 && !found; radius++) {
+    for (let dx = -radius; dx <= radius && !found; dx++) {
+      for (let dy = -radius; dy <= radius && !found; dy++) {
+        if (Math.abs(dx) + Math.abs(dy) === radius) {
+          let nx = playerTileX + dx;
+          let ny = playerTileY + dy;
+          if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT && game.map[ny][nx] === 'g') {
+            game.player.x = nx * TILE_SIZE + TILE_SIZE / 2;
+            game.player.y = ny * TILE_SIZE + TILE_SIZE / 2;
+            found = true;
+          }
+        }
+      }
+    }
+  }
+}
 updateHUD();
 updateDpadVisibility();
 window.addEventListener('resize',resizeCanvas);
