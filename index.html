@@ -876,9 +876,9 @@ ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 ctx.fillStyle='#f4e4c1';
 ctx.font='bold 18px Comfortaa';
 ctx.textAlign='center';
-if(game.map[y][x]==='b' && x === 3 && y === 2) ctx.fillText('Lab', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
-if(game.map[y][x]==='h' && x === 2 && y === 2) ctx.fillText('Camp', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
-if(game.map[y][x]==='q' && x === 2 && y === 2) ctx.fillText('Quest', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
+if(game.map[y][x]==='b' && (y === 0 || game.map[y-1][x] !== 'b')) ctx.fillText('Lab', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
+if(game.map[y][x]==='h' && (y === 0 || game.map[y-1][x] !== 'h')) ctx.fillText('Camp', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
+if(game.map[y][x]==='q' && (y === 0 || game.map[y-1][x] !== 'q')) ctx.fillText('Quest', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
 }
 }
 game.digsites.forEach(site=>{
