@@ -18,9 +18,6 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .bottom-left{position:absolute;bottom:20px;left:20px;font-size:14px;max-width:350px;max-height:400px;overflow-y:auto}
 .top-right{position:absolute;top:20px;right:20px}
 .top-right.touch{position:absolute;top:70px;left:20px}
-.minimap{position:absolute;bottom:20px;right:20px;width:300px;height:300px;border:3px solid #8b6f47;background:rgba(26,20,16,0.95);box-shadow:0 2px 8px rgba(0,0,0,0.5);display:none}
-.minimap.touch{width:150px;height:150px;display:none}
-#minimapCanvas{width:100%;height:100%;display:block}
 .action-button{background:#5a4a3a;color:#f4e4c1;border:1px solid #8b6f47;padding:8px 15px;cursor:pointer;border-radius:10px;transition:background 0.1s;font-family:'Comfortaa',cursive;font-size:14px}
 .action-button:hover{background:#6a5a4a}
 .action-button.red{background:#a03030;border-color:#f05050}
@@ -118,9 +115,6 @@ Research Points: <span id="moneyDisplay">0</span>
 <div id="messageBox">
 <p id="messageText"></p>
 </div>
-<div class="minimap">
-<canvas id="minimapCanvas"></canvas>
-</div>
 <div id="tutorialBox" class="hud-element" style="display:none">
 <p id="tutorialText"></p>
 <button id="nextTutorialButton" class="action-button" style="margin-top:10px" tabindex="3">Next</button>
@@ -141,15 +135,11 @@ Research Points: <span id="moneyDisplay">0</span>
 <div id="controlsModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
 <h2>Controls</h2>
-<h3>Controls</h3>
-<div class="control-scheme-option">
-<input type="radio" id="settingsKeyboardControl" name="settingsControlScheme" value="keyboard" checked>
-<label for="settingsKeyboardControl">🎹 Keyboard Controls</label>
+<div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px">
+<button id="settingsSelectKeyboard" class="action-button">🎹 Keyboard Controls</button>
+<button id="settingsSelectTouch" class="action-button">📱 Touch Controls (D-Pad)</button>
 </div>
-<div class="control-scheme-option">
-<input type="radio" id="settingsTouchControl" name="settingsControlScheme" value="touch">
-<label for="settingsTouchControl">📱 Touch Controls (D-Pad)</label>
-</div>
+<div id="keybindsSection" style="display:none">
 <div class="keybinds-grid">
 <div class="keybind-setting">
 <span>Move Up:</span>
@@ -180,6 +170,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <span>Return:</span>
 <button id="keybind-return1-btn" class="action-button keybind-btn" onclick="startKeybindChange('return',0)" tabindex="14">R</button>
 <button id="keybind-return2-btn" class="action-button keybind-btn" onclick="startKeybindChange('return',1)" tabindex="15">-</button>
+</div>
 </div>
 </div>
 <button id="closeControlsModal" class="action-button">Back to Settings</button>
@@ -228,7 +219,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <div class="modal-content">
 <h2>📜 Game Credits</h2>
 <div class="credits-section">
-<p><strong>Version 3.6</strong></p>
+<p><strong>Version 3.7</strong></p>
 <h3>Developers:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
@@ -247,7 +238,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <p style="font-size:18px;color:#ffd700"><strong>Congratulations!</strong></p>
 <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
 <div class="credits-section">
-<p><strong>Version 3.6</strong></p>
+<p><strong>Version 3.7</strong></p>
 <h3>Developers:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
@@ -465,7 +456,6 @@ function getTutorialText(stepIndex) {
 
 function handleDpadPress(event, direction) {
   event.preventDefault();
-  // Set key state for all buttons including interact
   const key = game.keybinds[direction][0];
   game.keys[key] = true;
 }
@@ -483,7 +473,7 @@ function updateDpadVisibility() {
   } else {
     dpad.style.display = 'none';
   }
-  game.zoomScale = 1.0; // Always 100% zoom
+  game.zoomScale = 1.0;
 }
 
 function saveGame() {
@@ -579,13 +569,9 @@ interactPressed:false
 };
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
-const minimapCanvas=document.getElementById('minimapCanvas');
-const minimapCtx=minimapCanvas.getContext('2d');
 function resizeCanvas(){
 canvas.width=window.innerWidth;
 canvas.height=window.innerHeight;
-minimapCanvas.width=300;
-minimapCanvas.height=300;
 }
 function createMap(){
 const map=Array(MAP_HEIGHT).fill(null).map(()=>Array(MAP_WIDTH).fill('g'));
@@ -784,63 +770,78 @@ default:color='#6b8e4e';
 ctx.fillStyle=color;
 ctx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='b'){
+const top = (y === 0 || game.map[y-1][x] !== 'b');
+const wallY = top ? tileY + 6 : tileY;
+const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
 // Uniform building color
 ctx.fillStyle='#8b6f47';
-// Base wall
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Wall
+ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+if (top) {
 // Roof
 ctx.fillStyle='#a89070';
-ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
-// Windows
+ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
+}
+// Windows only on non-top tiles
+if (!top) {
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+4, tileY+10, 4,4);
-ctx.fillRect(tileX+12, tileY+10, 4,4);
-ctx.fillRect(tileX+20, tileY+10, 4,4);
-ctx.fillRect(tileX+4, tileY+18, 4,4);
-ctx.fillRect(tileX+12, tileY+18, 4,4);
-ctx.fillRect(tileX+20, tileY+18, 4,4);
+ctx.fillRect(tileX+6, tileY+12, 5,4);
+ctx.fillRect(tileX+18, tileY+14, 4,6);
+ctx.fillRect(tileX+8, tileY+20, 6,3);
+ctx.fillRect(tileX+22, tileY+16, 3,5);
+}
 // Outline
 ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='h'){
+const top = (y === 0 || game.map[y-1][x] !== 'h');
+const wallY = top ? tileY + 6 : tileY;
+const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
 // Uniform building color
 ctx.fillStyle='#8b6f47';
-// Base wall
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Wall
+ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+if (top) {
 // Roof
 ctx.fillStyle='#a89070';
-ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
-// Windows
+ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
+}
+// Windows only on non-top tiles
+if (!top) {
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+4, tileY+10, 4,4);
-ctx.fillRect(tileX+12, tileY+10, 4,4);
-ctx.fillRect(tileX+20, tileY+10, 4,4);
-ctx.fillRect(tileX+4, tileY+18, 4,4);
-ctx.fillRect(tileX+12, tileY+18, 4,4);
-ctx.fillRect(tileX+20, tileY+18, 4,4);
+ctx.fillRect(tileX+6, tileY+12, 5,4);
+ctx.fillRect(tileX+18, tileY+14, 4,6);
+ctx.fillRect(tileX+8, tileY+20, 6,3);
+ctx.fillRect(tileX+22, tileY+16, 3,5);
+}
 // Outline
 ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='q'){
+const top = (y === 0 || game.map[y-1][x] !== 'q');
+const wallY = top ? tileY + 6 : tileY;
+const wallHeight = top ? TILE_SIZE - 6 : TILE_SIZE;
 // Uniform building color
 ctx.fillStyle='#8b6f47';
-// Base wall
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Wall
+ctx.fillRect(tileX, wallY, TILE_SIZE, wallHeight);
+if (top) {
 // Roof
 ctx.fillStyle='#a89070';
-ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
-// Windows
+ctx.fillRect(tileX, tileY, TILE_SIZE, 6);
+}
+// Windows only on non-top tiles
+if (!top) {
 ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+4, tileY+10, 4,4);
-ctx.fillRect(tileX+12, tileY+10, 4,4);
-ctx.fillRect(tileX+20, tileY+10, 4,4);
-ctx.fillRect(tileX+4, tileY+18, 4,4);
-ctx.fillRect(tileX+12, tileY+18, 4,4);
-ctx.fillRect(tileX+20, tileY+18, 4,4);
+ctx.fillRect(tileX+6, tileY+12, 5,4);
+ctx.fillRect(tileX+18, tileY+14, 4,6);
+ctx.fillRect(tileX+8, tileY+20, 6,3);
+ctx.fillRect(tileX+22, tileY+16, 3,5);
+}
 // Outline
 ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
@@ -1219,18 +1220,18 @@ document.getElementById('moneyDisplay').textContent=game.researchPoints;
 
 let inventoryHtml='';
 for(const artifactType in game.inventory){
-  if(game.inventory[artifactType]>0){ // Check if items are in inventory
+  if(game.inventory[artifactType]>0){
   const artifact=ARTIFACTS[artifactType];
   inventoryHtml+=`<div class="artifact-info">${artifact.name}: ${game.inventory[artifactType]}</div>`;
   }
 }
 
-if (inventoryHtml !== '') { // Show/hide panel based on inventory
+if (inventoryHtml !== '') {
   document.getElementById('inventoryDisplay').innerHTML=inventoryHtml;
   document.getElementById('bottomLeftPanel').style.display='block';
 } else {
-  document.getElementById('inventoryDisplay').innerHTML=''; // Clear it
-  document.getElementById('bottomLeftPanel').style.display='none'; // Hide it
+  document.getElementById('inventoryDisplay').innerHTML='';
+  document.getElementById('bottomLeftPanel').style.display='none';
 }
 }
 function showMessage(message){
@@ -1275,7 +1276,6 @@ drawMap();
 drawAmbiance();
 drawMapObjects();
 drawPlayer();
-// drawMinimap();
 }
 }else if(game.state==='digsite'){
 drawDigsite();
@@ -1289,80 +1289,6 @@ document.getElementById('nextTutorialButton').textContent=(game.tutorialStep===T
 document.getElementById('tutorialOverlay').style.display='none';
 document.getElementById('tutorialBox').style.display='none';
 }
-}
-function drawMinimap(){
-minimapCtx.fillStyle='#1a1410';
-minimapCtx.fillRect(0,0,minimapCanvas.width,minimapCanvas.height);
-
-// Scale the map to fit within the minimap canvas while maintaining aspect ratio
-const scaleX = minimapCanvas.width / MAP_WIDTH;
-const scaleY = minimapCanvas.height / MAP_HEIGHT;
-const scale = Math.min(scaleX, scaleY);
-const minimapW = MAP_WIDTH * scale;
-const minimapH = MAP_HEIGHT * scale;
-
-// Center the scaled map within the minimap canvas
-const offsetX = (minimapCanvas.width - minimapW) / 2;
-const offsetY = (minimapCanvas.height - minimapH) / 2;
-for(let y=0;y<MAP_HEIGHT;y++){
-for(let x=0;x<MAP_WIDTH;x++){
-let color;
-switch(game.map[y][x]){
-case'g':color='#3a4a2a';break;
-case'p':color='#806050';break;
-case'b':color='#6a5a3a';break;
-case'h':color='#5a4a3a';break;
-case'q':color='#6a5a4a';break;
-case'd':color='#d4a574';break;
-default:color='#3a4a2a';
-}
-minimapCtx.fillStyle=color;
-minimapCtx.fillRect(offsetX+x*scale,offsetY+y*scale,scale,scale);
-}
-}
-minimapCtx.font='bold 13px Comfortaa';
-minimapCtx.textAlign='center';
-minimapCtx.fillStyle='#f4e4c1';
-minimapCtx.strokeStyle='#1a1410';
-minimapCtx.lineWidth=3;
-let labPos = null, homePos = null, questPos = null;
-for(let y=0; y<MAP_HEIGHT; y++){
-for(let x=0; x<MAP_WIDTH; x++){
-if(game.map[y][x] === 'b' && !labPos) labPos = {x, y};
-if(game.map[y][x] === 'h' && !homePos) homePos = {x, y};
-if(game.map[y][x] === 'q' && !questPos) questPos = {x, y};
-}
-}
-if(labPos){
-const labX = offsetX + labPos.x * scale;
-const labY = offsetY + labPos.y * scale;
-minimapCtx.strokeText('Lab', labX, labY);
-minimapCtx.fillText('Lab', labX, labY);
-}
-if(homePos){
-const homeX = offsetX + homePos.x * scale;
-const homeY = offsetY + homePos.y * scale;
-minimapCtx.strokeText('Camp', homeX, homeY);
-minimapCtx.fillText('Camp', homeX, homeY);
-}
-if(questPos){
-const questX = offsetX + questPos.x * scale;
-const questY = offsetY + questPos.y * scale;
-minimapCtx.strokeText('Quest', questX, questY);
-minimapCtx.fillText('Quest', questX, questY);
-}
-minimapCtx.font='bold 11px Comfortaa';
-game.digsites.forEach((site,index)=>{
-if(site.completed)return;
-const digX=offsetX+site.x*scale;
-const digY=offsetY+site.y*scale;
-minimapCtx.strokeText('Dig',digX,digY);
-minimapCtx.fillText('Dig',digX,digY);
-});
-const playerX=Math.floor(game.player.x/TILE_SIZE);
-const playerY=Math.floor(game.player.y/TILE_SIZE);
-minimapCtx.fillStyle='#ff4444';
-minimapCtx.fillRect(offsetX+playerX*scale-1.5,offsetY+playerY*scale-1.5,scale+3,scale+3);
 }
 function handleInteraction(){
 if(game.tutorialActive&&game.tutorialStep<TUTORIAL_STEPS.length-1){
@@ -1651,18 +1577,26 @@ game.tutorialStep=0;
 }
 });
 document.getElementById('controlsButton').addEventListener('click',()=>{
+const keybindsSection = document.getElementById('keybindsSection');
+if (game.controlScheme === 'keyboard') {
+  keybindsSection.style.display = 'block';
+} else {
+  keybindsSection.style.display = 'none';
+}
 populateKeybinds();
 document.getElementById('controlsModal').style.display='flex';
 });
-document.getElementById('closeControlsModal').addEventListener('click',()=>{
-const selectedScheme = document.querySelector('input[name="settingsControlScheme"]:checked')?.value;
-if (selectedScheme && selectedScheme !== game.controlScheme) {
-game.controlScheme = selectedScheme;
+document.getElementById('settingsSelectKeyboard').addEventListener('click',()=>{
+game.controlScheme = 'keyboard';
 updateDpadVisibility();
-if (game.tutorialActive) {
-document.getElementById('tutorialText').textContent = getTutorialText(game.tutorialStep);
-}
-}
+document.getElementById('keybindsSection').style.display = 'block';
+});
+document.getElementById('settingsSelectTouch').addEventListener('click',()=>{
+game.controlScheme = 'touch';
+updateDpadVisibility();
+document.getElementById('keybindsSection').style.display = 'none';
+});
+document.getElementById('closeControlsModal').addEventListener('click',()=>{
 document.getElementById('controlsModal').style.display='none';
 });
 document.getElementById('settingsButton').addEventListener('click',()=>{
