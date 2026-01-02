@@ -228,8 +228,8 @@ Research Points: <span id="moneyDisplay">0</span>
 <div class="modal-content">
 <h2>📜 Game Credits</h2>
 <div class="credits-section">
-<p><strong>Version 3.5</strong></p>
-<h3>Developer:</h3>
+<p><strong>Version 3.6</strong></p>
+<h3>Developers:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
 <p>Claude Sonnet 4.5</p>
@@ -247,8 +247,8 @@ Research Points: <span id="moneyDisplay">0</span>
 <p style="font-size:18px;color:#ffd700"><strong>Congratulations!</strong></p>
 <p>You have completed the archaeological journey and uncovered the ancient secrets!</p>
 <div class="credits-section">
-<p><strong>Version 3.5</strong></p>
-<h3>Developer:</h3>
+<p><strong>Version 3.6</strong></p>
+<h3>Developers:</h3>
 <p>FLL Team 56913</p>
 <p>IDK R0b0c0ns</p>
 <p>Claude Sonnet 4.5</p>
@@ -784,29 +784,65 @@ default:color='#6b8e4e';
 ctx.fillStyle=color;
 ctx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='b'){
-ctx.fillStyle='#6a5a45';
-if((x+y)%3===0){
-ctx.fillRect(tileX+8,tileY+8,16,16);
-}
-ctx.strokeStyle='#5a4a35';
+// Uniform building color
+ctx.fillStyle='#8b6f47';
+// Base wall
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Roof
+ctx.fillStyle='#a89070';
+ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
+// Windows
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+10, 4,4);
+ctx.fillRect(tileX+12, tileY+10, 4,4);
+ctx.fillRect(tileX+20, tileY+10, 4,4);
+ctx.fillRect(tileX+4, tileY+18, 4,4);
+ctx.fillRect(tileX+12, tileY+18, 4,4);
+ctx.fillRect(tileX+20, tileY+18, 4,4);
+// Outline
+ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='h'){
-ctx.fillStyle='#5a4a3a';
-if((x+y)%2===0){
-ctx.fillRect(tileX+4,tileY+4,24,24);
-}
-ctx.strokeStyle='#4a3a2a';
+// Uniform building color
+ctx.fillStyle='#8b6f47';
+// Base wall
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Roof
+ctx.fillStyle='#a89070';
+ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
+// Windows
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+10, 4,4);
+ctx.fillRect(tileX+12, tileY+10, 4,4);
+ctx.fillRect(tileX+20, tileY+10, 4,4);
+ctx.fillRect(tileX+4, tileY+18, 4,4);
+ctx.fillRect(tileX+12, tileY+18, 4,4);
+ctx.fillRect(tileX+20, tileY+18, 4,4);
+// Outline
+ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='q'){
-ctx.fillStyle='#6a5a5a';
-if((x+y)%2===1){
-ctx.fillRect(tileX+6,tileY+6,20,20);
-}
-ctx.strokeStyle='#5a4a4a';
+// Uniform building color
+ctx.fillStyle='#8b6f47';
+// Base wall
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Roof
+ctx.fillStyle='#a89070';
+ctx.fillRect(tileX+2, tileY+2, TILE_SIZE-4, 6);
+// Windows
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+10, 4,4);
+ctx.fillRect(tileX+12, tileY+10, 4,4);
+ctx.fillRect(tileX+20, tileY+10, 4,4);
+ctx.fillRect(tileX+4, tileY+18, 4,4);
+ctx.fillRect(tileX+12, tileY+18, 4,4);
+ctx.fillRect(tileX+20, tileY+18, 4,4);
+// Outline
+ctx.strokeStyle='#6a5a35';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
