@@ -311,17 +311,12 @@ Research Points: <span id="moneyDisplay">0</span>
 </div>
 <div id="controlSchemeModal" class="modal-overlay" style="display:none">
 <div class="modal-content">
-<h2>🎮 Choose Control Scheme</h2>
+<h2>Choose Control Scheme</h2>
 <p>Select your preferred control method:</p>
-<div class="control-scheme-option">
-<input type="radio" id="keyboardControl" name="controlScheme" value="keyboard" checked>
-<label for="keyboardControl">🎹 Keyboard Controls</label>
+<div style="display:flex;gap:10px;justify-content:center">
+<button id="selectKeyboard" class="action-button">Keyboard Controls</button>
+<button id="selectTouch" class="action-button">Touch Controls (D-Pad)</button>
 </div>
-<div class="control-scheme-option">
-<input type="radio" id="touchControl" name="controlScheme" value="touch">
-<label for="touchControl">📱 Touch Controls (D-Pad)</label>
-</div>
-<button id="continueWithControls" class="action-button" tabindex="35">Continue</button>
 </div>
 </div>
 <div id="dpad" class="dpad">
@@ -483,16 +478,10 @@ function handleDpadRelease(event, direction) {
 
 function updateDpadVisibility() {
   const dpad = document.getElementById('dpad');
-  const minimap = document.querySelector('.minimap');
-  const topRightPanel = document.getElementById('topRightPanel');
   if (game.controlScheme === 'touch') {
     dpad.style.display = 'block';
-    minimap.classList.add('touch');
-    topRightPanel.classList.add('touch');
   } else {
     dpad.style.display = 'none';
-    minimap.classList.remove('touch');
-    topRightPanel.classList.remove('touch');
   }
   game.zoomScale = 1.0; // Always 100% zoom
 }
@@ -586,8 +575,6 @@ currentKeybindChange:null,
 currentKeybindSlot:null,
 controlScheme:'keyboard',
 zoomScale:1.0,
-lampsVisible:false,
-previousIsNight:false,
 interactPressed:false
 };
 const canvas=document.getElementById('gameCanvas');
@@ -836,23 +823,7 @@ ctx.font='12px Comfortaa';
 ctx.textAlign='center';
 ctx.fillText('Dig Site',centerX+TILE_SIZE/2,centerY+TILE_SIZE*2-8);
 });
-if(game.lampsVisible){
-for(let i=0;i<5;i++){
-const lampX=(10+i*8)*TILE_SIZE+game.offsetX;
-const lampY=22*TILE_SIZE+game.offsetY;
-ctx.fillStyle='#3a3a3a';
-ctx.fillRect(lampX,lampY,4,20);
-ctx.fillStyle='#ffd700';
-ctx.beginPath();
-ctx.arc(lampX+2,lampY,6,0,Math.PI*2);
-ctx.fill();
-const grad=ctx.createRadialGradient(lampX+2,lampY,0,lampX+2,lampY,30);
-grad.addColorStop(0,'rgba(255,215,0,0.3)');
-grad.addColorStop(1,'rgba(255,215,0,0)');
-ctx.fillStyle=grad;
-ctx.fillRect(lampX-28,lampY-30,60,60);
-}
-}
+
 }
 function drawAmbiance(){
 game.ambianceElements.forEach(amb=>{
@@ -952,6 +923,13 @@ if(tileType==='g'||tileType==='p'||tileType==='d'){
 for(const obj of game.mapObjects){
 const dx=obj.x-targetX;
 const dy=obj.y-targetY;
+if(Math.abs(dx)<15&&Math.abs(dy)<15){
+return false;
+}
+}
+for(const amb of game.ambianceElements){
+const dx=amb.x-targetX;
+const dy=amb.y-targetY;
 if(Math.abs(dx)<15&&Math.abs(dy)<15){
 return false;
 }
@@ -1119,10 +1097,6 @@ game.time.hour=0;
 }
 }
 game.isNight=game.time.hour>=18||game.time.hour<6;
-if(game.isNight !== game.previousIsNight){
-game.lampsVisible = game.isNight;
-game.previousIsNight = game.isNight;
-}
 const targetOpacity=game.isNight?0.6:0;
 if(Math.abs(game.nightOpacity-targetOpacity)>0.01){
 const fadeSpeed=0.01;
@@ -1725,12 +1699,17 @@ document.getElementById('closeHowToPlayModal').addEventListener('click',()=>{
 document.getElementById('howToPlayModal').style.display='none';
 document.getElementById('settingsModal').style.display='flex';
 });
-document.getElementById('continueWithControls').addEventListener('click',()=>{
-  const selectedScheme = document.querySelector('input[name="controlScheme"]:checked').value;
-  game.controlScheme = selectedScheme;
+document.getElementById('selectKeyboard').addEventListener('click',()=>{
+  game.controlScheme = 'keyboard';
   updateDpadVisibility();
   document.getElementById('controlSchemeModal').style.display='none';
-  // Start tutorial
+  game.tutorialActive = true;
+  game.tutorialStep = 0;
+});
+document.getElementById('selectTouch').addEventListener('click',()=>{
+  game.controlScheme = 'touch';
+  updateDpadVisibility();
+  document.getElementById('controlSchemeModal').style.display='none';
   game.tutorialActive = true;
   game.tutorialStep = 0;
 });
