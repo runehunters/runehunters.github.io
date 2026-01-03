@@ -482,7 +482,9 @@ function handleDpadRelease(event, direction) {
 
 function updateDpadVisibility() {
   const dpad = document.getElementById('dpad');
-  if (game.controlScheme === 'touch') {
+  const modals = ['settingsModal', 'controlsModal', 'artifactModal', 'documentationModal', 'sleepModal', 'researchTreeModal', 'questBoardModal', 'creditsModal', 'missionCompleteModal', 'lateNightModal', 'confirmModal', 'howToPlayModal', 'controlSchemeModal'];
+  const modalOpen = modals.some(id => document.getElementById(id).style.display === 'flex');
+  if (game.controlScheme === 'touch' && !modalOpen) {
     dpad.style.display = 'block';
   } else {
     dpad.style.display = 'none';
@@ -547,6 +549,7 @@ function showControlSchemeSelector() {
   if (selectedRadio) {
     selectedRadio.checked = true;
   }
+  updateDpadVisibility();
 }
 let game={
 state:'town',
@@ -827,18 +830,10 @@ if(game.map[y][x]==='h'){
 const top = (y === 0 || game.map[y-1][x] !== 'h');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'h');
 const wallColor = '#708070'; // pale sage
-const roofColor = '#F4A460'; // sandy brown for tent
+const roofColor = '#F4A460'; // sandy brown
 if (top) {
 ctx.fillStyle=roofColor;
-ctx.beginPath();
-ctx.moveTo(tileX, tileY + TILE_SIZE);
-ctx.lineTo(tileX + TILE_SIZE, tileY + TILE_SIZE);
-ctx.lineTo(tileX + TILE_SIZE/2, tileY);
-ctx.closePath();
-ctx.fill();
-// Tent pole
-ctx.fillStyle='#654321';
-ctx.fillRect(tileX + TILE_SIZE/2 - 1, tileY + TILE_SIZE/2, 2, TILE_SIZE/2);
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 } else if (bottom) {
 ctx.fillStyle=wallColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -1460,6 +1455,7 @@ if(totalValue>0){
 
 updateHUD();
 document.getElementById('documentationModal').style.display='flex';
+updateDpadVisibility();
 }
 function showResearchTree(){
 const content=document.getElementById('researchTreeContent');
@@ -1485,6 +1481,7 @@ tierDiv.appendChild(nodeDiv);
 content.appendChild(tierDiv);
 }
 document.getElementById('researchTreeModal').style.display='flex';
+updateDpadVisibility();
 }
 function canUnlockResearch(upgrade){
 if(upgrade.unlocked)return false;
@@ -1717,6 +1714,7 @@ showResearchTree();
 });
 document.getElementById('closeResearchTreeModal').addEventListener('click',()=>{
 document.getElementById('researchTreeModal').style.display='none';
+updateDpadVisibility();
 });
 document.getElementById('closeQuestBoardModal').addEventListener('click',()=>{
 document.getElementById('questBoardModal').style.display='none';
@@ -1756,15 +1754,15 @@ document.getElementById('settingsModal').style.display='flex';
 });
 document.getElementById('selectKeyboard').addEventListener('click',()=>{
   game.controlScheme = 'keyboard';
-  updateDpadVisibility();
   document.getElementById('controlSchemeModal').style.display='none';
+  updateDpadVisibility();
   game.tutorialActive = true;
   game.tutorialStep = 0;
 });
 document.getElementById('selectTouch').addEventListener('click',()=>{
   game.controlScheme = 'touch';
-  updateDpadVisibility();
   document.getElementById('controlSchemeModal').style.display='none';
+  updateDpadVisibility();
   game.tutorialActive = true;
   game.tutorialStep = 0;
 });
