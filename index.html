@@ -594,6 +594,7 @@ const buildings = [
 {type: 'h', width: 5, height: 5}, // camp
 {type: 'q', width: 5, height: 5}  // quest
 ];
+const placedBuildings = [];
 for(const building of buildings){
 let placed = false;
 let attempts = 0;
@@ -601,19 +602,28 @@ while(!placed && attempts < 100){
 const x = Math.floor(Math.random() * (MAP_WIDTH - building.width - 4)) + 2;
 const y = Math.floor(Math.random() * (MAP_HEIGHT - building.height - 4)) + 2;
 const distFromCenter = Math.sqrt(Math.pow(x + building.width/2 - MAP_WIDTH/2, 2) + Math.pow(y + building.height/2 - MAP_HEIGHT/2, 2));
-if(distFromCenter < 15){
+if(distFromCenter > 10){
 let clear = true;
 for(let dy = 0; dy < building.height; dy++){
 for(let dx = 0; dx < building.width; dx++){
 if(map[y + dy][x + dx] !== 'g') clear = false;
 }
 }
-if(clear){
+let tooClose = false;
+for (const pb of placedBuildings) {
+  if (!(x + building.width + 2 <= pb.x || pb.x + pb.width + 2 <= x ||
+        y + building.height + 2 <= pb.y || pb.y + pb.height + 2 <= y)) {
+    tooClose = true;
+    break;
+  }
+}
+if(clear && !tooClose){
 for(let dy = 0; dy < building.height; dy++){
 for(let dx = 0; dx < building.width; dx++){
 map[y + dy][x + dx] = building.type;
 }
 }
+placedBuildings.push({x, y, width: building.width, height: building.height, type: building.type});
 placed = true;
 }
 }
@@ -817,10 +827,18 @@ if(game.map[y][x]==='h'){
 const top = (y === 0 || game.map[y-1][x] !== 'h');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'h');
 const wallColor = '#708070'; // pale sage
-const roofColor = '#907060'; // muted brown
+const roofColor = '#F4A460'; // sandy brown for tent
 if (top) {
 ctx.fillStyle=roofColor;
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.beginPath();
+ctx.moveTo(tileX, tileY + TILE_SIZE);
+ctx.lineTo(tileX + TILE_SIZE, tileY + TILE_SIZE);
+ctx.lineTo(tileX + TILE_SIZE/2, tileY);
+ctx.closePath();
+ctx.fill();
+// Tent pole
+ctx.fillStyle='#654321';
+ctx.fillRect(tileX + TILE_SIZE/2 - 1, tileY + TILE_SIZE/2, 2, TILE_SIZE/2);
 } else if (bottom) {
 ctx.fillStyle=wallColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -847,10 +865,19 @@ if(game.map[y][x]==='q'){
 const top = (y === 0 || game.map[y-1][x] !== 'q');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'q');
 const wallColor = '#708090'; // pale blue
-const roofColor = '#808080'; // muted gray
+const roofColor = '#8B4513'; // saddlebrown for thatch
 if (top) {
 ctx.fillStyle=roofColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+// Add thatch lines
+ctx.strokeStyle='#654321';
+ctx.lineWidth=1;
+for(let i=0; i<5; i++){
+ctx.beginPath();
+ctx.moveTo(tileX + i*6, tileY);
+ctx.lineTo(tileX + i*6 + 8, tileY + TILE_SIZE);
+ctx.stroke();
+}
 } else if (bottom) {
 ctx.fillStyle=wallColor;
 ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
@@ -879,23 +906,26 @@ ctx.textAlign='center';
 function isRoofTile(y, x, type) {
   return game.map[y][x] === type && (y === 0 || game.map[y-1][x] !== type);
 }
-function getRoofCenter(y, type) {
-  // Find leftmost roof tile
-  let leftX = x;
-  while (leftX > 0 && isRoofTile(y, leftX - 1, type)) {
-    leftX--;
+const buildingTitles = {'b': 'Lab', 'h': 'Camp', 'q': 'Quest'};
+for(const type in buildingTitles){
+  const title = buildingTitles[type];
+  const chars = title.split('');
+  let roofTiles = [];
+  for(let y=0; y<MAP_HEIGHT; y++){
+    for(let x=0; x<MAP_WIDTH; x++){
+      if(isRoofTile(y, x, type)){
+        roofTiles.push({x, y});
+      }
+    }
   }
-  // Find rightmost roof tile
-  let rightX = x;
-  while (rightX < MAP_WIDTH - 1 && isRoofTile(y, rightX + 1, type)) {
-    rightX++;
+  roofTiles.sort((a,b)=>a.x - b.x);
+  for(let i=0; i<chars.length && i<roofTiles.length; i++){
+    const tile = roofTiles[i];
+    const tileX = tile.x * TILE_SIZE + game.offsetX;
+    const tileY = tile.y * TILE_SIZE + game.offsetY;
+    ctx.fillText(chars[i], tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
   }
-  // Return center tile
-  return leftX + Math.floor((rightX - leftX) / 2);
 }
-if(isRoofTile(y, x, 'b') && x === getRoofCenter(y, 'b')) ctx.fillText('Lab', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
-if(isRoofTile(y, x, 'h') && x === getRoofCenter(y, 'h')) ctx.fillText('Camp', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
-if(isRoofTile(y, x, 'q') && x === getRoofCenter(y, 'q')) ctx.fillText('Quest', tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
 }
 }
 game.digsites.forEach(site=>{
