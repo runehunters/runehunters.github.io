@@ -669,7 +669,7 @@ return false;
 }
 function generateMapObjects(){
 game.mapObjects=[];
-const treeCount=MAP_WIDTH*MAP_HEIGHT/30;
+const treeCount=Math.floor(MAP_WIDTH*MAP_HEIGHT/60); // Reduced from /30 to /60
 for(let i=0;i<treeCount;i++){
 let x,y,attempts=0;
 do{
@@ -685,7 +685,7 @@ game.mapObjects.push(new MapObject(x*TILE_SIZE+TILE_SIZE/2,y*TILE_SIZE+TILE_SIZE
 }
 function generateAmbiance(){
 game.ambianceElements=[];
-const rockCount=MAP_WIDTH*MAP_HEIGHT/35;
+const rockCount=Math.floor(MAP_WIDTH*MAP_HEIGHT/70); // Reduced from /35 to /70
 for(let i=0;i<rockCount;i++){
 let x,y,attempts=0;
 do{
@@ -783,11 +783,14 @@ digsite.dirtCount=(rows*cols)-digsite.artifactCount;
 digsite.dugCells=Array(rows).fill(null).map(()=>Array(cols).fill(false));
 }
 function drawMap(){
-for(let y=0;y<MAP_HEIGHT;y++){
-for(let x=0;x<MAP_WIDTH;x++){
+const startTileX = Math.max(0, Math.floor(-game.offsetX / TILE_SIZE) - 1);
+const endTileX = Math.min(MAP_WIDTH, Math.ceil((-game.offsetX + canvas.width) / TILE_SIZE) + 1);
+const startTileY = Math.max(0, Math.floor(-game.offsetY / TILE_SIZE) - 1);
+const endTileY = Math.min(MAP_HEIGHT, Math.ceil((-game.offsetY + canvas.height) / TILE_SIZE) + 1);
+for(let y=startTileY;y<endTileY;y++){
+for(let x=startTileX;x<endTileX;x++){
 const tileX=x*TILE_SIZE+game.offsetX;
 const tileY=y*TILE_SIZE+game.offsetY;
-if(tileX>canvas.width||tileY>canvas.height||tileX<-TILE_SIZE||tileY<-TILE_SIZE)continue;
 let color;
 switch(game.map[y][x]){
 case'g':color='#6b8e4e';break;
@@ -1797,12 +1800,16 @@ showMessage(`Press any key to set new bind for: ${action.toUpperCase()} slot ${s
 }
 window.unlockResearch=unlockResearch;
 window.startKeybindChange=startKeybindChange;
+function gameLoop() {
+  updateGame();
+  requestAnimationFrame(gameLoop);
+}
+
 function initGame(){
 resizeCanvas();
 loadGame();
 game.map=createMap();
 generateDigsites();
-generateBackgroundElements();
 generateMapObjects();
 generateAmbiance();
 // Adjust player spawn if blocked
@@ -1832,9 +1839,12 @@ window.addEventListener('resize',resizeCanvas);
 window.addEventListener('keydown',handleKeydown);
 window.addEventListener('keyup',handleKeyup);
 canvas.addEventListener('click',handleMouseClick);
-document.getElementById('loadingScreen').style.display = 'none';
-showControlSchemeSelector();
-setInterval(updateGame,1000/60);
+setTimeout(() => {
+  document.getElementById('loadingScreen').style.display = 'none';
+  showControlSchemeSelector();
+  generateBackgroundElements();
+}, 500);
+requestAnimationFrame(gameLoop);
 }
 initGame();
 </script>
