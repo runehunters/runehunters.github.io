@@ -452,6 +452,45 @@ const TUTORIAL_STEPS=[
 {text:"When ready to sleep, enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!"}
 ];
 
+const splashTexts = [
+  "Digging artifacts",
+  "Unearthing history",
+  "Excavating the past",
+  "Discovering ancient secrets",
+  "Archaeology in action",
+  "Finding lost civilizations",
+  "Revealing Roman mysteries",
+  "Uncovering historical treasures",
+  "Exploring ancient ruins",
+  "Preserving the past"
+];
+
+function startLoadingSequence() {
+  const loadingElement = document.getElementById('loadingScreen');
+  const textElement = loadingElement.querySelector('p');
+  const shuffled = [...splashTexts].sort(() => 0.5 - Math.random());
+  const selectedSplash = shuffled.slice(0, 3);
+  const sequence = [
+    'loading.', 'loading..', 'loading...',
+    'loading.', 'loading..', 'loading...',
+    'initializing.', 'initializing..', 'initializing...',
+    'initializing.', 'initializing..', 'initializing...',
+    ...selectedSplash
+  ];
+  let index = 0;
+
+  function nextText() {
+    if (index < sequence.length) {
+      textElement.textContent = sequence[index];
+      index++;
+      const delay = index <= 12 ? 250 : 1000;
+      setTimeout(nextText, delay);
+    }
+  }
+
+  nextText();
+}
+
 function getTutorialText(stepIndex) {
   const baseText = TUTORIAL_STEPS[stepIndex].text;
 
@@ -1809,42 +1848,43 @@ function initGame(){
 resizeCanvas();
 loadGame();
 game.map=createMap();
-generateDigsites();
-generateMapObjects();
-generateAmbiance();
-// Adjust player spawn if blocked
-let playerTileX = Math.floor(game.player.x / TILE_SIZE);
-let playerTileY = Math.floor(game.player.y / TILE_SIZE);
-if (!isWalkable(game.player.x, game.player.y)) {
-  let found = false;
-  for (let radius = 1; radius < 10 && !found; radius++) {
-    for (let dx = -radius; dx <= radius && !found; dx++) {
-      for (let dy = -radius; dy <= radius && !found; dy++) {
-        if (Math.abs(dx) + Math.abs(dy) === radius) {
-          let nx = playerTileX + dx;
-          let ny = playerTileY + dy;
-          if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT && game.map[ny][nx] === 'g') {
-            game.player.x = nx * TILE_SIZE + TILE_SIZE / 2;
-            game.player.y = ny * TILE_SIZE + TILE_SIZE / 2;
-            found = true;
+startLoadingSequence();
+window.addEventListener('resize',resizeCanvas);
+window.addEventListener('keydown',handleKeydown);
+window.addEventListener('keyup',handleKeyup);
+canvas.addEventListener('click',handleMouseClick);
+setTimeout(() => generateDigsites(), 500);
+setTimeout(() => generateMapObjects(), 1000);
+setTimeout(() => generateAmbiance(), 1500);
+setTimeout(() => {
+  // Adjust player spawn if blocked
+  let playerTileX = Math.floor(game.player.x / TILE_SIZE);
+  let playerTileY = Math.floor(game.player.y / TILE_SIZE);
+  if (!isWalkable(game.player.x, game.player.y)) {
+    let found = false;
+    for (let radius = 1; radius < 10 && !found; radius++) {
+      for (let dx = -radius; dx <= radius && !found; dx++) {
+        for (let dy = -radius; dy <= radius && !found; dy++) {
+          if (Math.abs(dx) + Math.abs(dy) === radius) {
+            let nx = playerTileX + dx;
+            let ny = playerTileY + dy;
+            if (nx >= 0 && nx < MAP_WIDTH && ny >= 0 && ny < MAP_HEIGHT && game.map[ny][nx] === 'g') {
+              game.player.x = nx * TILE_SIZE + TILE_SIZE / 2;
+              game.player.y = ny * TILE_SIZE + TILE_SIZE / 2;
+              found = true;
+            }
           }
         }
       }
     }
   }
-}
-updateHUD();
-updateDpadVisibility();
-window.addEventListener('resize',resizeCanvas);
-window.addEventListener('keydown',handleKeydown);
-window.addEventListener('keyup',handleKeyup);
-canvas.addEventListener('click',handleMouseClick);
-setTimeout(() => {
+  updateHUD();
+  updateDpadVisibility();
   document.getElementById('loadingScreen').style.display = 'none';
   showControlSchemeSelector();
   generateBackgroundElements();
-}, 10000);
-requestAnimationFrame(gameLoop);
+  requestAnimationFrame(gameLoop);
+}, 5000);
 }
 initGame();
 </script>
