@@ -92,6 +92,11 @@ body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:h
 .dpad-down-right{grid-area:down-right}
 .dpad-grid{display:grid;grid-template-areas:'up-left up up-right''left center right''down-left down down-right';grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:5px}
 .dpad-center{grid-area:center}
+.joystick-container{position:relative;width:120px;height:120px;margin:0 auto}
+.joystick-base{position:absolute;width:100%;height:100%;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:50%;touch-action:none}
+.joystick-handle{position:absolute;width:40px;height:40px;background:rgba(120,100,80,0.9);border:2px solid #6b5545;border-radius:50%;left:40px;top:40px;transition:transform 0.2s ease-out;touch-action:none}
+.joystick-center-button{position:absolute;left:140px;top:40px;width:60px;height:60px;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none}
+.joystick-center-button:active{background:rgba(120,100,80,0.9)}
 .control-scheme-option{display:flex;align-items:center;justify-content:center;margin:15px 0}
 .control-scheme-option input[type="radio"]{margin-right:10px;transform:scale(1.2)}
 .control-scheme-option label{font-size:16px;cursor:pointer}
@@ -319,16 +324,10 @@ Research Points: <span id="moneyDisplay">0</span>
 <p>Loading Rune Hunters...</p>
 </div>
 <div id="dpad" class="dpad">
-<div class="dpad-grid">
-<button id="dpad-up-left" class="dpad-button dpad-up-left" onpointerdown="handleDpadPress(event, 'up-left')" onpointerup="handleDpadRelease(event, 'up-left')" onpointercancel="handleDpadRelease(event, 'up-left')" onmouseleave="handleDpadRelease(event, 'up-left')" oncontextmenu="return false;">↖</button>
-<button id="dpad-up" class="dpad-button dpad-up" onpointerdown="handleDpadPress(event, 'up')" onpointerup="handleDpadRelease(event, 'up')" onpointercancel="handleDpadRelease(event, 'up')" onmouseleave="handleDpadRelease(event, 'up')" oncontextmenu="return false;">↑</button>
-<button id="dpad-up-right" class="dpad-button dpad-up-right" onpointerdown="handleDpadPress(event, 'up-right')" onpointerup="handleDpadRelease(event, 'up-right')" onpointercancel="handleDpadRelease(event, 'up-right')" onmouseleave="handleDpadRelease(event, 'up-right')" oncontextmenu="return false;">↗</button>
-<button id="dpad-left" class="dpad-button dpad-left" onpointerdown="handleDpadPress(event, 'left')" onpointerup="handleDpadRelease(event, 'left')" onpointercancel="handleDpadRelease(event, 'left')" onmouseleave="handleDpadRelease(event, 'left')" oncontextmenu="return false;">←</button>
-<button id="dpad-center" class="dpad-button dpad-center" onpointerdown="handleDpadPress(event, 'interact')" onpointerup="handleDpadRelease(event, 'interact')" onpointercancel="handleDpadRelease(event, 'interact')" onmouseleave="handleDpadRelease(event, 'interact')" oncontextmenu="return false;">●</button>
-<button id="dpad-right" class="dpad-button dpad-right" onpointerdown="handleDpadPress(event, 'right')" onpointerup="handleDpadRelease(event, 'right')" onpointercancel="handleDpadRelease(event, 'right')" onmouseleave="handleDpadRelease(event, 'right')" oncontextmenu="return false;">→</button>
-<button id="dpad-down-left" class="dpad-button dpad-down-left" onpointerdown="handleDpadPress(event, 'down-left')" onpointerup="handleDpadRelease(event, 'down-left')" onpointercancel="handleDpadRelease(event, 'down-left')" onmouseleave="handleDpadRelease(event, 'down-left')" oncontextmenu="return false;">↙</button>
-<button id="dpad-down" class="dpad-button dpad-down" onpointerdown="handleDpadPress(event, 'down')" onpointerup="handleDpadRelease(event, 'down')" onpointercancel="handleDpadRelease(event, 'down')" onmouseleave="handleDpadRelease(event, 'down')" oncontextmenu="return false;">↓</button>
-<button id="dpad-down-right" class="dpad-button dpad-down-right" onpointerdown="handleDpadPress(event, 'down-right')" onpointerup="handleDpadRelease(event, 'down-right')" onpointercancel="handleDpadRelease(event, 'down-right')" onmouseleave="handleDpadRelease(event, 'down-right')" oncontextmenu="return false;">↘</button>
+<div class="joystick-container">
+<div id="joystick-base" class="joystick-base"></div>
+<div id="joystick-handle" class="joystick-handle"></div>
+<button id="joystick-center-button" class="joystick-center-button" onpointerdown="handleJoystickCenterPress(event)" onpointerup="handleJoystickCenterRelease(event)" onpointercancel="handleJoystickCenterRelease(event)" oncontextmenu="return false;">●</button>
 </div>
 </div>
 <script>
@@ -522,7 +521,7 @@ function getTutorialText(stepIndex) {
 
   if (stepIndex === 2) {
     if (game.controlScheme === 'touch') {
-      return "Use the on-screen D-pad to move around. The map shows your research base and surrounding areas where dig sites will appear.";
+      return "Use the on-screen joystick to move around. The map shows your research base and surrounding areas where dig sites will appear.";
     } else {
       return "Use your movement keys to move around. The map shows your research base and surrounding areas where dig sites will appear.";
     }
@@ -530,7 +529,7 @@ function getTutorialText(stepIndex) {
 
   if (stepIndex === 3) {
     if (game.controlScheme === 'touch') {
-      return "Dig sites appear each day at 9 AM. Tap the center of the D-pad to enter them during the day and excavate layered trenches.";
+      return "Dig sites appear each day at 9 AM. Tap the center button to enter them during the day and excavate layered trenches.";
     } else {
       return "Dig sites appear each day at 9 AM. Press E to enter them during the day and excavate layered trenches.";
     }
@@ -538,7 +537,7 @@ function getTutorialText(stepIndex) {
 
   if (stepIndex === 4) {
     if (game.controlScheme === 'touch') {
-      return "The central building is your Research Laboratory. Tap the center of the D-pad to enter and document your artifacts to earn Research Points!";
+      return "The central building is your Research Laboratory. Tap the center button to enter and document your artifacts to earn Research Points!";
     } else {
       return "The central building is your Research Laboratory. Press E to enter and document your artifacts to earn Research Points!";
     }
@@ -546,7 +545,7 @@ function getTutorialText(stepIndex) {
 
   if (stepIndex === 5) {
     if (game.controlScheme === 'touch') {
-      return "When ready to sleep, tap the center of the D-pad to enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!";
+      return "When ready to sleep, tap the center button to enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!";
     } else {
       return "When ready to sleep, press E to enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!";
     }
@@ -573,12 +572,148 @@ function handleDpadRelease(event, direction) {
   });
 }
 
+function handleJoystickCenterPress(event) {
+  event.preventDefault();
+  const key = game.keybinds.interact[0];
+  game.keys[key] = true;
+}
+
+function handleJoystickCenterRelease(event) {
+  event.preventDefault();
+  const key = game.keybinds.interact[0];
+  game.keys[key] = false;
+}
+
+function setupJoystick() {
+  const joystickBase = document.getElementById('joystick-base');
+  const joystickHandle = document.getElementById('joystick-handle');
+  const joystickContainer = document.querySelector('.joystick-container');
+
+  let isDragging = false;
+  let touchId = null;
+  let maxRadius = 40;
+
+  function handleTouchStart(e) {
+    if (e.touches.length > 1) return;
+
+    const touch = e.touches[0];
+    const rect = joystickContainer.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Check if touch is within the joystick base
+    const distance = Math.sqrt(Math.pow(touch.clientX - centerX, 2) + Math.pow(touch.clientY - centerY, 2));
+    if (distance <= rect.width / 2) {
+      isDragging = true;
+      touchId = touch.identifier;
+      e.preventDefault();
+    }
+  }
+
+  function handleTouchMove(e) {
+    if (!isDragging || touchId === null) return;
+
+    const touch = Array.from(e.touches).find(t => t.identifier === touchId);
+    if (!touch) return;
+
+    const rect = joystickContainer.getBoundingClientRect();
+    const centerX = rect.left + rect.width / 2;
+    const centerY = rect.top + rect.height / 2;
+
+    // Calculate position relative to center
+    let dx = touch.clientX - centerX;
+    let dy = touch.clientY - centerY;
+    const distance = Math.sqrt(dx * dx + dy * dy);
+
+    // Constrain to max radius
+    if (distance > maxRadius) {
+      const ratio = maxRadius / distance;
+      dx *= ratio;
+      dy *= ratio;
+    }
+
+    // Update handle position
+    joystickHandle.style.transform = `translate(${dx}px, ${dy}px)`;
+
+    // Calculate angle and determine direction
+    const angle = Math.atan2(dy, dx);
+    const degrees = angle * (180 / Math.PI);
+
+    // Clear all directional keys
+    Object.keys(game.keybinds).forEach(dir => {
+      if (dir !== 'interact' && dir !== 'return') {
+        game.keybinds[dir].forEach(key => {
+          if (key) game.keys[key] = false;
+        });
+      }
+    });
+
+    // Determine which direction(s) to activate based on angle
+    if (distance > 10) { // Dead zone
+      const sectors = [
+        { min: -22.5, max: 22.5, dirs: ['right'] },
+        { min: 22.5, max: 67.5, dirs: ['up', 'right'] },
+        { min: 67.5, max: 112.5, dirs: ['up'] },
+        { min: 112.5, max: 157.5, dirs: ['up', 'left'] },
+        { min: 157.5, max: 180, dirs: ['left'] },
+        { min: -180, max: -157.5, dirs: ['left'] },
+        { min: -157.5, max: -112.5, dirs: ['down', 'left'] },
+        { min: -112.5, max: -67.5, dirs: ['down'] },
+        { min: -67.5, max: -22.5, dirs: ['down', 'right'] }
+      ];
+
+      const sector = sectors.find(s =>
+        (degrees >= s.min && degrees <= s.max) ||
+        (s.min < 0 && s.max < 0 && degrees >= s.min && degrees <= s.max)
+      );
+
+      if (sector) {
+        sector.dirs.forEach(dir => {
+          const key = game.keybinds[dir][0];
+          if (key) game.keys[key] = true;
+        });
+      }
+    }
+
+    e.preventDefault();
+  }
+
+  function handleTouchEnd(e) {
+    if (!isDragging || touchId === null) return;
+
+    // Reset handle position
+    joystickHandle.style.transform = 'translate(0px, 0px)';
+
+    // Clear all directional keys
+    Object.keys(game.keybinds).forEach(dir => {
+      if (dir !== 'interact' && dir !== 'return') {
+        game.keybinds[dir].forEach(key => {
+          if (key) game.keys[key] = false;
+        });
+      }
+    });
+
+    isDragging = false;
+    touchId = null;
+  }
+
+  // Add event listeners
+  joystickBase.addEventListener('touchstart', handleTouchStart, { passive: false });
+  document.addEventListener('touchmove', handleTouchMove, { passive: false });
+  document.addEventListener('touchend', handleTouchEnd);
+  document.addEventListener('touchcancel', handleTouchEnd);
+}
+
 function updateDpadVisibility() {
   const dpad = document.getElementById('dpad');
   const modals = ['settingsModal', 'controlsModal', 'artifactModal', 'documentationModal', 'sleepModal', 'researchTreeModal', 'questBoardModal', 'creditsModal', 'missionCompleteModal', 'lateNightModal', 'confirmModal', 'howToPlayModal', 'controlSchemeModal'];
   const modalOpen = modals.some(id => document.getElementById(id).style.display === 'flex');
   if (game.controlScheme === 'touch' && !modalOpen) {
     dpad.style.display = 'block';
+    if (!joystickSetupComplete) {
+      setupJoystick();
+      joystickSetupComplete = true;
+    }
   } else {
     dpad.style.display = 'none';
   }
@@ -677,6 +812,7 @@ controlScheme:'keyboard',
 zoomScale:1.0,
 interactPressed:false
 };
+let joystickSetupComplete = false;
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
 function resizeCanvas(){
@@ -1843,9 +1979,9 @@ document.getElementById('help-move-keys').textContent=moveKeys;
 document.getElementById('help-interact-keys').textContent=interactKeys;
 document.getElementById('help-return-keys').textContent=returnKeys;
 if (game.controlScheme === 'touch') {
-  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use the <strong>on-screen D-pad</strong> to move around the world.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5-10 hidden layers. Only one layer is visible at a time. <strong>Tap tiles</strong> to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = '<strong>Interact / Exit Site:</strong> Center D-pad button<br><strong>Secondary Return:</strong> Not used in touch mode';
+  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use the <strong>on-screen joystick</strong> to move around the world.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5 hidden layers. Only one layer is visible at a time. <strong>Tap tiles</strong> to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = '<strong>Interact / Exit Site:</strong> Center button<br><strong>Secondary Return:</strong> Not used in touch mode';
 } else {
   document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use <strong id="help-move-keys">WASD/Arrow Keys</strong> to move around the world.';
   document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5-10 hidden layers. Only one layer is visible at a time. Click tiles to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
