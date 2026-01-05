@@ -468,27 +468,36 @@ const splashTexts = [
 function startLoadingSequence() {
   const loadingElement = document.getElementById('loadingScreen');
   const textElement = loadingElement.querySelector('p');
-  const shuffled = [...splashTexts].sort(() => 0.5 - Math.random());
-  const selectedSplash = shuffled.slice(0, 3);
-  const sequence = [
-    'loading.', 'loading..', 'loading...',
-    'loading.', 'loading..', 'loading...',
-    'initializing.', 'initializing..', 'initializing...',
-    'initializing.', 'initializing..', 'initializing...',
-    ...selectedSplash
-  ];
-  let index = 0;
+  const progressElement = document.createElement('div');
+  progressElement.style.marginTop = '20px';
+  progressElement.style.width = '200px';
+  progressElement.style.height = '10px';
+  progressElement.style.background = 'rgba(255, 215, 0, 0.3)';
+  progressElement.style.borderRadius = '5px';
+  progressElement.style.overflow = 'hidden';
 
-  function nextText() {
-    if (index < sequence.length) {
-      textElement.textContent = sequence[index];
-      index++;
-      const delay = index <= 12 ? 250 : 1000;
-      setTimeout(nextText, delay);
+  const progressBar = document.createElement('div');
+  progressBar.style.width = '0%';
+  progressBar.style.height = '100%';
+  progressBar.style.background = '#ffd700';
+  progressBar.style.transition = 'width 0.3s ease';
+  progressElement.appendChild(progressBar);
+
+  loadingElement.appendChild(progressElement);
+
+  // Restore the loading text element to show exactly what's being generated
+  textElement.style.display = 'block';
+  textElement.style.marginBottom = '15px';
+  textElement.textContent = 'Loading Rune Hunters...';
+
+  return {
+    updateProgress: (percent) => {
+      progressBar.style.width = `${Math.min(100, percent)}%`;
+    },
+    setMessage: (message) => {
+      textElement.textContent = message;
     }
-  }
-
-  nextText();
+  };
 }
 
 function getTutorialText(stepIndex) {
@@ -708,7 +717,7 @@ return false;
 }
 function generateMapObjects(){
 game.mapObjects=[];
-const treeCount=Math.floor(MAP_WIDTH*MAP_HEIGHT/60); // Reduced from /30 to /60
+const treeCount=Math.floor(MAP_WIDTH*MAP_HEIGHT/80); // Further reduced from /60 to /80
 for(let i=0;i<treeCount;i++){
 let x,y,attempts=0;
 do{
@@ -740,10 +749,10 @@ game.ambianceElements.push({x:x*TILE_SIZE+TILE_SIZE/2,y:y*TILE_SIZE+TILE_SIZE/2,
 }
 function generateBackgroundElements(){
 game.backgroundElements=[];
-for(let i=0;i<15;i++){
+for(let i=0;i<10;i++){ // Reduced from 15 to 10
 game.backgroundElements.push({x:Math.random()*(MAP_WIDTH*TILE_SIZE),y:Math.random()*(MAP_HEIGHT*TILE_SIZE*0.4),type:'column',height:80+Math.random()*40});
 }
-for(let i=0;i<8;i++){
+for(let i=0;i<5;i++){ // Reduced from 8 to 5
 game.backgroundElements.push({x:Math.random()*(MAP_WIDTH*TILE_SIZE),y:Math.random()*(MAP_HEIGHT*TILE_SIZE*0.4),type:'arch',width:60+Math.random()*40});
 }
 game.backgroundElements.push({x:MAP_WIDTH*TILE_SIZE*0.8,y:MAP_HEIGHT*TILE_SIZE*0.15,type:'colosseum'});
@@ -1844,20 +1853,46 @@ function gameLoop() {
   requestAnimationFrame(gameLoop);
 }
 
-function initGame(){
+async function initGame(){
 resizeCanvas();
 loadGame();
 game.map=createMap();
-startLoadingSequence();
+
+const loading = startLoadingSequence();
 window.addEventListener('resize',resizeCanvas);
 window.addEventListener('keydown',handleKeydown);
 window.addEventListener('keyup',handleKeyup);
 canvas.addEventListener('click',handleMouseClick);
-setTimeout(() => generateDigsites(), 500);
-setTimeout(() => generateMapObjects(), 1000);
-setTimeout(() => generateAmbiance(), 1500);
-setTimeout(() => {
+
+// Use frame-based loading to prevent UI freezing
+async function loadWithProgress() {
+  // Generate map objects with progress
+  loading.setMessage("Generating terrain...");
+  await new Promise(resolve => setTimeout(resolve, 100));
+  generateMapObjects();
+  loading.updateProgress(25);
+
+  // Generate ambiance elements
+  loading.setMessage("Adding environmental details...");
+  await new Promise(resolve => setTimeout(resolve, 100));
+  generateAmbiance();
+  loading.updateProgress(50);
+
+  // Generate dig sites
+  loading.setMessage("Creating excavation sites...");
+  await new Promise(resolve => setTimeout(resolve, 100));
+  generateDigsites();
+  loading.updateProgress(75);
+
+  // Generate background elements
+  loading.setMessage("Finalizing world...");
+  await new Promise(resolve => setTimeout(resolve, 100));
+  generateBackgroundElements();
+  loading.updateProgress(90);
+
   // Adjust player spawn if blocked
+  loading.setMessage("Preparing player...");
+  await new Promise(resolve => setTimeout(resolve, 100));
   let playerTileX = Math.floor(game.player.x / TILE_SIZE);
   let playerTileY = Math.floor(game.player.y / TILE_SIZE);
   if (!isWalkable(game.player.x, game.player.y)) {
@@ -1878,13 +1913,23 @@ setTimeout(() => {
       }
     }
   }
+
+  loading.updateProgress(100);
+  loading.setMessage("Ready to explore!");
+
+  // Final setup
   updateHUD();
   updateDpadVisibility();
+
+  // Hide loading screen and start game
+  await new Promise(resolve => setTimeout(resolve, 500));
   document.getElementById('loadingScreen').style.display = 'none';
   showControlSchemeSelector();
-  generateBackgroundElements();
   requestAnimationFrame(gameLoop);
-}, 5000);
+}
+
+// Start the loading process
+loadWithProgress();
 }
 initGame();
 </script>
