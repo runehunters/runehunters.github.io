@@ -446,10 +446,10 @@ pack4:{name:"Legendary Discoveries",unlock:'questpack4',quests:[
 const TUTORIAL_STEPS=[
 {text:"Welcome to Rune Hunters! You're an archaeologist studying ancient Roman civilization. Your mission is to excavate artifacts and learn about the past."},
 {text:"Archaeology is the study of human history through excavation and analysis of artifacts and structures. Each discovery helps us understand how people lived thousands of years ago."},
-{text:"Move around using your movement controls. The map shows your research base and surrounding areas where dig sites will appear daily."},
-{text:"Dig sites appear each day at 9 AM. Visit them during the day to excavate layered trenches. Click or tap tiles to uncover artifacts!"},
-{text:"The central building is your Research Laboratory. Visit it to document your artifacts and earn Research Points for upgrades!"},
-{text:"When ready to sleep, enter your Camp building at night (after 6 PM). This starts a new day with fresh dig sites. Time to begin your journey!"}
+{text:"Move around using your movement keys. The map shows your research base and surrounding areas where dig sites will appear."},
+{text:"Dig sites appear each day at 9 AM. Visit them during the day to excavate layered trenches."},
+{text:"The central building is your Research Laboratory. Visit it to document your artifacts and earn Research Points!"},
+{text:"When ready to sleep, enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!"}
 ];
 
 const splashTexts = [
@@ -546,6 +546,7 @@ function saveGame() {
     tutorialActive: game.tutorialActive,
     tutorialStep: game.tutorialStep,
     questProgress: game.questProgress,
+    controlScheme: game.controlScheme,
     zoomScale: game.zoomScale,
     unlockedResearches: []
   };
@@ -572,6 +573,7 @@ function loadGame() {
     game.tutorialActive = saveData.tutorialActive || false;
     game.tutorialStep = saveData.tutorialStep || 0;
     game.questProgress = saveData.questProgress || game.questProgress;
+    game.controlScheme = saveData.controlScheme || 'keyboard';
     game.zoomScale = saveData.zoomScale || 1.0;
     if(saveData.unlockedResearches){
       saveData.unlockedResearches.forEach(id => {
@@ -623,8 +625,7 @@ currentKeybindChange:null,
 currentKeybindSlot:null,
 controlScheme:'keyboard',
 zoomScale:1.0,
-interactPressed:false,
-offscreenCanvas:null
+interactPressed:false
 };
 const canvas=document.getElementById('gameCanvas');
 const ctx=canvas.getContext('2d');
@@ -766,6 +767,10 @@ const x=Math.floor(Math.random()*(MAP_WIDTH-5))+2;
 const y=Math.floor(Math.random()*(MAP_HEIGHT-5))+2;
 const distFromCenter=Math.sqrt(Math.pow(x-21,2)+Math.pow(y-12,2));
 let width = 3, height = 3;
+if(game.controlScheme === 'touch'){
+width = Math.floor(Math.random()*4)+2;
+height = Math.floor(Math.random()*4)+2;
+}
 let isClear=distFromCenter>10;
 if(isClear){
 for(let dy=0;dy<height;dy++){
@@ -783,9 +788,7 @@ game.map[y+dy][x+dx]='d';
 }
 }
 const layers = game.controlScheme === 'touch' ? 5 : 5 + Math.floor(Math.random() * 6);
-const digsite = {x:x+1,y:y+1,completed:false,grid:null,layers:layers,width:width,height:height};
-game.digsites.push(digsite);
-generateDigsiteContent(digsite);
+game.digsites.push({x:x+1,y:y+1,completed:false,grid:null,layers:layers,width:width,height:height});
 placed=true;
 }
 attempts++;
@@ -818,15 +821,15 @@ placed=true;
 digsite.dirtCount=(rows*cols)-digsite.artifactCount;
 digsite.dugCells=Array(rows).fill(null).map(()=>Array(cols).fill(false));
 }
-function drawMap(targetCtx = ctx, offsetX = game.offsetX, offsetY = game.offsetY){
-const startTileX = Math.max(0, Math.floor(-offsetX / TILE_SIZE) - 1);
-const endTileX = Math.min(MAP_WIDTH, Math.ceil((-offsetX + canvas.width) / TILE_SIZE) + 1);
-const startTileY = Math.max(0, Math.floor(-offsetY / TILE_SIZE) - 1);
-const endTileY = Math.min(MAP_HEIGHT, Math.ceil((-offsetY + canvas.height) / TILE_SIZE) + 1);
+function drawMap(){
+const startTileX = Math.max(0, Math.floor(-game.offsetX / TILE_SIZE) - 1);
+const endTileX = Math.min(MAP_WIDTH, Math.ceil((-game.offsetX + canvas.width) / TILE_SIZE) + 1);
+const startTileY = Math.max(0, Math.floor(-game.offsetY / TILE_SIZE) - 1);
+const endTileY = Math.min(MAP_HEIGHT, Math.ceil((-game.offsetY + canvas.height) / TILE_SIZE) + 1);
 for(let y=startTileY;y<endTileY;y++){
 for(let x=startTileX;x<endTileX;x++){
-const tileX=x*TILE_SIZE+offsetX;
-const tileY=y*TILE_SIZE+offsetY;
+const tileX=x*TILE_SIZE+game.offsetX;
+const tileY=y*TILE_SIZE+game.offsetY;
 let color;
 switch(game.map[y][x]){
 case'g':color='#6b8e4e';break;
@@ -837,37 +840,37 @@ case'q':color='#8a7a6a';break;
 case'd':color='#d4a574';break;
 default:color='#6b8e4e';
 }
-targetCtx.fillStyle=color;
-targetCtx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
+ctx.fillStyle=color;
+ctx.fillRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 if(game.map[y][x]==='b'){
 const top = (y === 0 || game.map[y-1][x] !== 'b');
 const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'b');
 const wallColor = '#A09070'; // pale tan
 const roofColor = '#B06060'; // muted red
 if (top) {
-targetCtx.fillStyle=roofColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 } else if (bottom) {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Door
-targetCtx.fillStyle='#654321';
-targetCtx.fillRect(tileX+12, tileY+16, 8, 16);
+ctx.fillStyle='#654321';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
 } else {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Windows
-targetCtx.fillStyle='rgba(0,0,0,0.4)';
-targetCtx.fillRect(tileX+4, tileY+8, 6,6);
-targetCtx.fillRect(tileX+12, tileY+8, 6,6);
-targetCtx.fillRect(tileX+20, tileY+8, 6,6);
-targetCtx.fillRect(tileX+4, tileY+18, 6,6);
-targetCtx.fillRect(tileX+20, tileY+18, 6,6);
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-targetCtx.strokeStyle='#654321';
-targetCtx.lineWidth=1;
-targetCtx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
+ctx.strokeStyle='#654321';
+ctx.lineWidth=1;
+ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='h'){
 const top = (y === 0 || game.map[y-1][x] !== 'h');
@@ -875,29 +878,29 @@ const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'h');
 const wallColor = '#708070'; // pale sage
 const roofColor = '#F4A460'; // sandy brown
 if (top) {
-targetCtx.fillStyle=roofColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 } else if (bottom) {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Door
-targetCtx.fillStyle='#0F5132';
-targetCtx.fillRect(tileX+12, tileY+16, 8, 16);
+ctx.fillStyle='#0F5132';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
 } else {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Windows
-targetCtx.fillStyle='rgba(0,0,0,0.4)';
-targetCtx.fillRect(tileX+4, tileY+8, 6,6);
-targetCtx.fillRect(tileX+12, tileY+8, 6,6);
-targetCtx.fillRect(tileX+20, tileY+8, 6,6);
-targetCtx.fillRect(tileX+4, tileY+18, 6,6);
-targetCtx.fillRect(tileX+20, tileY+18, 6,6);
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-targetCtx.strokeStyle='#0F5132';
-targetCtx.lineWidth=1;
-targetCtx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
+ctx.strokeStyle='#0F5132';
+ctx.lineWidth=1;
+ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
 if(game.map[y][x]==='q'){
 const top = (y === 0 || game.map[y-1][x] !== 'q');
@@ -905,42 +908,42 @@ const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'q');
 const wallColor = '#708090'; // pale blue
 const roofColor = '#8B4513'; // saddlebrown for thatch
 if (top) {
-targetCtx.fillStyle=roofColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=roofColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Add thatch lines
-targetCtx.strokeStyle='#654321';
-targetCtx.lineWidth=1;
+ctx.strokeStyle='#654321';
+ctx.lineWidth=1;
 for(let i=0; i<5; i++){
-targetCtx.beginPath();
-targetCtx.moveTo(tileX + i*6, tileY);
-targetCtx.lineTo(tileX + i*6 + 8, tileY + TILE_SIZE);
-targetCtx.stroke();
+ctx.beginPath();
+ctx.moveTo(tileX + i*6, tileY);
+ctx.lineTo(tileX + i*6 + 8, tileY + TILE_SIZE);
+ctx.stroke();
 }
 } else if (bottom) {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Door
-targetCtx.fillStyle='#1E3A8A';
-targetCtx.fillRect(tileX+12, tileY+16, 8, 16);
+ctx.fillStyle='#1E3A8A';
+ctx.fillRect(tileX+12, tileY+16, 8, 16);
 } else {
-targetCtx.fillStyle=wallColor;
-targetCtx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
+ctx.fillStyle=wallColor;
+ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
 // Windows
-targetCtx.fillStyle='rgba(0,0,0,0.4)';
-targetCtx.fillRect(tileX+4, tileY+8, 6,6);
-targetCtx.fillRect(tileX+12, tileY+8, 6,6);
-targetCtx.fillRect(tileX+20, tileY+8, 6,6);
-targetCtx.fillRect(tileX+4, tileY+18, 6,6);
-targetCtx.fillRect(tileX+20, tileY+18, 6,6);
+ctx.fillStyle='rgba(0,0,0,0.4)';
+ctx.fillRect(tileX+4, tileY+8, 6,6);
+ctx.fillRect(tileX+12, tileY+8, 6,6);
+ctx.fillRect(tileX+20, tileY+8, 6,6);
+ctx.fillRect(tileX+4, tileY+18, 6,6);
+ctx.fillRect(tileX+20, tileY+18, 6,6);
 }
 // Outline
-targetCtx.strokeStyle='#1E3A8A';
-targetCtx.lineWidth=1;
-targetCtx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
+ctx.strokeStyle='#1E3A8A';
+ctx.lineWidth=1;
+ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
-targetCtx.fillStyle='#f4e4c1';
-targetCtx.font='bold 18px Comfortaa';
-targetCtx.textAlign='center';
+ctx.fillStyle='#f4e4c1';
+ctx.font='bold 18px Comfortaa';
+ctx.textAlign='center';
 function isRoofTile(y, x, type) {
   return game.map[y][x] === type && (y === 0 || game.map[y-1][x] !== type);
 }
@@ -959,58 +962,58 @@ for(const type in buildingTitles){
   roofTiles.sort((a,b)=>a.x - b.x);
   for(let i=0; i<chars.length && i<roofTiles.length; i++){
     const tile = roofTiles[i];
-    const tileX = tile.x * TILE_SIZE + offsetX;
-    const tileY = tile.y * TILE_SIZE + offsetY;
-    targetCtx.fillText(chars[i], tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
+    const tileX = tile.x * TILE_SIZE + game.offsetX;
+    const tileY = tile.y * TILE_SIZE + game.offsetY;
+    ctx.fillText(chars[i], tileX + TILE_SIZE/2, tileY + TILE_SIZE/2);
   }
 }
 }
 }
 game.digsites.forEach(site=>{
 if(site.completed)return;
-const centerX=site.x*TILE_SIZE+offsetX;
-const centerY=site.y*TILE_SIZE+offsetY;
-targetCtx.fillStyle='rgba(0,0,0,0.3)';
-targetCtx.fillRect(centerX-TILE_SIZE,centerY+TILE_SIZE/2,TILE_SIZE*3,TILE_SIZE);
-targetCtx.fillStyle='#f4e4c1';
-targetCtx.font='bold 16px Comfortaa';
-targetCtx.textAlign='center';
-targetCtx.fillText('Dig Site',centerX+TILE_SIZE/2,centerY+TILE_SIZE*2-8);
+const centerX=site.x*TILE_SIZE+game.offsetX;
+const centerY=site.y*TILE_SIZE+game.offsetY;
+ctx.fillStyle='rgba(0,0,0,0.3)';
+ctx.fillRect(centerX-TILE_SIZE,centerY+TILE_SIZE/2,TILE_SIZE*3,TILE_SIZE);
+ctx.fillStyle='#f4e4c1';
+ctx.font='bold 16px Comfortaa';
+ctx.textAlign='center';
+ctx.fillText('Dig Site',centerX+TILE_SIZE/2,centerY+TILE_SIZE*2-8);
 });
 
 }
-function drawAmbiance(targetCtx = ctx, offsetX = game.offsetX, offsetY = game.offsetY){
+function drawAmbiance(){
 game.ambianceElements.forEach(amb=>{
-const drawX=amb.x+offsetX;
-const drawY=amb.y+offsetY;
+const drawX=amb.x+game.offsetX;
+const drawY=amb.y+game.offsetY;
 if(amb.type==='rock'){
-targetCtx.fillStyle='#7a7a7a';
-targetCtx.beginPath();
-targetCtx.arc(drawX,drawY,5,0,Math.PI*2);
-targetCtx.fill();
-targetCtx.fillStyle='#6a6a6a';
-targetCtx.beginPath();
-targetCtx.arc(drawX+3,drawY+3,3,0,Math.PI*2);
-targetCtx.fill();
+ctx.fillStyle='#7a7a7a';
+ctx.beginPath();
+ctx.arc(drawX,drawY,5,0,Math.PI*2);
+ctx.fill();
+ctx.fillStyle='#6a6a6a';
+ctx.beginPath();
+ctx.arc(drawX+3,drawY+3,3,0,Math.PI*2);
+ctx.fill();
 }
 });
 }
-function drawMapObjects(targetCtx = ctx, offsetX = game.offsetX, offsetY = game.offsetY){
+function drawMapObjects(){
 game.mapObjects.sort((a,b)=>a.y-b.y);
 game.mapObjects.forEach(obj=>{
-const drawX=obj.x+offsetX;
-const drawY=obj.y+offsetY;
+const drawX=obj.x+game.offsetX;
+const drawY=obj.y+game.offsetY;
 if(obj.type==='tree'){
-targetCtx.fillStyle='#5a4a3a';
-targetCtx.fillRect(drawX-4,drawY+5,8,15);
-targetCtx.fillStyle='#3a5a3a';
-targetCtx.beginPath();
-targetCtx.arc(drawX,drawY,15,0,Math.PI*2);
-targetCtx.fill();
-targetCtx.arc(drawX-8,drawY+5,10,0,Math.PI*2);
-targetCtx.fill();
-targetCtx.arc(drawX+8,drawY+5,10,0,Math.PI*2);
-targetCtx.fill();
+ctx.fillStyle='#5a4a3a';
+ctx.fillRect(drawX-4,drawY+5,8,15);
+ctx.fillStyle='#3a5a3a';
+ctx.beginPath();
+ctx.arc(drawX,drawY,15,0,Math.PI*2);
+ctx.fill();
+ctx.arc(drawX-8,drawY+5,10,0,Math.PI*2);
+ctx.fill();
+ctx.arc(drawX+8,drawY+5,10,0,Math.PI*2);
+ctx.fill();
 }
 });
 }
@@ -1383,8 +1386,9 @@ ctx.fillRect(drawX-70+i*20,drawY+10,6,40);
 });
 if(game.state==='town'){
 if(game.scene==='overworld'){
-ctx.drawImage(game.offscreenCanvas, game.offsetX, game.offsetY);
-drawBackgroundElements();
+drawMap();
+drawAmbiance();
+drawMapObjects();
 drawPlayer();
 }
 }else if(game.state==='digsite'){
@@ -1879,13 +1883,6 @@ setTimeout(() => {
   document.getElementById('loadingScreen').style.display = 'none';
   showControlSchemeSelector();
   generateBackgroundElements();
-  game.offscreenCanvas = document.createElement('canvas');
-  game.offscreenCanvas.width = MAP_WIDTH * TILE_SIZE;
-  game.offscreenCanvas.height = MAP_HEIGHT * TILE_SIZE;
-  const offCtx = game.offscreenCanvas.getContext('2d');
-  drawMap(offCtx, 0, 0);
-  drawAmbiance(offCtx, 0, 0);
-  drawMapObjects(offCtx, 0, 0);
   requestAnimationFrame(gameLoop);
 }, 5000);
 }
