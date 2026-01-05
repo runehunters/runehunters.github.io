@@ -520,11 +520,35 @@ function startLoadingSequence() {
 function getTutorialText(stepIndex) {
   const baseText = TUTORIAL_STEPS[stepIndex].text;
 
-  if (stepIndex === 2) { // Movement step
+  if (stepIndex === 2) {
     if (game.controlScheme === 'touch') {
       return "Use the on-screen D-pad to move around. The map shows your research base and surrounding areas where dig sites will appear.";
     } else {
       return "Use your movement keys to move around. The map shows your research base and surrounding areas where dig sites will appear.";
+    }
+  }
+
+  if (stepIndex === 3) {
+    if (game.controlScheme === 'touch') {
+      return "Dig sites appear each day at 9 AM. Tap the center of the D-pad to enter them during the day and excavate layered trenches.";
+    } else {
+      return "Dig sites appear each day at 9 AM. Press E to enter them during the day and excavate layered trenches.";
+    }
+  }
+
+  if (stepIndex === 4) {
+    if (game.controlScheme === 'touch') {
+      return "The central building is your Research Laboratory. Tap the center of the D-pad to enter and document your artifacts to earn Research Points!";
+    } else {
+      return "The central building is your Research Laboratory. Press E to enter and document your artifacts to earn Research Points!";
+    }
+  }
+
+  if (stepIndex === 5) {
+    if (game.controlScheme === 'touch') {
+      return "When ready to sleep, tap the center of the D-pad to enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!";
+    } else {
+      return "When ready to sleep, press E to enter your Camp building at night. This starts a new day with fresh dig sites. Time to begin your journey!";
     }
   }
 
@@ -623,7 +647,7 @@ function showControlSchemeSelector() {
 let game={
 state:'town',
 scene:'overworld',
-player:{x:(MAP_WIDTH/2)*TILE_SIZE,y:(MAP_HEIGHT/2)*TILE_SIZE,speed:4,dx:0,dy:1,walkFrame:0,walkCounter:0,isWalking:false},
+player:{x:(MAP_WIDTH/2)*TILE_SIZE,y:(MAP_HEIGHT/2)*TILE_SIZE,speed:8,dx:0,dy:1,walkFrame:0,walkCounter:0,isWalking:false},
 map:[],
 mapObjects:[],
 ambianceElements:[],
@@ -1818,6 +1842,15 @@ const returnKeys=game.keybinds.return.filter(k=>k).map(k=>k.toUpperCase()).join(
 document.getElementById('help-move-keys').textContent=moveKeys;
 document.getElementById('help-interact-keys').textContent=interactKeys;
 document.getElementById('help-return-keys').textContent=returnKeys;
+if (game.controlScheme === 'touch') {
+  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use the <strong>on-screen D-pad</strong> to move around the world.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5-10 hidden layers. Only one layer is visible at a time. <strong>Tap tiles</strong> to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = '<strong>Interact / Exit Site:</strong> Center D-pad button<br><strong>Secondary Return:</strong> Not used in touch mode';
+} else {
+  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use <strong id="help-move-keys">WASD/Arrow Keys</strong> to move around the world.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5-10 hidden layers. Only one layer is visible at a time. Click tiles to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
+  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = 'Interact / Exit Site: <strong id="help-interact-keys">E</strong><br>Secondary Return: <strong id="help-return-keys">R</strong>';
+}
 document.getElementById('howToPlayModal').style.display='flex';
 });
 document.getElementById('closeHowToPlayModal').addEventListener('click',()=>{
