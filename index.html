@@ -468,8 +468,17 @@ const splashTexts = [
 function startLoadingSequence() {
   const loadingElement = document.getElementById('loadingScreen');
   const textElement = loadingElement.querySelector('p');
+
+  // Create a container for better layout control
+  const loadingContainer = document.createElement('div');
+  loadingContainer.style.display = 'flex';
+  loadingContainer.style.flexDirection = 'column';
+  loadingContainer.style.alignItems = 'center';
+  loadingContainer.style.justifyContent = 'center';
+  loadingContainer.style.gap = '15px';
+
+  // Create progress bar container
   const progressElement = document.createElement('div');
-  progressElement.style.marginTop = '20px';
   progressElement.style.width = '200px';
   progressElement.style.height = '10px';
   progressElement.style.background = 'rgba(255, 215, 0, 0.3)';
@@ -483,12 +492,20 @@ function startLoadingSequence() {
   progressBar.style.transition = 'width 0.3s ease';
   progressElement.appendChild(progressBar);
 
-  loadingElement.appendChild(progressElement);
-
-  // Restore the loading text element to show exactly what's being generated
+  // Style the text element for centered display below progress bar
   textElement.style.display = 'block';
-  textElement.style.marginBottom = '15px';
+  textElement.style.textAlign = 'center';
+  textElement.style.margin = '0';
+  textElement.style.fontSize = '18px';
   textElement.textContent = 'Loading Rune Hunters...';
+
+  // Assemble the container
+  loadingContainer.appendChild(progressElement);
+  loadingContainer.appendChild(textElement);
+
+  // Clear loading screen and add our container
+  loadingElement.innerHTML = '';
+  loadingElement.appendChild(loadingContainer);
 
   return {
     updateProgress: (percent) => {
