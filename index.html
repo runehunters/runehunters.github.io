@@ -1,39 +1,54 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Rune Hunters</title>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Comfortaa:wght@400;700&display=swap" rel="stylesheet">
-<style>
-*{margin:0;padding:0;box-sizing:border-box}
-body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:hidden;display:flex;justify-content:center;align-items:center;height:100vh}
-#gameContainer{width:100vw;height:100vh;position:relative}
-#gameCanvas{width:100%;height:100%;display:block;image-rendering:pixelated}
-#hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
-.hud-element{pointer-events:all;background:rgba(42,24,16,0.9);border:2px solid #8b6f47;padding:10px 15px;color:#f4e4c1;box-shadow:0 2px 8px rgba(0,0,0,0.5);border-radius:15px}
-.top-left{position:absolute;top:20px;left:20px;font-size:14px}
-.bottom-left{position:absolute;bottom:20px;left:20px;font-size:14px;max-width:350px;max-height:400px;overflow-y:auto}
-.top-right{position:absolute;top:20px;right:20px}
-.top-right.touch{position:absolute;top:70px;left:20px}
-.action-button{background:#5a4a3a;color:#f4e4c1;border:1px solid #8b6f47;padding:8px 15px;cursor:pointer;border-radius:10px;transition:background 0.1s;font-family:'Comfortaa',cursive;font-size:14px}
-.action-button:hover{background:#6a5a4a}
-.action-button.red{background:#a03030;border-color:#f05050}
-.action-button.red:hover{background:#b04040}
-.action-button:disabled{background:#3a3a3a;color:#6a6a6a;cursor:not-allowed}
-.action-button:focus{outline:2px solid #ffd700}
-#tutorialBox{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:500px;width:90%;text-align:center;padding:20px;font-size:16px;line-height:1.6;z-index:10}
-.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.75);display:flex;justify-content:center;align-items:center;z-index:1000}
-.modal-content{background:#2a1810;border:4px solid #8b6f47;padding:30px;border-radius:20px;box-shadow:0 5px 20px rgba(0,0,0,0.8);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;color:#f4e4c1;text-align:center}
-.modal-content h2{margin-bottom:20px;color:#ffd700;font-size:24px}
-.modal-content p{margin-bottom:15px;font-size:14px;line-height:1.6}
-.modal-content button{margin:10px auto;display:block;width:90%}
-#messageBox{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(42,24,16,0.95);border:2px solid #8b6f47;padding:15px 25px;border-radius:15px;display:none;max-width:500px;text-align:center;z-index:10}
-.artifact-info{text-align:left;margin:10px 0;font-size:12px;line-height:1.5}
-#nightOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,20,0.6);pointer-events:none;opacity:0;transition:opacity 1s ease-in-out}
-.study-item{background:rgba(90,74,58,0.5);border:1px solid #8b6f47;padding:10px;margin:8px 0;border-radius:10px;text-align:left}
+.research-tree{display:flex;flex-direction:column;gap:50px;padding:20px 0;position:relative}
+.research-tier{display:flex;justify-content:center;gap:60px;position:relative;min-height:120px;align-items:center}
+.research-tier::before{content:'';position:absolute;left:40px;right:40px;top:50%;height:3px;background:linear-gradient(90deg,transparent,#8b6f47,transparent);z-index:0}
+.research-tier-label{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:16px;font-weight:bold;color:#ffd700;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg);background:rgba(26,20,16,0.9);padding:10px 5px;border-radius:5px;border:2px solid #8b6f47}
+.research-node{position:relative;display:flex;flex-direction:column;align-items:center;padding:12px 15px;background:rgba(90,74,58,0.9);border:3px solid #8b6f47;border-radius:12px;min-width:150px;max-width:180px;transition:all 0.3s ease;cursor:pointer;z-index:1}
+.research-node:hover{transform:scale(1.08);border-color:#ffd700;box-shadow:0 0 25px rgba(255,215,0,0.6)}
+.research-node.unlocked{background:rgba(50,100,50,0.9);border-color:#4a8a4a}
+.research-node.unlocked:hover{box-shadow:0 0 25px rgba(74,138,74,0.8)}
+.research-node.locked{opacity:0.7;filter:grayscale(30%)}
+.research-node.locked:hover{transform:none;border-color:#8a4a4a;box-shadow:0 0 15px rgba(138,74,74,0.5)}
+.research-node-name{font-size:13px;font-weight:bold;color:#f4e4c1;text-align:center;margin-bottom:4px;line-height:1.3}
+.research-node-cost{font-size:12px;color:#ffd700;margin-bottom:4px}
+.research-node-status{font-size:10px;padding:2px 8px;border-radius:10px;margin-top:5px}
+.research-node-status.locked{background:rgba(138,74,74,0.5);color:#f88}
+.research-node-status.available{background:rgba(255,215,0,0.3);color:#ffd700}
+.research-node-status.purchased{background:rgba(74,138,74,0.5);color:#8f8}
+.research-tree-container{display:flex;flex-direction:column;gap:40px;padding:20px 0}
+.research-tier{display:flex;justify-content:center;gap:60px;position:relative}
+.research-tier-label{position:absolute;left:0;top:50%;transform:translateY(-50%);font-size:18px;font-weight:bold;color:#ffd700;writing-mode:vertical-rl;text-orientation:mixed;transform:rotate(180deg)}
+.research-node{position:relative;display:flex;flex-direction:column;align-items:center;padding:15px;background:rgba(90,74,58,0.8);border:3px solid #8b6f47;border-radius:15px;min-width:160px;transition:all 0.3s ease;cursor:pointer}
+.research-node:hover{transform:scale(1.05);border-color:#ffd700;box-shadow:0 0 20px rgba(255,215,0,0.5)}
+.research-node.unlocked{background:rgba(50,100,50,0.8);border-color:#4a8a4a}
+.research-node.locked{opacity:0.6;filter:grayscale(50%)}
+.research-node.locked:hover{transform:none;border-color:#8a4a4a;box-shadow:none}
+.research-node-name{font-size:14px;font-weight:bold;color:#f4e4c1;text-align:center;margin-bottom:5px}
+.research-node-cost{font-size:12px;color:#ffd700;margin-bottom:5px}
+.research-node-effect{font-size:11px;color:#c4b4a4;text-align:center}
+.research-node-connector{position:absolute;top:-40px;width:3px;height:40px;background:linear-gradient(to bottom,#8b6f47,#4a3a2a)}
+.research-node-connector.horizontal{position:absolute;top:50%;width:60px;height:3px;background:linear-gradient(to right,#8b6f47,#4a3a2a)}
+.research-connections{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none;z-index:0}
+.research-connection-line{stroke:#8b6f47;stroke-width:3;fill:none}
+.research-tooltip{position:fixed;background:rgba(42,24,16,0.98);border:3px solid #ffd700;border-radius:15px;padding:15px;min-width:280px;max-width:350px;z-index:1000;pointer-events:none;opacity:0;transition:opacity 0.2s ease;box-shadow:0 5px 30px rgba(0,0,0,0.8)}
+.research-tooltip.visible{opacity:1}
+.research-tooltip h3{color:#ffd700;font-size:16px;margin-bottom:10px;border-bottom:1px solid #8b6f47;padding-bottom:8px}
+.research-tooltip p{margin:5px 0;font-size:13px;color:#f4e4c1}
+.research-tooltip .cost{color:#ffd700;font-weight:bold;font-size:14px}
+.research-tooltip .effect{color:#c4b4a4;font-style:italic}
+.research-tooltip .requirements{margin-top:12px;padding-top:10px;border-top:1px solid #8b6f47}
+.research-tooltip .requirements h4{color:#f4e4c1;font-size:13px;margin-bottom:8px}
+.research-tooltip .req-item{font-size:12px;margin:4px 0;padding:3px 8px;border-radius:5px}
+.research-tooltip .req-item.completed{background:rgba(74,138,74,0.3);color:#8f8}
+.research-tooltip .req-item.incomplete{background:rgba(138,74,74,0.3);color:#f88}
+.research-node-prereq-line{position:absolute;pointer-events:none}
+</parameter>
+<task_progress>
+- [ ] Add CSS for tree structure and tooltips
+- [ ] Add JavaScript for tree rendering with connections
+- [ ] Add hover tooltips with upgrade details
+- [ ] Show requirements with ☑/🅇 indicators
+- [ ] Test the implementation
+</task_progress>
 .study-item button{width:auto;padding:6px 12px;font-size:12px;margin:5px 5px 0 0}
 .research-tree{display:grid;gap:15px;text-align:left;max-height:60vh;overflow-y:auto}
 .research-node{background:rgba(90,74,58,0.3);border:2px solid #8b6f47;padding:15px;border-radius:15px;margin:10px 0}
@@ -147,7 +162,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <h2>Controls</h2>
 <div style="display:flex;gap:10px;justify-content:center;margin-bottom:20px">
 <button id="settingsSelectKeyboard" class="action-button">🎹 Keyboard Controls</button>
-<button id="settingsSelectTouch" class="action-button">📱 Touch Controls (D-Pad)</button>
+<button id="settingsSelectTouch" class="action-button">📱 Touch Controls (Joystick)</button>
 </div>
 <div id="keybindsSection" style="display:none">
 <div class="keybinds-grid">
@@ -215,6 +230,15 @@ Research Points: <span id="moneyDisplay">0</span>
 <p>Unlock upgrades to improve your archaeological abilities</p>
 <div id="researchTreeContent" class="research-tree"></div>
 <button id="closeResearchTreeModal" class="action-button" tabindex="26">Close</button>
+</div>
+</div>
+<div id="researchTooltip" class="research-tooltip">
+<h3 id="tooltipName"></h3>
+<p id="tooltipCost" class="cost"></p>
+<p id="tooltipEffect" class="effect"></p>
+<div class="requirements">
+<h4>Requirements:</h4>
+<div id="tooltipRequirements"></div>
 </div>
 </div>
 <div id="questBoardModal" class="modal-overlay" style="display:none">
@@ -316,7 +340,7 @@ Research Points: <span id="moneyDisplay">0</span>
 <p>Select your preferred control method:</p>
 <div style="display:flex;gap:10px;justify-content:center">
 <button id="selectKeyboard" class="action-button">Keyboard Controls</button>
-<button id="selectTouch" class="action-button">Touch Controls (D-Pad)</button>
+<button id="selectTouch" class="action-button">Touch Controls (Joystick)</button>
 </div>
 </div>
 </div>
@@ -389,37 +413,37 @@ book2:{name:"Papyrus Fragment",rarity:"epic",value:230,description:"Egyptian pap
 const RARITY_ORDER=['common','uncommon','rare','epic','legendary'];
 const RESEARCH_TREE={
 tier1:[
-{id:'brush1',name:'Brush With Greatness',cost:150,effect:'Improved excavation techniques',tier:1,unlocked:false,prereqs:[]},
-{id:'file',name:'File It Under History',cost:150,effect:'Advanced documentation methods',tier:1,unlocked:false,prereqs:[]},
-{id:'cardio',name:'Cardio-facts Training',cost:200,effect:'+10% movement speed',tier:1,unlocked:false,prereqs:[]},
+{id:'brush1',name:'Brush With Greatness',cost:150,effect:'Finds artifacts in tiles you excavate',tier:1,unlocked:false,prereqs:[]},
+{id:'file',name:'File It Under History',cost:150,effect:'Earn 20% more RP from documenting artifacts',tier:1,unlocked:false,prereqs:[]},
+{id:'cardio',name:'Cardio-facts Training',cost:200,effect:'+10% movement speed while walking',tier:1,unlocked:false,prereqs:[]},
 {id:'questpack1',name:'Open Sesame-Stone',cost:100,effect:'Unlock Quest Pack 1',tier:1,unlocked:false,prereqs:[]}
 ],
 tier2:[
-{id:'shovel1',name:'Shovel Some Respect',cost:250,effect:'Stronger digging tools',tier:2,unlocked:false,prereqs:['brush1']},
-{id:'radar1',name:'Peek Performance',cost:300,effect:'See 2 layers',tier:2,unlocked:false,prereqs:['brush1']},
-{id:'paperwork',name:'Paperwork Makes Dream Work',cost:500,effect:'Efficient archival system',tier:2,unlocked:false,prereqs:['file']},
+{id:'shovel1',name:'Shovel Some Respect',cost:250,effect:'Reveal hidden tiles faster when digging',tier:2,unlocked:false,prereqs:['brush1']},
+{id:'radar1',name:'Peek Performance',cost:300,effect:'See 2 layers deep in dig sites',tier:2,unlocked:false,prereqs:['brush1']},
+{id:'paperwork',name:'Paperwork Makes Dream Work',cost:500,effect:'Document more artifacts at once',tier:2,unlocked:false,prereqs:['file']},
 {id:'questpack2',name:'Quest-ionable Methods',cost:300,effect:'Unlock Quest Pack 2',tier:2,unlocked:false,prereqs:['questpack1']}
 ],
 tier3:[
-{id:'brush2',name:'Brush Hour 2',cost:400,effect:'Fine-detail analysis tools',tier:3,unlocked:false,prereqs:['shovel1']},
-{id:'scan1',name:'Scan-You-Dig-It?',cost:700,effect:'10% reveal chance',tier:3,unlocked:false,prereqs:['radar1']},
-{id:'radar2',name:'Double-Down Detector',cost:600,effect:'See 3 layers',tier:3,unlocked:false,prereqs:['radar1']},
-{id:'keep',name:'Keep It Together',cost:1100,effect:'Artifact preservation training',tier:3,unlocked:false,prereqs:['paperwork']},
+{id:'brush2',name:'Brush Hour 2',cost:400,effect:'Better tools find rarer artifacts',tier:3,unlocked:false,prereqs:['shovel1']},
+{id:'scan1',name:'Scan-You-Dig-It?',cost:700,effect:'10% chance to auto-reveal adjacent tiles',tier:3,unlocked:false,prereqs:['radar1']},
+{id:'radar2',name:'Double-Down Detector',cost:600,effect:'See 3 layers deep in dig sites',tier:3,unlocked:false,prereqs:['radar1']},
+{id:'keep',name:'Keep It Together',cost:1100,effect:'Artifacts never break during excavation',tier:3,unlocked:false,prereqs:['paperwork']},
 {id:'questpack3',name:'Quest For Success',cost:900,effect:'Unlock Quest Pack 3',tier:3,unlocked:false,prereqs:['questpack2']}
 ],
 tier4:[
-{id:'shovel2',name:'Shovel With Punches',cost:600,effect:'Reinforced excavation gear',tier:4,unlocked:false,prereqs:['brush2']},
-{id:'radar3',name:'Depth Charge',cost:1200,effect:'See 4 layers, +25% detect',tier:4,unlocked:false,prereqs:['scan1','radar2']},
-{id:'map',name:'Map-tastic Insights',cost:900,effect:'Show digsite contents',tier:4,unlocked:false,prereqs:['keep']},
-{id:'labgo',name:'Lab On the Go-pher',cost:2800,effect:'Field documentation',tier:4,unlocked:false,prereqs:['keep']},
+{id:'shovel2',name:'Shovel With Punches',cost:600,effect:'Master tools dig through tough soil',tier:4,unlocked:false,prereqs:['brush2']},
+{id:'radar3',name:'Depth Charge',cost:1200,effect:'See 4 layers deep, +25% artifact detection',tier:4,unlocked:false,prereqs:['scan1','radar2']},
+{id:'map',name:'Map-tastic Insights',cost:900,effect:'See where artifacts are buried',tier:4,unlocked:false,prereqs:['keep']},
+{id:'labgo',name:'Lab On the Go-pher',cost:2800,effect:'Document artifacts in the field',tier:4,unlocked:false,prereqs:['keep']},
 {id:'questpack4',name:'A Quest-ion of Time',cost:1200,effect:'Unlock Quest Pack 4',tier:4,unlocked:false,prereqs:['questpack3']}
 ],
 tier5:[
-{id:'tools3',name:'Dig-nificantly Better',cost:1200,effect:'Master excavation kit',tier:5,unlocked:false,prereqs:['shovel2']},
-{id:'radar4',name:'All-Seeing Eye-chaeology',cost:1800,effect:'See 5 layers, +50% detect',tier:5,unlocked:false,prereqs:['radar3']},
-{id:'laser',name:'Laser Focused',cost:3000,effect:'30% reveal chance',tier:5,unlocked:false,prereqs:['radar3']},
-{id:'research',name:'Research and Destroy',cost:2400,effect:'Advanced research methodology',tier:5,unlocked:false,prereqs:['map','labgo']},
-{id:'victory',name:'Dig Victory',cost:4000,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research']}
+{id:'tools3',name:'Dig-nificantly Better',cost:1200,effect:'Elite excavation kit finds everything',tier:5,unlocked:false,prereqs:['shovel2']},
+{id:'radar4',name:'All-Seeing Eye-chaeology',cost:1800,effect:'See 5 layers deep, +50% artifact detection',tier:5,unlocked:false,prereqs:['radar3']},
+{id:'laser',name:'Laser Focused',cost:3000,effect:'30% chance to reveal entire layer instantly',tier:5,unlocked:false,prereqs:['radar3']},
+{id:'research',name:'Research and Destroy',cost:2400,effect:'Earn bonus RP from all sources',tier:5,unlocked:false,prereqs:['map','labgo']},
+{id:'victory',name:'Dig Victory',cost:4000,effect:'Complete the archaeological journey!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research']}
 ]
 };
 const QUEST_PACKS={
@@ -635,9 +659,9 @@ function setupJoystick() {
     // Update handle position
     joystickHandle.style.transform = `translate(${dx}px, ${dy}px)`;
 
-    // Calculate angle and determine direction
-    const angle = Math.atan2(dy, dx);
-    const degrees = angle * (180 / Math.PI);
+  // Calculate angle and determine direction
+  const angle = Math.atan2(-dy, dx);
+  const degrees = angle * (180 / Math.PI);
 
     // Clear all directional keys
     Object.keys(game.keybinds).forEach(dir => {
@@ -733,7 +757,24 @@ function saveGame() {
     questProgress: game.questProgress,
     controlScheme: game.controlScheme,
     zoomScale: game.zoomScale,
-    unlockedResearches: []
+    unlockedResearches: [],
+    digsites: game.digsites,
+    currentDigsite: game.currentDigsite ? {
+      x: game.currentDigsite.x,
+      y: game.currentDigsite.y,
+      completed: game.currentDigsite.completed,
+      layers: game.currentDigsite.layers,
+      width: game.currentDigsite.width,
+      height: game.currentDigsite.height,
+      artifactCount: game.currentDigsite.artifactCount,
+      currentLayer: game.currentDigsite.currentLayer,
+      grid: game.currentDigsite.grid,
+      dugCells: game.currentDigsite.dugCells
+    } : null,
+    timeFrozen: game.timeFrozen,
+    lateNightWarningShown: game.lateNightWarningShown,
+    state: game.state,
+    scene: game.scene
   };
   for(const tierKey in RESEARCH_TREE){
     RESEARCH_TREE[tierKey].forEach(upgrade => {
@@ -760,6 +801,14 @@ function loadGame() {
     game.questProgress = saveData.questProgress || game.questProgress;
     game.controlScheme = saveData.controlScheme || 'keyboard';
     game.zoomScale = saveData.zoomScale || 1.0;
+    game.digsites = saveData.digsites || [];
+    game.state = saveData.state || 'town';
+    game.scene = saveData.scene || 'overworld';
+    game.timeFrozen = saveData.timeFrozen || false;
+    game.lateNightWarningShown = saveData.lateNightWarningShown || false;
+    if(saveData.currentDigsite){
+      game.currentDigsite = saveData.currentDigsite;
+    }
     if(saveData.unlockedResearches){
       saveData.unlockedResearches.forEach(id => {
         const upgrade = findResearchById(id);
@@ -935,6 +984,7 @@ game.backgroundElements.push({x:Math.random()*(MAP_WIDTH*TILE_SIZE),y:Math.rando
 game.backgroundElements.push({x:MAP_WIDTH*TILE_SIZE*0.8,y:MAP_HEIGHT*TILE_SIZE*0.15,type:'colosseum'});
 }
 function generateDigsites(){
+// Clear existing digsite tiles on the map first
 for(let y=0;y<MAP_HEIGHT;y++){
 for(let x=0;x<MAP_WIDTH;x++){
 if(game.map[y][x]==='d'||game.map[y][x]==='w'){
@@ -942,10 +992,11 @@ game.map[y][x]='g';
 }
 }
 }
+
+// Only generate new digsites if none were loaded from save
+if(!game.digsites || game.digsites.length === 0){
 game.digsites=[];
-const existingDigsites=game.digsites.filter(d=>d.completed===false);
-const newSitesNeeded=4-existingDigsites.length;
-for(let i=0;i<newSitesNeeded;i++){
+for(let i=0;i<4;i++){
 let placed=false;
 let attempts=0;
 while(!placed&&attempts<100){
@@ -980,6 +1031,22 @@ placed=true;
 attempts++;
 }
 }
+}
+// Mark completed digsites on the map and restore uncompleted ones
+game.digsites.forEach(site => {
+if(site.completed){
+// Completed sites stay cleared
+}else{
+// Restore uncompleted sites to the map
+for(let dy=0;dy<site.height;dy++){
+for(let dx=0;dx<site.width;dx++){
+if(game.map[site.y+dy] && game.map[site.y+dy][site.x+dx]){
+game.map[site.y+dy][site.x+dx]='d';
+}
+}
+}
+}
+});
 generatePaths();
 }
 function generateDigsiteContent(digsite){
@@ -990,7 +1057,7 @@ digsite.artifactCount=0;
 digsite.dirtCount=0;
 digsite.currentLayer=0;
 const artifactTypes=Object.keys(ARTIFACTS);
-const numArtifacts=Math.floor(rows*cols*0.15);
+const numArtifacts=Math.floor(rows*cols*0.075);
 for(let i=0;i<numArtifacts;i++){
 let placed=false;
 while(!placed){
@@ -1692,28 +1759,106 @@ updateDpadVisibility();
 function showResearchTree(){
 const content=document.getElementById('researchTreeContent');
 content.innerHTML='';
+const container=document.createElement('div');
+container.className='research-tree-container';
+
 for(let tier=1;tier<=5;tier++){
 const tierKey='tier'+tier;
 if(!RESEARCH_TREE[tierKey])continue;
 const tierDiv=document.createElement('div');
-tierDiv.innerHTML=`<h3 style="color:#ffd700;margin:10px 0">Tier ${tier}</h3>`;
+tierDiv.className='research-tier';
+tierDiv.innerHTML=`<div class="research-tier-label">TIER ${tier}</div>`;
+
 RESEARCH_TREE[tierKey].forEach(upgrade=>{
 const canUnlock=canUnlockResearch(upgrade);
 const nodeDiv=document.createElement('div');
 nodeDiv.className=`research-node ${upgrade.unlocked?'unlocked':''} ${!canUnlock?'locked':''}`;
 nodeDiv.innerHTML=`
-<strong>${upgrade.name}</strong> - ${upgrade.cost} RP<br>
-<small>${upgrade.effect}</small><br>
-${upgrade.unlocked?'<span style="color:#4a8a4a">✓ Unlocked</span>':
-canUnlock?`<button class="action-button" onclick="unlockResearch('${upgrade.id}')">Unlock</button>`:
-'<span style="color:#8a4a4a">Requires prerequisites</span>'}</p>
+<div class="research-node-name">${upgrade.name}</div>
+<div class="research-node-cost">${upgrade.cost} RP</div>
+<div class="research-node-status ${upgrade.unlocked?'purchased':(canUnlock?'available':'locked')}">
+${upgrade.unlocked?'✓ PURCHASED':(canUnlock?'● AVAILABLE':'✗ LOCKED')}
+</div>
 `;
+nodeDiv.dataset.upgradeId=upgrade.id;
+nodeDiv.addEventListener('mouseenter',(e)=>showTooltip(e,upgrade));
+nodeDiv.addEventListener('mouseleave',hideTooltip);
+nodeDiv.addEventListener('mousemove',(e)=>positionTooltip(e));
+if(!upgrade.unlocked&&canUnlock){
+nodeDiv.addEventListener('click',()=>unlockResearch(upgrade.id));
+}
 tierDiv.appendChild(nodeDiv);
 });
-content.appendChild(tierDiv);
+container.appendChild(tierDiv);
 }
+content.appendChild(container);
 document.getElementById('researchTreeModal').style.display='flex';
 updateDpadVisibility();
+}
+
+function showTooltip(e,upgrade){
+const tooltip=document.getElementById('researchTooltip');
+document.getElementById('tooltipName').textContent=upgrade.name;
+document.getElementById('tooltipCost').textContent=`Cost: ${upgrade.cost} Research Points`;
+document.getElementById('tooltipEffect').textContent=upgrade.effect;
+
+const reqDiv=document.getElementById('tooltipRequirements');
+reqDiv.innerHTML='';
+
+// Show tier prerequisite
+const prevTier=upgrade.tier > 1 ? `tier${upgrade.tier-1}` : null;
+if(prevTier && RESEARCH_TREE[prevTier]){
+const prevUnlocked=RESEARCH_TREE[prevTier].every(u=>u.unlocked);
+const prevDiv=document.createElement('div');
+prevDiv.className=`req-item ${prevUnlocked?'completed':'incomplete'}`;
+prevDiv.textContent=`${prevUnlocked?'☑':'✗'} Tier ${upgrade.tier-1} Complete`;
+reqDiv.appendChild(prevDiv);
+}
+
+// Show specific prerequisites
+if(upgrade.prereqs.length > 0){
+upgrade.prereqs.forEach(prereqId=>{
+const prereq=findResearchById(prereqId);
+if(prereq){
+const prereqDiv=document.createElement('div');
+prereqDiv.className=`req-item ${prereq.unlocked?'completed':'incomplete'}`;
+prereqDiv.textContent=`${prereq.unlocked?'☑':'✗'} ${prereq.name}`;
+reqDiv.appendChild(prereqDiv);
+}
+});
+}
+
+// Show RP requirement
+if(!upgrade.unlocked){
+const rpDiv=document.createElement('div');
+rpDiv.className=`req-item ${game.researchPoints>=upgrade.cost?'completed':'incomplete'}`;
+rpDiv.textContent=`${game.researchPoints>=upgrade.cost?'☑':'✗'} ${upgrade.cost} RP Available (You have ${game.researchPoints})`;
+reqDiv.appendChild(rpDiv);
+}
+
+tooltip.classList.add('visible');
+positionTooltip(e);
+}
+
+function hideTooltip(){
+document.getElementById('researchTooltip').classList.remove('visible');
+}
+
+function positionTooltip(e){
+const tooltip=document.getElementById('researchTooltip');
+const x=e.clientX+15;
+const y=e.clientY+15;
+tooltip.style.left=x+'px';
+tooltip.style.top=y+'px';
+
+// Keep tooltip in viewport
+const rect=tooltip.getBoundingClientRect();
+if(rect.right>window.innerWidth){
+tooltip.style.left=(window.innerWidth-rect.width-10)+'px';
+}
+if(rect.bottom>window.innerHeight){
+tooltip.style.top=(window.innerHeight-rect.height-10)+'px';
+}
 }
 function canUnlockResearch(upgrade){
 if(upgrade.unlocked)return false;
