@@ -55,37 +55,29 @@ book2:{name:"Papyrus Fragment",value:46,description:"Egyptian papyrus with Latin
 };
 const RESEARCH_TREE={
 tier1:[
-{id:'brush1',name:'Brush With Greatness',cost:30,effect:'Improved excavation techniques',tier:1,unlocked:false,prereqs:[],x:100,y:50},
-{id:'file',name:'File It Under History',cost:30,effect:'Advanced documentation methods',tier:1,unlocked:false,prereqs:[],x:250,y:50},
-{id:'cardio',name:'Cardio-facts Training',cost:40,effect:'+10% movement speed',tier:1,unlocked:false,prereqs:[],x:400,y:50},
-{id:'questpack1',name:'Open Sesame-Stone',cost:20,effect:'Unlock Quest Pack 1',tier:1,unlocked:false,prereqs:[],x:550,y:50}
+{id:'dig1',name:'Enhanced Digging',cost:30,effect:'Dig 1x2 area',tier:1,unlocked:false,prereqs:[],x:100,y:50},
+{id:'reveal1',name:'Lucky Finds',cost:30,effect:'20% chance to reveal artifacts',tier:1,unlocked:false,prereqs:[],x:350,y:50},
+{id:'layers1',name:'Layer Insight',cost:40,effect:'See 2 layers at once',tier:1,unlocked:false,prereqs:[],x:600,y:50}
 ],
 tier2:[
-{id:'shovel1',name:'Shovel Some Respect',cost:50,effect:'Stronger digging tools',tier:2,unlocked:false,prereqs:['brush1'],x:100,y:150},
-{id:'radar1',name:'Peek Performance',cost:60,effect:'See 2 layers',tier:2,unlocked:false,prereqs:['brush1'],x:250,y:150},
-{id:'paperwork',name:'Paperwork Makes Dream Work',cost:100,effect:'Efficient archival system',tier:2,unlocked:false,prereqs:['file'],x:400,y:150},
-{id:'questpack2',name:'Quest-ionable Methods',cost:60,effect:'Unlock Quest Pack 2',tier:2,unlocked:false,prereqs:['questpack1'],x:550,y:150}
+{id:'dig2',name:'Wider Excavation',cost:50,effect:'Dig 2x2 area',tier:2,unlocked:false,prereqs:['dig1'],x:100,y:150},
+{id:'reveal2',name:'Marked Treasures',cost:60,effect:'30% reveal chance, ! on artifacts',tier:2,unlocked:false,prereqs:['reveal1'],x:350,y:150},
+{id:'layers2',name:'Deep Vision',cost:60,effect:'See 3 layers at once',tier:2,unlocked:false,prereqs:['layers1'],x:600,y:150}
 ],
 tier3:[
-{id:'brush2',name:'Brush Hour 2',cost:80,effect:'Fine-detail analysis tools',tier:3,unlocked:false,prereqs:['shovel1'],x:100,y:250},
-{id:'scan1',name:'Scan-You-Dig-It?',cost:140,effect:'10% reveal chance',tier:3,unlocked:false,prereqs:['radar1'],x:200,y:250},
-{id:'radar2',name:'Double-Down Detector',cost:120,effect:'See 3 layers',tier:3,unlocked:false,prereqs:['radar1'],x:300,y:250},
-{id:'keep',name:'Keep It Together',cost:220,effect:'Artifact preservation training',tier:3,unlocked:false,prereqs:['paperwork'],x:400,y:250},
-{id:'questpack3',name:'Quest For Success',cost:180,effect:'Unlock Quest Pack 3',tier:3,unlocked:false,prereqs:['questpack2'],x:550,y:250}
+{id:'dig3',name:'Broad Digging',cost:80,effect:'Dig 3x2 area',tier:3,unlocked:false,prereqs:['dig2'],x:100,y:250},
+{id:'reveal3',name:'Fortune Seeker',cost:100,effect:'40% reveal chance',tier:3,unlocked:false,prereqs:['reveal2'],x:350,y:250},
+{id:'layers3',name:'Archaeologist\'s Eye',cost:120,effect:'See 4 layers at once',tier:3,unlocked:false,prereqs:['layers2'],x:600,y:250}
 ],
 tier4:[
-{id:'shovel2',name:'Shovel With Punches',cost:120,effect:'Reinforced excavation gear',tier:4,unlocked:false,prereqs:['brush2'],x:100,y:350},
-{id:'radar3',name:'Depth Charge',cost:240,effect:'See 4 layers, +25% detect',tier:4,unlocked:false,prereqs:['scan1','radar2'],x:250,y:350},
-{id:'map',name:'Map-tastic Insights',cost:180,effect:'Show digsite contents',tier:4,unlocked:false,prereqs:['keep'],x:400,y:350},
-{id:'labgo',name:'Lab On the Go-pher',cost:560,effect:'Field documentation',tier:4,unlocked:false,prereqs:['keep'],x:500,y:350},
-{id:'questpack4',name:'A Quest-ion of Time',cost:240,effect:'Unlock Quest Pack 4',tier:4,unlocked:false,prereqs:['questpack3'],x:600,y:350}
+{id:'dig4',name:'Mass Excavation',cost:150,effect:'Dig 3x3 area',tier:4,unlocked:false,prereqs:['dig3'],x:100,y:350},
+{id:'reveal4',name:'Treasure Hunter',cost:200,effect:'50% reveal chance',tier:4,unlocked:false,prereqs:['reveal3'],x:350,y:350},
+{id:'layers4',name:'Ancient Secrets',cost:240,effect:'See 5 layers at once',tier:4,unlocked:false,prereqs:['layers3'],x:600,y:350}
 ],
 tier5:[
-{id:'tools3',name:'Dig-nificantly Better',cost:240,effect:'Master excavation kit',tier:5,unlocked:false,prereqs:['shovel2'],x:100,y:450},
-{id:'radar4',name:'All-Seeing Eye-chaeology',cost:360,effect:'See 5 layers, +50% detect',tier:5,unlocked:false,prereqs:['radar3'],x:200,y:450},
-{id:'laser',name:'Laser Focused',cost:600,effect:'30% reveal chance',tier:5,unlocked:false,prereqs:['radar3'],x:300,y:450},
-{id:'research',name:'Research and Destroy',cost:480,effect:'Advanced research methodology',tier:5,unlocked:false,prereqs:['map','labgo'],x:400,y:450},
-{id:'victory',name:'Dig Victory',cost:800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research'],x:550,y:450}
+{id:'dig5',name:'Ultimate Excavator',cost:300,effect:'Dig 4x3 area',tier:5,unlocked:false,prereqs:['dig4'],x:225,y:450},
+{id:'reveal5',name:'Master Archaeologist',cost:400,effect:'60% reveal chance',tier:5,unlocked:false,prereqs:['reveal4'],x:450,y:450},
+{id:'victory',name:'Dig Victory',cost:600,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:337,y:550}
 ]
 };
 const QUEST_PACKS={
@@ -1382,16 +1374,16 @@ for(const tierKey in RESEARCH_TREE){
       button.onclick=()=>unlockResearch(upgrade.id);
       nodeDiv.appendChild(button);
     }
-    nodeDiv.addEventListener('mouseenter', (e)=>{
-      const prereqText = upgrade.prereqs.length > 0 ? 'Prerequisites: ' + upgrade.prereqs.map(id => findResearchById(id).name).join(', ') + (upgrade.tier > 1 ? ' and all Tier ' + (upgrade.tier - 1) + ' upgrades' : '') : 'No prerequisites';
+    nodeDiv.addEventListener('mouseenter', ()=>{
+      const prereqText = upgrade.prereqs.length > 0 ? 'Prerequisites: ' + upgrade.prereqs.map(id => findResearchById(id).name).join(', ') : 'No prerequisites';
       tooltipDiv.innerHTML=`
         <strong>${upgrade.name}</strong><br>
         Cost: ${upgrade.cost} RP<br>
         Effect: ${upgrade.effect}<br>
         ${prereqText}
       `;
-      tooltipDiv.style.left=`${e.clientX + 10}px`;
-      tooltipDiv.style.top=`${e.clientY + 10}px`;
+      tooltipDiv.style.left=`${upgrade.x + 70}px`;
+      tooltipDiv.style.top=`${upgrade.y - 60}px`;
       tooltipDiv.style.display='block';
     });
     nodeDiv.addEventListener('mouseleave', ()=>{
@@ -1425,6 +1417,8 @@ for(const tierKey in RESEARCH_TREE){
 lines.forEach(line => treeDiv.appendChild(line));
 
 content.appendChild(treeDiv);
+const modalContent = document.getElementById('researchTreeModal').querySelector('.modal-content');
+modalContent.style.maxWidth = '900px';
 document.getElementById('researchTreeModal').style.display='flex';
 updateDpadVisibility();
 }
@@ -1434,14 +1428,6 @@ if(game.researchPoints<upgrade.cost)return false;
 for(const prereqId of upgrade.prereqs){
 const prereq=findResearchById(prereqId);
 if(!prereq||!prereq.unlocked)return false;
-}
-if(upgrade.tier > 1){
-  const prevTier = 'tier' + (upgrade.tier - 1);
-  if(RESEARCH_TREE[prevTier]){
-    for(const prevUpgrade of RESEARCH_TREE[prevTier]){
-      if(!prevUpgrade.unlocked) return false;
-    }
-  }
 }
 return true;
 }
