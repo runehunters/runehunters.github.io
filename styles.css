@@ -1,0 +1,93 @@
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:'Comfortaa',cursive;background:#1a1410;color:#f4e4c1;overflow:hidden;display:flex;justify-content:center;align-items:center;height:100vh}
+#gameContainer{width:100vw;height:100vh;position:relative}
+#gameCanvas{width:100%;height:100%;display:block;image-rendering:pixelated}
+#hud{position:absolute;top:0;left:0;width:100%;height:100%;pointer-events:none}
+.hud-element{pointer-events:all;background:rgba(42,24,16,0.9);border:2px solid #8b6f47;padding:10px 15px;color:#f4e4c1;box-shadow:0 2px 8px rgba(0,0,0,0.5);border-radius:15px}
+.top-left{position:absolute;top:20px;left:20px;font-size:14px}
+.bottom-left{position:absolute;bottom:20px;left:20px;font-size:14px;max-width:350px;max-height:400px;overflow-y:auto}
+.top-right{position:absolute;top:20px;right:20px}
+.top-right.touch{position:absolute;top:70px;left:20px}
+.action-button{background:#5a4a3a;color:#f4e4c1;border:1px solid #8b6f47;padding:8px 15px;cursor:pointer;border-radius:10px;transition:background 0.1s;font-family:'Comfortaa',cursive;font-size:14px}
+.action-button:hover{background:#6a5a4a}
+.action-button.red{background:#a03030;border-color:#f05050}
+.action-button.red:hover{background:#b04040}
+.action-button:disabled{background:#3a3a3a;color:#6a6a6a;cursor:not-allowed}
+.action-button:focus{outline:2px solid #ffd700}
+#tutorialBox{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);max-width:500px;width:90%;text-align:center;padding:20px;font-size:16px;line-height:1.6;z-index:10}
+.modal-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background-color:rgba(0,0,0,0.75);display:flex;justify-content:center;align-items:center;z-index:1000}
+.modal-content{background:#2a1810;border:4px solid #8b6f47;padding:30px;border-radius:20px;box-shadow:0 5px 20px rgba(0,0,0,0.8);width:90%;max-width:600px;max-height:80vh;overflow-y:auto;color:#f4e4c1;text-align:center}
+.modal-content h2{margin-bottom:20px;color:#ffd700;font-size:24px}
+.modal-content p{margin-bottom:15px;font-size:14px;line-height:1.6}
+.modal-content button{margin:10px auto;display:block;width:90%}
+#messageBox{position:absolute;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(42,24,16,0.95);border:2px solid #8b6f47;padding:15px 25px;border-radius:15px;display:none;max-width:500px;text-align:center;z-index:10}
+.artifact-info{text-align:left;margin:10px 0;font-size:12px;line-height:1.5}
+#nightOverlay{position:absolute;top:0;left:0;width:100%;height:100%;background:rgba(0,0,20,0.6);pointer-events:none;opacity:0;transition:opacity 1s ease-in-out}
+.study-item{background:rgba(90,74,58,0.5);border:1px solid #8b6f47;padding:10px;margin:8px 0;border-radius:10px;text-align:left}
+.study-item button{width:auto;padding:6px 12px;font-size:12px;margin:5px 5px 0 0}
+.research-tree{display:grid;gap:15px;text-align:left;max-height:60vh;overflow-y:auto}
+.research-node{background:rgba(90,74,58,0.3);border:2px solid #8b6f47;padding:15px;border-radius:15px;margin:10px 0}
+.research-node.unlocked{background:rgba(50,100,50,0.3);border-color:#4a8a4a}
+.research-node.locked{opacity:0.5}
+.research-node button{width:auto;padding:6px 12px;font-size:12px;margin-top:5px}
+.quest-pack{border:2px solid #8b6f47;padding:15px;margin:10px 0;border-radius:15px;background:rgba(90,74,58,0.3)}
+.quest-pack.locked{opacity:0.5}
+.quest-item{background:rgba(42,24,16,0.8);border:1px solid #8b6f47;padding:10px;margin:8px 0;border-radius:10px;text-align:left}
+.quest-item.completed{background:rgba(50,100,50,0.3);border-color:#4a8a4a}
+.quest-progress{background:#3a2a1a;height:10px;border-radius:5px;margin:5px 0;overflow:hidden}
+.quest-progress-bar{background:#ffd700;height:100%;transition:width 0.3s}
+.credits-section{text-align:left;line-height:1.8;margin:20px 0}
+.credits-section h3{color:#ffd700;margin:15px 0 10px 0}
+.keybinds-grid{display:grid;grid-template-columns:1fr 1fr;gap:15px;margin:20px 0;text-align:left}
+.keybind-setting{display:flex;justify-content:space-between;align-items:center;background:rgba(90,74,58,0.5);padding:10px;border-radius:10px;border:1px solid #8b6f47}
+.keybind-setting span{font-size:14px;font-weight:bold}
+.keybind-btn{width:100px;text-align:center;font-weight:bold}
+#tutorialOverlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.85);z-index:5;pointer-events:all;display:none}
+#tutorialBox{z-index:1001}
+.help-section{margin:15px 0;text-align:left;padding:10px;background:rgba(90,74,58,0.3);border-radius:10px}
+.help-section h3{color:#ffd700;margin-bottom:5px}
+#digsiteProgress{
+  position:absolute;
+   bottom: 330px;
+  width: 300px;
+  background:rgba(42,24,16,0.95);
+  border:3px solid #8b6f47;
+  padding:20px;
+  border-radius:15px;
+  display:none;
+  text-align:center;
+  z-index:100
+}
+.progress-bar-container{
+  width: 100%;
+  height:30px;
+  background:#3a2a1a;
+  border:2px solid #8b6f47;
+  border-radius:15px;
+  overflow:hidden;
+  margin:10px 0
+}
+.progress-bar-fill{height:100%;background:#ffd700;transition:width 0.3s}
+.analysis-notes{background:rgba(60,50,40,0.5);padding:10px;margin:10px 0;border-left:3px solid #ffd700;border-radius:5px;text-align:left;font-size:13px;line-height:1.5}
+.dpad{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);z-index:100;display:none}
+.dpad-button{width:60px;height:60px;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:10px;margin:5px;display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none}
+.dpad-button:active{background:rgba(120,100,80,0.9)}
+.dpad-up{grid-area:up}
+.dpad-down{grid-area:down}
+.dpad-left{grid-area:left}
+.dpad-right{grid-area:right}
+.dpad-up-left{grid-area:up-left}
+.dpad-up-right{grid-area:up-right}
+.dpad-down-left{grid-area:down-left}
+.dpad-down-right{grid-area:down-right}
+.dpad-grid{display:grid;grid-template-areas:'up-left up up-right''left center right''down-left down down-right';grid-template-columns:60px 60px 60px;grid-template-rows:60px 60px 60px;gap:5px}
+.dpad-center{grid-area:center}
+.joystick-container{position:relative;width:120px;height:120px;margin:0 auto}
+.joystick-base{position:absolute;width:100%;height:100%;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:50%;touch-action:none}
+.joystick-handle{position:absolute;width:40px;height:40px;background:rgba(120,100,80,0.9);border:2px solid #6b5545;border-radius:50%;left:40px;top:40px;transition:transform 0.2s ease-out;touch-action:none}
+.joystick-center-button{position:absolute;left:140px;top:40px;width:60px;height:60px;background:rgba(90,74,58,0.8);border:2px solid #8b6f47;border-radius:10px;display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;cursor:pointer;user-select:none;-webkit-user-select:none;touch-action:manipulation;-webkit-touch-callout:none}
+.joystick-center-button:active{background:rgba(120,100,80,0.9)}
+.control-scheme-option{display:flex;align-items:center;justify-content:center;margin:15px 0}
+.control-scheme-option input[type="radio"]{margin-right:10px;transform:scale(1.2)}
+.control-scheme-option label{font-size:16px;cursor:pointer}
+.loading-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.8);display:flex;justify-content:center;align-items:center;color:#f4e4c1;font-size:24px;font-family:'Comfortaa',cursive;z-index:10000}
