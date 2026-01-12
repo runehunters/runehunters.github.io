@@ -591,11 +591,8 @@ while(!placed&&attempts<100){
 const x=Math.floor(Math.random()*(MAP_WIDTH-5))+2;
 const y=Math.floor(Math.random()*(MAP_HEIGHT-5))+2;
 const distFromCenter=Math.sqrt(Math.pow(x-21,2)+Math.pow(y-12,2));
-let width = 3, height = 3;
-if(game.controlScheme === 'touch'){
-width = Math.floor(Math.random()*4)+2;
-height = Math.floor(Math.random()*4)+2;
-}
+const width = 3;
+const height = 3;
 let isClear=distFromCenter>10;
 if(isClear){
 for(let dy=0;dy<height;dy++){
@@ -612,7 +609,7 @@ for(let dx=0;dx<width;dx++){
 game.map[y+dy][x+dx]='d';
 }
 }
-const layers = game.controlScheme === 'touch' ? 5 : 5 + Math.floor(Math.random() * 6);
+const layers = 5 + Math.floor(Math.random() * 6);
 game.digsites.push({x:x+1,y:y+1,completed:false,grid:null,layers:layers,width:width,height:height});
 placed=true;
 }
@@ -623,7 +620,7 @@ generatePaths();
 }
 function generateDigsiteContent(digsite){
 const rows=digsite.layers;
-const cols = game.controlScheme === 'touch' ? 5 : 15;
+const cols = 15;
 digsite.grid=Array(rows).fill(null).map(()=>Array(cols).fill(null));
 digsite.artifactCount=0;
 digsite.dirtCount=0;
