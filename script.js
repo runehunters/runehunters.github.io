@@ -2,108 +2,108 @@ const TILE_SIZE=32;
 const MAP_WIDTH=45;
 const MAP_HEIGHT=45;
 const ARTIFACTS={
-pottery1:{name:"Terra Sigillata Bowl",value:15,description:"Red-gloss pottery widely traded across the Roman Empire. The stamped decoration indicates mass production in Gaulish workshops.",insights:["Popular trade good across Mediterranean","Manufacturing techniques spread through conquest","Similar styles found in Britain and Africa"]},
-pottery2:{name:"Amphora Fragment",value:12,description:"Storage vessel for wine, olive oil, or garum. The shape and clay composition reveal its origin and trade route.",insights:["Essential for maritime commerce","Different regions had distinct amphora styles","Contents identifiable through residue analysis"]},
-coin1:{name:"Silver Denarius",value:45,description:"Roman silver coin featuring Emperor Trajan. Coins help date archaeological layers and track economic connections.",insights:["Portraiture propaganda tool for emperors","Debasement over time reflects economic decline","Found far beyond empire borders via trade"]},
-coin2:{name:"Bronze Sestertius",value:40,description:"Large bronze coin with detailed imagery. The reverse depicts a military victory, common imperial propaganda.",insights:["Coins communicated political messages","Bronze denominations for daily transactions","Imagery reveals contemporary events"]},
-tool1:{name:"Iron Strigil",value:18,description:"Curved scraper used in Roman baths to remove oil and sweat. Essential grooming tool for all social classes.",insights:["Bathing central to Roman culture","Similar tools across vast geographic range","Manufacturing standardization evidence"]},
-tool2:{name:"Bronze Fibula",value:20,description:"Ornate brooch for fastening clothing. The design indicates regional fashion preferences and metalworking skill.",insights:["Practical yet decorative objects","Regional styles show cultural diversity","Evolution tracks fashion changes"]},
-jewelry1:{name:"Gold Aureus Ring",value:100,description:"Finger ring incorporating a gold coin. Demonstrates wealth and possibly political allegiance to the emperor depicted.",insights:["Gold reserved for elite classes","Coin-rings show imperial loyalty","Similar designs across empire suggest workshops"]},
-jewelry2:{name:"Carnelian Intaglio",value:95,description:"Carved gemstone seal showing Minerva. Used to stamp documents with personal signature in wax.",insights:["Literacy and legal documentation widespread","Gemstone trade from India and Arabia","Iconography reveals religious preferences"]},
-tablet1:{name:"Wax Tablet Stylus",value:35,description:"Bronze writing implement for inscribing letters in wax-filled wooden tablets. Evidence of daily correspondence.",insights:["High literacy rates in urban areas","Reusable writing surfaces economical","Business records and letters preserved"]},
-tablet2:{name:"Lead Curse Tablet",value:250,description:"Inscribed lead sheet from a sacred spring. Contains a curse requesting divine punishment for a thief.",insights:["Personal religious practices documented","Latin literacy across social classes","Magic and religion intertwined"]},
-sculpture1:{name:"Marble Portrait Bust",value:120,description:"Life-sized head of a Roman matron. Hairstyle dates it to the Flavian period, showing fashion as chronological marker.",insights:["Portraiture emphasized social status","Hairstyles changed rapidly, aiding dating","Imported Greek marble for wealthy patrons"]},
-sculpture2:{name:"Terracotta Figurine",value:22,description:"Small household deity or decorative figure. Mass-produced for the lower classes to display in home shrines.",insights:["Religious practice at all economic levels","Standardized production for mass market","Regional deities alongside Roman pantheon"]},
-seal1:{name:"Imperial Bulla",value:110,description:"Gold pendant worn by freeborn children until coming of age. Protective amulet and status symbol.",insights:["Life-stage rituals marked by objects","Gold bullae exclusive to upper classes","Protective magic widespread belief"]},
-seal2:{name:"Signaculum Stamp",value:50,description:"Bronze seal for marking ownership of goods. Inscribed name proves literacy and commercial activity.",insights:["Personal property protection important","Commercial networks required identification","Administrative systems relied on seals"]},
-weapon1:{name:"Gladius Hispaniensis",value:115,description:"Short sword used by Roman legionaries. Superior iron-working technology gave Rome military advantage.",insights:["Standardized military equipment","Iron technology from Celtic influences","Found in burial contexts shows veteran status"]},
-weapon2:{name:"Pilum Head",value:48,description:"Javelin point designed to bend on impact, preventing reuse by enemies. Engineering innovation in warfare.",insights:["Military tactics drove technological innovation","Standardization across legions","Metalworking prowess of empire"]},
-mosaic1:{name:"Geometric Mosaic Tessera",value:90,description:"Small colored stone cube from a floor mosaic. Geometric patterns decorated middle-class homes.",insights:["Artistic styles spread empire-wide","Local workshops copied elite fashions","Mathematics in decorative arts"]},
-mosaic2:{name:"Figured Mosaic Panel",value:200,description:"Mythological scene depicting Neptune. Complex figural mosaics required master craftsmen and wealthy patrons.",insights:["Greek mythology remained culturally dominant","Workshop signatures sometimes preserved","Similar iconography across provinces shows cultural unity"]},
-lamp1:{name:"Terracotta Oil Lamp",value:16,description:"Mass-produced clay lamp with maker's stamp. Artificial lighting extended productive hours and social activities.",insights:["Factory production of household goods","Maker's marks track commercial networks","Design standardization across empire"]},
-lamp2:{name:"Bronze Lucerna",value:42,description:"Multi-nozzle bronze lamp for wealthy households. More expensive and decorative than ceramic versions.",insights:["Material wealth visible in daily objects","Bronze lamps could be heirlooms","Decorative motifs show personal taste"]},
-fresco1:{name:"Pompeian Red Fresco",value:105,description:"Wall painting fragment showing architectural illusion. Fourth Pompeian Style with elaborate fantasy architecture.",insights:["Interior decoration priority for Romans","Painting styles evolved over time","Volcanic preservation unique opportunity"]},
-fresco2:{name:"Garden Scene Fresco",value:98,description:"Naturalistic painting of plants and birds. Romans brought nature indoors through trompe-l'oeil artworks.",insights:["Nature scenes created peaceful ambiance","Greek artistic influence strong","Pigments imported from across empire"]},
-glass1:{name:"Blown Glass Unguentarium",value:38,description:"Small glass bottle for perfumes or oils. Glass-blowing revolution made glass affordable for middle classes.",insights:["Syrian innovation spread rapidly","Recycled glass common practice","Perfume trade from Arabia"]},
-glass2:{name:"Millefiori Glass Bowl",value:220,description:"Multi-colored mosaic glass vessel. Complex technique requiring specialized knowledge and expensive materials.",insights:["Luxury goods for elite display","Mediterranean-wide trade in glass","Technical knowledge closely guarded"]},
-inscr1:{name:"Funerary Inscription",value:108,description:"Marble tombstone with deceased's name, age, and profession. Commemorates a freed slave who became a merchant.",insights:["Social mobility possible through commerce","Freed slaves integral to economy","Commemoration important across classes"]},
-inscr2:{name:"Building Dedication",value:240,description:"Stone block recording construction of public baths by a wealthy magistrate. Lists benefactor's political offices.",insights:["Public building displayed civic virtue","Political careers documented in stone","Infrastructure funded by private wealth"]},
-statue1:{name:"Bronze Statuette of Mercury",value:112,description:"Small bronze figure of the messenger god. Household shrine deity or votive offering at a temple.",insights:["Personal religious devotion documented","Bronze casting widespread skill","Roman and local deities coexisted"]},
-statue2:{name:"Venus Figurine",value:46,description:"Terracotta Venus figure from a domestic shrine. Love goddess popular across all social levels.",insights:["Domestic religious practices universal","Female deities prominent in worship","Mass production of religious items"]},
-tile1:{name:"Roof Tile with Mark",value:14,description:"Curved clay roof tile stamped with legion name. Military kilns produced standardized building materials.",insights:["Military infrastructure sophisticated","Legions self-sufficient in production","Standardization across provinces"]},
-tile2:{name:"Hypocaust Tile",value:36,description:"Box tile from underfloor heating system. Engineering innovation that heated public baths and wealthy homes.",insights:["Advanced engineering for comfort","Roman concrete enabled complex structures","Heating systems show climate adaptation"]},
-armor1:{name:"Lorica Segmentata Plate",value:118,description:"Iron plate armor segment from legionary kit. Superior protection through articulated metal strips.",insights:["Military equipment highly specialized","Iron industry enormous scale","Standardized legionary appearance"]},
-armor2:{name:"Bronze Scale Armor",value:102,description:"Overlapping bronze scales sewn to fabric backing. Used by auxiliary cavalry and eastern legions.",insights:["Regional military traditions incorporated","Auxiliary units brought diverse equipment","Scale armor eastern origin"]},
-medical1:{name:"Bronze Surgical Probe",value:44,description:"Medical instrument for wound examination and treatment. Roman medicine surprisingly advanced.",insights:["Professional medical practitioners widespread","Greek medical knowledge adopted","Surgical tools sophisticated"]},
-medical2:{name:"Collyrium Stamp",value:94,description:"Stone stamp for eye medicine. Inscription names the physician and medication for specific conditions.",insights:["Pharmaceutical knowledge extensive","Doctor's reputation marked on product","Eye diseases common ailment"]},
-weight1:{name:"Lead Steelyard Weight",value:17,description:"Counterweight for Roman balance scales. Standardized weights enabled fair commerce across empire.",insights:["Standardized measurement systems","Commercial regulation by government","Lead abundant and malleable"]},
-weight2:{name:"Bronze Measure",value:39,description:"Standard volume measure for grain sales. Stamped with official verification to prevent fraud.",insights:["Government regulated commerce","Grain supply critical to stability","Bronze durability ensured accuracy"]},
-dice1:{name:"Bone Gaming Die",value:19,description:"Six-sided die carved from animal bone. Gaming and gambling popular across all social classes.",insights:["Leisure activities universal","Games spread throughout empire","Similar forms to modern dice"]},
-dice2:{name:"Loaded Lead Die",value:41,description:"Weighted die for cheating at games. Evidence that gambling fraud is ancient practice.",insights:["Human behavior consistent across time","Gaming important social activity","Cheating prompted regulations"]},
-key1:{name:"Bronze Door Key",value:21,description:"L-shaped key for tumbler lock. Roman locks surprisingly sophisticated with complex mechanisms.",insights:["Security concerns in urban areas","Lock technology advanced","Personal property protection"]},
-key2:{name:"Iron Chest Lock",value:37,description:"Locking mechanism from strongbox. Wealthy households secured valuables with complex locks.",insights:["Wealth security paramount","Metalworking enabled complex mechanisms","Locksmithing specialized profession"]},
-mirror1:{name:"Polished Bronze Mirror",value:96,description:"Hand mirror with decorated handle. Personal grooming important to Romans of both genders.",insights:["Appearance valued across genders","Bronze polishing sophisticated technique","Greek influence on personal care"]},
-mirror2:{name:"Silver Hand Mirror",value:210,description:"Ornate silver mirror with mythological scene. Luxury item demonstrating exceptional wealth and craftsmanship.",insights:["Silver reserved for elite","Greek artisans employed by wealthy","Mythology in everyday objects"]},
-tool3:{name:"Iron Hoe Blade",value:20,description:"Agricultural tool from rural villa. Iron tools increased farming efficiency and productivity.",insights:["Agriculture backbone of economy","Iron tools widespread by empire","Rural life contrasts urban"]},
-tool4:{name:"Surveying Groma",value:122,description:"Bronze surveying instrument for laying out straight roads and property boundaries. Roman engineering precision.",insights:["Engineering created empire infrastructure","Geometry applied practically","Standardized tools across provinces"]},
-jewelry3:{name:"Glass Bead Necklace",value:18,description:"Colorful glass beads strung together. Affordable jewelry for lower classes after glass-blowing invention.",insights:["Fashion accessible to all classes","Glass industry democratized luxury","Color preferences show personal taste"]},
-jewelry4:{name:"Emerald Earrings",value:500,description:"Gold earrings set with Egyptian emeralds. Extreme luxury indicating highest social status and wealth.",insights:["Gemstone trade from Egypt and beyond","Gold jewelry status symbol","Elite fashion influenced all classes"]},
-pottery3:{name:"Samian Ware Cup",value:13,description:"Red-gloss drinking vessel with relief decoration. Standard tableware found across Western provinces.",insights:["Standardized tableware empire-wide","Gaulish pottery industry massive scale","Style preferences spread through trade"]},
-pottery4:{name:"African Red Slip Dish",value:43,description:"North African fine ware that replaced Samian pottery. Shift shows changing trade patterns in late empire.",insights:["Economic centers shifted over time","North African industry rose","Trade patterns reveal historical changes"]},
-book1:{name:"Stylus and Wax Tablet",value:47,description:"Complete writing set with bronze stylus and wooden frame holding wax. Personal correspondence and accounts.",insights:["Literacy valued skill","Writing materials portable","Business records essential"]},
-book2:{name:"Papyrus Fragment",value:230,description:"Egyptian papyrus with Latin text. Rare survival of perishable material preserves actual Roman handwriting.",insights:["Egypt supplied writing material","Dry climate preserved organics","Cursive script evolved regionally"]}
+pottery1:{name:"Terra Sigillata Bowl",value:3,description:"Red-gloss pottery widely traded across the Roman Empire. The stamped decoration indicates mass production in Gaulish workshops.",insights:["Popular trade good across Mediterranean","Manufacturing techniques spread through conquest","Similar styles found in Britain and Africa"]},
+pottery2:{name:"Amphora Fragment",value:2,description:"Storage vessel for wine, olive oil, or garum. The shape and clay composition reveal its origin and trade route.",insights:["Essential for maritime commerce","Different regions had distinct amphora styles","Contents identifiable through residue analysis"]},
+coin1:{name:"Silver Denarius",value:9,description:"Roman silver coin featuring Emperor Trajan. Coins help date archaeological layers and track economic connections.",insights:["Portraiture propaganda tool for emperors","Debasement over time reflects economic decline","Found far beyond empire borders via trade"]},
+coin2:{name:"Bronze Sestertius",value:8,description:"Large bronze coin with detailed imagery. The reverse depicts a military victory, common imperial propaganda.",insights:["Coins communicated political messages","Bronze denominations for daily transactions","Imagery reveals contemporary events"]},
+tool1:{name:"Iron Strigil",value:4,description:"Curved scraper used in Roman baths to remove oil and sweat. Essential grooming tool for all social classes.",insights:["Bathing central to Roman culture","Similar tools across vast geographic range","Manufacturing standardization evidence"]},
+tool2:{name:"Bronze Fibula",value:4,description:"Ornate brooch for fastening clothing. The design indicates regional fashion preferences and metalworking skill.",insights:["Practical yet decorative objects","Regional styles show cultural diversity","Evolution tracks fashion changes"]},
+jewelry1:{name:"Gold Aureus Ring",value:20,description:"Finger ring incorporating a gold coin. Demonstrates wealth and possibly political allegiance to the emperor depicted.",insights:["Gold reserved for elite classes","Coin-rings show imperial loyalty","Similar designs across empire suggest workshops"]},
+jewelry2:{name:"Carnelian Intaglio",value:19,description:"Carved gemstone seal showing Minerva. Used to stamp documents with personal signature in wax.",insights:["Literacy and legal documentation widespread","Gemstone trade from India and Arabia","Iconography reveals religious preferences"]},
+tablet1:{name:"Wax Tablet Stylus",value:7,description:"Bronze writing implement for inscribing letters in wax-filled wooden tablets. Evidence of daily correspondence.",insights:["High literacy rates in urban areas","Reusable writing surfaces economical","Business records and letters preserved"]},
+tablet2:{name:"Lead Curse Tablet",value:50,description:"Inscribed lead sheet from a sacred spring. Contains a curse requesting divine punishment for a thief.",insights:["Personal religious practices documented","Latin literacy across social classes","Magic and religion intertwined"]},
+sculpture1:{name:"Marble Portrait Bust",value:24,description:"Life-sized head of a Roman matron. Hairstyle dates it to the Flavian period, showing fashion as chronological marker.",insights:["Portraiture emphasized social status","Hairstyles changed rapidly, aiding dating","Imported Greek marble for wealthy patrons"]},
+sculpture2:{name:"Terracotta Figurine",value:4,description:"Small household deity or decorative figure. Mass-produced for the lower classes to display in home shrines.",insights:["Religious practice at all economic levels","Standardized production for mass market","Regional deities alongside Roman pantheon"]},
+seal1:{name:"Imperial Bulla",value:22,description:"Gold pendant worn by freeborn children until coming of age. Protective amulet and status symbol.",insights:["Life-stage rituals marked by objects","Gold bullae exclusive to upper classes","Protective magic widespread belief"]},
+seal2:{name:"Signaculum Stamp",value:10,description:"Bronze seal for marking ownership of goods. Inscribed name proves literacy and commercial activity.",insights:["Personal property protection important","Commercial networks required identification","Administrative systems relied on seals"]},
+weapon1:{name:"Gladius Hispaniensis",value:23,description:"Short sword used by Roman legionaries. Superior iron-working technology gave Rome military advantage.",insights:["Standardized military equipment","Iron technology from Celtic influences","Found in burial contexts shows veteran status"]},
+weapon2:{name:"Pilum Head",value:10,description:"Javelin point designed to bend on impact, preventing reuse by enemies. Engineering innovation in warfare.",insights:["Military tactics drove technological innovation","Standardization across legions","Metalworking prowess of empire"]},
+mosaic1:{name:"Geometric Mosaic Tessera",value:18,description:"Small colored stone cube from a floor mosaic. Geometric patterns decorated middle-class homes.",insights:["Artistic styles spread empire-wide","Local workshops copied elite fashions","Mathematics in decorative arts"]},
+mosaic2:{name:"Figured Mosaic Panel",value:40,description:"Mythological scene depicting Neptune. Complex figural mosaics required master craftsmen and wealthy patrons.",insights:["Greek mythology remained culturally dominant","Workshop signatures sometimes preserved","Similar iconography across provinces shows cultural unity"]},
+lamp1:{name:"Terracotta Oil Lamp",value:3,description:"Mass-produced clay lamp with maker's stamp. Artificial lighting extended productive hours and social activities.",insights:["Factory production of household goods","Maker's marks track commercial networks","Design standardization across empire"]},
+lamp2:{name:"Bronze Lucerna",value:8,description:"Multi-nozzle bronze lamp for wealthy households. More expensive and decorative than ceramic versions.",insights:["Material wealth visible in daily objects","Bronze lamps could be heirlooms","Decorative motifs show personal taste"]},
+fresco1:{name:"Pompeian Red Fresco",value:21,description:"Wall painting fragment showing architectural illusion. Fourth Pompeian Style with elaborate fantasy architecture.",insights:["Interior decoration priority for Romans","Painting styles evolved over time","Volcanic preservation unique opportunity"]},
+fresco2:{name:"Garden Scene Fresco",value:20,description:"Naturalistic painting of plants and birds. Romans brought nature indoors through trompe-l'oeil artworks.",insights:["Nature scenes created peaceful ambiance","Greek artistic influence strong","Pigments imported from across empire"]},
+glass1:{name:"Blown Glass Unguentarium",value:8,description:"Small glass bottle for perfumes or oils. Glass-blowing revolution made glass affordable for middle classes.",insights:["Syrian innovation spread rapidly","Recycled glass common practice","Perfume trade from Arabia"]},
+glass2:{name:"Millefiori Glass Bowl",value:44,description:"Multi-colored mosaic glass vessel. Complex technique requiring specialized knowledge and expensive materials.",insights:["Luxury goods for elite display","Mediterranean-wide trade in glass","Technical knowledge closely guarded"]},
+inscr1:{name:"Funerary Inscription",value:22,description:"Marble tombstone with deceased's name, age, and profession. Commemorates a freed slave who became a merchant.",insights:["Social mobility possible through commerce","Freed slaves integral to economy","Commemoration important across classes"]},
+inscr2:{name:"Building Dedication",value:48,description:"Stone block recording construction of public baths by a wealthy magistrate. Lists benefactor's political offices.",insights:["Public building displayed civic virtue","Political careers documented in stone","Infrastructure funded by private wealth"]},
+statue1:{name:"Bronze Statuette of Mercury",value:22,description:"Small bronze figure of the messenger god. Household shrine deity or votive offering at a temple.",insights:["Personal religious devotion documented","Bronze casting widespread skill","Roman and local deities coexisted"]},
+statue2:{name:"Venus Figurine",value:9,description:"Terracotta Venus figure from a domestic shrine. Love goddess popular across all social levels.",insights:["Domestic religious practices universal","Female deities prominent in worship","Mass production of religious items"]},
+tile1:{name:"Roof Tile with Mark",value:3,description:"Curved clay roof tile stamped with legion name. Military kilns produced standardized building materials.",insights:["Military infrastructure sophisticated","Legions self-sufficient in production","Standardization across provinces"]},
+tile2:{name:"Hypocaust Tile",value:7,description:"Box tile from underfloor heating system. Engineering innovation that heated public baths and wealthy homes.",insights:["Advanced engineering for comfort","Roman concrete enabled complex structures","Heating systems show climate adaptation"]},
+armor1:{name:"Lorica Segmentata Plate",value:24,description:"Iron plate armor segment from legionary kit. Superior protection through articulated metal strips.",insights:["Military equipment highly specialized","Iron industry enormous scale","Standardized legionary appearance"]},
+armor2:{name:"Bronze Scale Armor",value:20,description:"Overlapping bronze scales sewn to fabric backing. Used by auxiliary cavalry and eastern legions.",insights:["Regional military traditions incorporated","Auxiliary units brought diverse equipment","Scale armor eastern origin"]},
+medical1:{name:"Bronze Surgical Probe",value:9,description:"Medical instrument for wound examination and treatment. Roman medicine surprisingly advanced.",insights:["Professional medical practitioners widespread","Greek medical knowledge adopted","Surgical tools sophisticated"]},
+medical2:{name:"Collyrium Stamp",value:19,description:"Stone stamp for eye medicine. Inscription names the physician and medication for specific conditions.",insights:["Pharmaceutical knowledge extensive","Doctor's reputation marked on product","Eye diseases common ailment"]},
+weight1:{name:"Lead Steelyard Weight",value:3,description:"Counterweight for Roman balance scales. Standardized weights enabled fair commerce across empire.",insights:["Standardized measurement systems","Commercial regulation by government","Lead abundant and malleable"]},
+weight2:{name:"Bronze Measure",value:8,description:"Standard volume measure for grain sales. Stamped with official verification to prevent fraud.",insights:["Government regulated commerce","Grain supply critical to stability","Bronze durability ensured accuracy"]},
+dice1:{name:"Bone Gaming Die",value:4,description:"Six-sided die carved from animal bone. Gaming and gambling popular across all social classes.",insights:["Leisure activities universal","Games spread throughout empire","Similar forms to modern dice"]},
+dice2:{name:"Loaded Lead Die",value:8,description:"Weighted die for cheating at games. Evidence that gambling fraud is ancient practice.",insights:["Human behavior consistent across time","Gaming important social activity","Cheating prompted regulations"]},
+key1:{name:"Bronze Door Key",value:4,description:"L-shaped key for tumbler lock. Roman locks surprisingly sophisticated with complex mechanisms.",insights:["Security concerns in urban areas","Lock technology advanced","Personal property protection"]},
+key2:{name:"Iron Chest Lock",value:7,description:"Locking mechanism from strongbox. Wealthy households secured valuables with complex locks.",insights:["Wealth security paramount","Metalworking enabled complex mechanisms","Locksmithing specialized profession"]},
+mirror1:{name:"Polished Bronze Mirror",value:19,description:"Hand mirror with decorated handle. Personal grooming important to Romans of both genders.",insights:["Appearance valued across genders","Bronze polishing sophisticated technique","Greek influence on personal care"]},
+mirror2:{name:"Silver Hand Mirror",value:42,description:"Ornate silver mirror with mythological scene. Luxury item demonstrating exceptional wealth and craftsmanship.",insights:["Silver reserved for elite","Greek artisans employed by wealthy","Mythology in everyday objects"]},
+tool3:{name:"Iron Hoe Blade",value:4,description:"Agricultural tool from rural villa. Iron tools increased farming efficiency and productivity.",insights:["Agriculture backbone of economy","Iron tools widespread by empire","Rural life contrasts urban"]},
+tool4:{name:"Surveying Groma",value:24,description:"Bronze surveying instrument for laying out straight roads and property boundaries. Roman engineering precision.",insights:["Engineering created empire infrastructure","Geometry applied practically","Standardized tools across provinces"]},
+jewelry3:{name:"Glass Bead Necklace",value:4,description:"Colorful glass beads strung together. Affordable jewelry for lower classes after glass-blowing invention.",insights:["Fashion accessible to all classes","Glass industry democratized luxury","Color preferences show personal taste"]},
+jewelry4:{name:"Emerald Earrings",value:100,description:"Gold earrings set with Egyptian emeralds. Extreme luxury indicating highest social status and wealth.",insights:["Gemstone trade from Egypt and beyond","Gold jewelry status symbol","Elite fashion influenced all classes"]},
+pottery3:{name:"Samian Ware Cup",value:3,description:"Red-gloss drinking vessel with relief decoration. Standard tableware found across Western provinces.",insights:["Standardized tableware empire-wide","Gaulish pottery industry massive scale","Style preferences spread through trade"]},
+pottery4:{name:"African Red Slip Dish",value:9,description:"North African fine ware that replaced Samian pottery. Shift shows changing trade patterns in late empire.",insights:["Economic centers shifted over time","North African industry rose","Trade patterns reveal historical changes"]},
+book1:{name:"Stylus and Wax Tablet",value:9,description:"Complete writing set with bronze stylus and wooden frame holding wax. Personal correspondence and accounts.",insights:["Literacy valued skill","Writing materials portable","Business records essential"]},
+book2:{name:"Papyrus Fragment",value:46,description:"Egyptian papyrus with Latin text. Rare survival of perishable material preserves actual Roman handwriting.",insights:["Egypt supplied writing material","Dry climate preserved organics","Cursive script evolved regionally"]}
 };
 const RESEARCH_TREE={
 tier1:[
-{id:'brush1',name:'Brush With Greatness',cost:150,effect:'Improved excavation techniques',tier:1,unlocked:false,prereqs:[]},
-{id:'file',name:'File It Under History',cost:150,effect:'Advanced documentation methods',tier:1,unlocked:false,prereqs:[]},
-{id:'cardio',name:'Cardio-facts Training',cost:200,effect:'+10% movement speed',tier:1,unlocked:false,prereqs:[]},
-{id:'questpack1',name:'Open Sesame-Stone',cost:100,effect:'Unlock Quest Pack 1',tier:1,unlocked:false,prereqs:[]}
+{id:'brush1',name:'Brush With Greatness',cost:30,effect:'Improved excavation techniques',tier:1,unlocked:false,prereqs:[]},
+{id:'file',name:'File It Under History',cost:30,effect:'Advanced documentation methods',tier:1,unlocked:false,prereqs:[]},
+{id:'cardio',name:'Cardio-facts Training',cost:40,effect:'+10% movement speed',tier:1,unlocked:false,prereqs:[]},
+{id:'questpack1',name:'Open Sesame-Stone',cost:20,effect:'Unlock Quest Pack 1',tier:1,unlocked:false,prereqs:[]}
 ],
 tier2:[
-{id:'shovel1',name:'Shovel Some Respect',cost:250,effect:'Stronger digging tools',tier:2,unlocked:false,prereqs:['brush1']},
-{id:'radar1',name:'Peek Performance',cost:300,effect:'See 2 layers',tier:2,unlocked:false,prereqs:['brush1']},
-{id:'paperwork',name:'Paperwork Makes Dream Work',cost:500,effect:'Efficient archival system',tier:2,unlocked:false,prereqs:['file']},
-{id:'questpack2',name:'Quest-ionable Methods',cost:300,effect:'Unlock Quest Pack 2',tier:2,unlocked:false,prereqs:['questpack1']}
+{id:'shovel1',name:'Shovel Some Respect',cost:50,effect:'Stronger digging tools',tier:2,unlocked:false,prereqs:['brush1']},
+{id:'radar1',name:'Peek Performance',cost:60,effect:'See 2 layers',tier:2,unlocked:false,prereqs:['brush1']},
+{id:'paperwork',name:'Paperwork Makes Dream Work',cost:100,effect:'Efficient archival system',tier:2,unlocked:false,prereqs:['file']},
+{id:'questpack2',name:'Quest-ionable Methods',cost:60,effect:'Unlock Quest Pack 2',tier:2,unlocked:false,prereqs:['questpack1']}
 ],
 tier3:[
-{id:'brush2',name:'Brush Hour 2',cost:400,effect:'Fine-detail analysis tools',tier:3,unlocked:false,prereqs:['shovel1']},
-{id:'scan1',name:'Scan-You-Dig-It?',cost:700,effect:'10% reveal chance',tier:3,unlocked:false,prereqs:['radar1']},
-{id:'radar2',name:'Double-Down Detector',cost:600,effect:'See 3 layers',tier:3,unlocked:false,prereqs:['radar1']},
-{id:'keep',name:'Keep It Together',cost:1100,effect:'Artifact preservation training',tier:3,unlocked:false,prereqs:['paperwork']},
-{id:'questpack3',name:'Quest For Success',cost:900,effect:'Unlock Quest Pack 3',tier:3,unlocked:false,prereqs:['questpack2']}
+{id:'brush2',name:'Brush Hour 2',cost:80,effect:'Fine-detail analysis tools',tier:3,unlocked:false,prereqs:['shovel1']},
+{id:'scan1',name:'Scan-You-Dig-It?',cost:140,effect:'10% reveal chance',tier:3,unlocked:false,prereqs:['radar1']},
+{id:'radar2',name:'Double-Down Detector',cost:120,effect:'See 3 layers',tier:3,unlocked:false,prereqs:['radar1']},
+{id:'keep',name:'Keep It Together',cost:220,effect:'Artifact preservation training',tier:3,unlocked:false,prereqs:['paperwork']},
+{id:'questpack3',name:'Quest For Success',cost:180,effect:'Unlock Quest Pack 3',tier:3,unlocked:false,prereqs:['questpack2']}
 ],
 tier4:[
-{id:'shovel2',name:'Shovel With Punches',cost:600,effect:'Reinforced excavation gear',tier:4,unlocked:false,prereqs:['brush2']},
-{id:'radar3',name:'Depth Charge',cost:1200,effect:'See 4 layers, +25% detect',tier:4,unlocked:false,prereqs:['scan1','radar2']},
-{id:'map',name:'Map-tastic Insights',cost:900,effect:'Show digsite contents',tier:4,unlocked:false,prereqs:['keep']},
-{id:'labgo',name:'Lab On the Go-pher',cost:2800,effect:'Field documentation',tier:4,unlocked:false,prereqs:['keep']},
-{id:'questpack4',name:'A Quest-ion of Time',cost:1200,effect:'Unlock Quest Pack 4',tier:4,unlocked:false,prereqs:['questpack3']}
+{id:'shovel2',name:'Shovel With Punches',cost:120,effect:'Reinforced excavation gear',tier:4,unlocked:false,prereqs:['brush2']},
+{id:'radar3',name:'Depth Charge',cost:240,effect:'See 4 layers, +25% detect',tier:4,unlocked:false,prereqs:['scan1','radar2']},
+{id:'map',name:'Map-tastic Insights',cost:180,effect:'Show digsite contents',tier:4,unlocked:false,prereqs:['keep']},
+{id:'labgo',name:'Lab On the Go-pher',cost:560,effect:'Field documentation',tier:4,unlocked:false,prereqs:['keep']},
+{id:'questpack4',name:'A Quest-ion of Time',cost:240,effect:'Unlock Quest Pack 4',tier:4,unlocked:false,prereqs:['questpack3']}
 ],
 tier5:[
-{id:'tools3',name:'Dig-nificantly Better',cost:1200,effect:'Master excavation kit',tier:5,unlocked:false,prereqs:['shovel2']},
-{id:'radar4',name:'All-Seeing Eye-chaeology',cost:1800,effect:'See 5 layers, +50% detect',tier:5,unlocked:false,prereqs:['radar3']},
-{id:'laser',name:'Laser Focused',cost:3000,effect:'30% reveal chance',tier:5,unlocked:false,prereqs:['radar3']},
-{id:'research',name:'Research and Destroy',cost:2400,effect:'Advanced research methodology',tier:5,unlocked:false,prereqs:['map','labgo']},
-{id:'victory',name:'Dig Victory',cost:4000,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research']}
+{id:'tools3',name:'Dig-nificantly Better',cost:240,effect:'Master excavation kit',tier:5,unlocked:false,prereqs:['shovel2']},
+{id:'radar4',name:'All-Seeing Eye-chaeology',cost:360,effect:'See 5 layers, +50% detect',tier:5,unlocked:false,prereqs:['radar3']},
+{id:'laser',name:'Laser Focused',cost:600,effect:'30% reveal chance',tier:5,unlocked:false,prereqs:['radar3']},
+{id:'research',name:'Research and Destroy',cost:480,effect:'Advanced research methodology',tier:5,unlocked:false,prereqs:['map','labgo']},
+{id:'victory',name:'Dig Victory',cost:800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['tools3','radar4','laser','research']}
 ]
 };
 const QUEST_PACKS={
 pack1:{name:"Beginner's Luck",unlock:'questpack1',quests:[
-{id:'q1_1',name:'First Steps',desc:'Collect 5 artifacts',type:'collect',target:5,progress:0,completed:false,reward:50},
-{id:'q1_2',name:'Complete Excavation',desc:'Complete 1 dig site',type:'digsite',target:1,progress:0,completed:false,reward:100}
+{id:'q1_1',name:'First Steps',desc:'Collect 5 artifacts',type:'collect',target:5,progress:0,completed:false,reward:10},
+{id:'q1_2',name:'Complete Excavation',desc:'Complete 1 dig site',type:'digsite',target:1,progress:0,completed:false,reward:20}
 ]},
 pack2:{name:"Intermediate Excavator",unlock:'questpack2',quests:[
-{id:'q2_1',name:'Artifact Collector',desc:'Collect 15 artifacts',type:'collect',target:15,progress:0,completed:false,reward:150},
-{id:'q2_2',name:'Site Explorer',desc:'Complete 3 dig sites',type:'digsite',target:3,progress:0,completed:false,reward:200}
+{id:'q2_1',name:'Artifact Collector',desc:'Collect 15 artifacts',type:'collect',target:15,progress:0,completed:false,reward:30},
+{id:'q2_2',name:'Site Explorer',desc:'Complete 3 dig sites',type:'digsite',target:3,progress:0,completed:false,reward:40}
 ]},
 pack3:{name:"Advanced Archaeologist",unlock:'questpack3',quests:[
-{id:'q3_1',name:'Treasure Hunter',desc:'Collect 30 artifacts',type:'collect',target:30,progress:0,completed:false,reward:350},
-{id:'q3_2',name:'Excavation Master',desc:'Complete 5 dig sites',type:'digsite',target:5,progress:0,completed:false,reward:400}
+{id:'q3_1',name:'Treasure Hunter',desc:'Collect 30 artifacts',type:'collect',target:30,progress:0,completed:false,reward:70},
+{id:'q3_2',name:'Excavation Master',desc:'Complete 5 dig sites',type:'digsite',target:5,progress:0,completed:false,reward:80}
 ]},
 pack4:{name:"Master Archaeologist",unlock:'questpack4',quests:[
-{id:'q4_1',name:'Ultimate Collector',desc:'Collect 50 artifacts',type:'collect',target:50,progress:0,completed:false,reward:600},
-{id:'q4_2',name:'Dig Site Champion',desc:'Complete 10 dig sites',type:'digsite',target:10,progress:0,completed:false,reward:700}
+{id:'q4_1',name:'Ultimate Collector',desc:'Collect 50 artifacts',type:'collect',target:50,progress:0,completed:false,reward:120},
+{id:'q4_2',name:'Dig Site Champion',desc:'Complete 10 dig sites',type:'digsite',target:10,progress:0,completed:false,reward:140}
 ]}
 };
 const TUTORIAL_STEPS=[
