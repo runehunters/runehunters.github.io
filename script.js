@@ -1322,7 +1322,7 @@ if(totalValue>0){
 
 updateHUD();
 document.getElementById('documentationModal').style.display='flex';
-updateDpadVisibility();
+updateJoystickVisibility();
 }
 function showResearchTree(){
 const content=document.getElementById('researchTreeContent');
@@ -1403,7 +1403,7 @@ content.appendChild(treeDiv);
 const modalContent = document.getElementById('researchTreeModal').querySelector('.modal-content');
 modalContent.style.maxWidth = '900px';
 document.getElementById('researchTreeModal').style.display='flex';
-updateDpadVisibility();
+updateJoystickVisibility();
 }
 function canUnlockResearch(upgrade){
 if(upgrade.unlocked)return false;
@@ -1561,13 +1561,13 @@ document.getElementById('controlsModal').style.display='flex';
 });
 document.getElementById('settingsSelectKeyboard').addEventListener('click',()=>{
 game.controlScheme = 'keyboard';
-updateDpadVisibility();
+updateJoystickVisibility();
 document.getElementById('keybindsSection').style.display = 'block';
 });
 document.getElementById('settingsSelectTouch').addEventListener('click',()=>{
 game.controlScheme = 'touch';
 generateDigsites();
-updateDpadVisibility();
+updateJoystickVisibility();
 document.getElementById('keybindsSection').style.display = 'none';
 });
 document.getElementById('closeControlsModal').addEventListener('click',()=>{
@@ -1615,7 +1615,7 @@ showResearchTree();
 });
 document.getElementById('closeResearchTreeModal').addEventListener('click',()=>{
 document.getElementById('researchTreeModal').style.display='none';
-updateDpadVisibility();
+updateJoystickVisibility();
 });
 document.getElementById('closeQuestBoardModal').addEventListener('click',()=>{
 document.getElementById('questBoardModal').style.display='none';
@@ -1665,14 +1665,14 @@ document.getElementById('settingsModal').style.display='flex';
 document.getElementById('selectKeyboard').addEventListener('click',()=>{
   game.controlScheme = 'keyboard';
   document.getElementById('controlSchemeModal').style.display='none';
-  updateDpadVisibility();
+  updateJoystickVisibility();
   game.tutorialActive = true;
   game.tutorialStep = 0;
 });
 document.getElementById('selectTouch').addEventListener('click',()=>{
   game.controlScheme = 'touch';
   document.getElementById('controlSchemeModal').style.display='none';
-  updateDpadVisibility();
+  updateJoystickVisibility();
   game.tutorialActive = true;
   game.tutorialStep = 0;
 });
@@ -1774,7 +1774,7 @@ async function loadWithProgress() {
 
   // Final setup
   updateHUD();
-  updateDpadVisibility();
+  updateJoystickVisibility();
 
   // Hide loading screen and start game
   await new Promise(resolve => setTimeout(resolve, 500));
