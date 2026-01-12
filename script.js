@@ -80,24 +80,7 @@ tier5:[
 {id:'victory',name:'Dig Victory',cost:600,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:337,y:550}
 ]
 };
-const QUEST_PACKS={
-pack1:{name:"Beginner's Luck",unlock:'questpack1',quests:[
-{id:'q1_1',name:'First Steps',desc:'Collect 5 artifacts',type:'collect',target:5,progress:0,completed:false,reward:10},
-{id:'q1_2',name:'Complete Excavation',desc:'Complete 1 dig site',type:'digsite',target:1,progress:0,completed:false,reward:20}
-]},
-pack2:{name:"Intermediate Excavator",unlock:'questpack2',quests:[
-{id:'q2_1',name:'Artifact Collector',desc:'Collect 15 artifacts',type:'collect',target:15,progress:0,completed:false,reward:30},
-{id:'q2_2',name:'Site Explorer',desc:'Complete 3 dig sites',type:'digsite',target:3,progress:0,completed:false,reward:40}
-]},
-pack3:{name:"Advanced Archaeologist",unlock:'questpack3',quests:[
-{id:'q3_1',name:'Treasure Hunter',desc:'Collect 30 artifacts',type:'collect',target:30,progress:0,completed:false,reward:70},
-{id:'q3_2',name:'Excavation Master',desc:'Complete 5 dig sites',type:'digsite',target:5,progress:0,completed:false,reward:80}
-]},
-pack4:{name:"Master Archaeologist",unlock:'questpack4',quests:[
-{id:'q4_1',name:'Ultimate Collector',desc:'Collect 50 artifacts',type:'collect',target:50,progress:0,completed:false,reward:120},
-{id:'q4_2',name:'Dig Site Champion',desc:'Complete 10 dig sites',type:'digsite',target:10,progress:0,completed:false,reward:140}
-]}
-};
+
 const TUTORIAL_STEPS=[
 {text:"Welcome to Rune Hunters! You're an archaeologist studying ancient Roman civilization. Your mission is to excavate artifacts and learn about the past."},
 {text:"Archaeology is the study of human history through excavation and analysis of artifacts and structures. Each discovery helps us understand how people lived thousands of years ago."},
@@ -360,18 +343,18 @@ function setupJoystick() {
   document.addEventListener('touchcancel', handleTouchEnd);
 }
 
-function updateDpadVisibility() {
-  const dpad = document.getElementById('dpad');
+function updateJoystickVisibility() {
+  const joystick = document.getElementById('joystick');
   const modals = ['settingsModal', 'controlsModal', 'artifactModal', 'documentationModal', 'sleepModal', 'researchTreeModal', 'questBoardModal', 'creditsModal', 'missionCompleteModal', 'lateNightModal', 'confirmModal', 'howToPlayModal', 'controlSchemeModal'];
   const modalOpen = modals.some(id => document.getElementById(id).style.display === 'flex');
   if (game.controlScheme === 'touch' && !modalOpen) {
-    dpad.style.display = 'block';
+    joystick.style.display = 'block';
     if (!joystickSetupComplete) {
       setupJoystick();
       joystickSetupComplete = true;
     }
   } else {
-    dpad.style.display = 'none';
+    joystick.style.display = 'none';
   }
   game.zoomScale = 1.0;
 }
