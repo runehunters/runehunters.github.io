@@ -416,7 +416,7 @@ function showControlSchemeSelector() {
   if (selectedRadio) {
     selectedRadio.checked = true;
   }
-  updateDpadVisibility();
+  updateJoystickVisibility();
 }
 let game={
 state:'town',
