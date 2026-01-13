@@ -1325,6 +1325,34 @@ for(const tierKey in RESEARCH_TREE){
     nodeDiv.addEventListener('mouseleave', ()=>{
       tooltipDiv.style.display='none';
     });
+
+    // Touchscreen behavior
+    nodeDiv.addEventListener('touchstart', (e) => {
+      e.preventDefault();
+      if (game.controlScheme === 'touch') {
+        if (canUnlockResearch(upgrade)) {
+          // If can afford, unlock immediately without showing tooltip
+          unlockResearch(upgrade.id);
+        } else {
+          // If can't afford, show tooltip
+          const prereqText = upgrade.prereqs.length > 0 ? 'Prerequisites: ' + upgrade.prereqs.map(id => findResearchById(id).name).join(', ') : 'No prerequisites';
+          tooltipDiv.innerHTML=`
+            <strong>${upgrade.name}</strong><br>
+            Cost: ${upgrade.cost} RP<br>
+            Effect: ${upgrade.effect}<br>
+            ${prereqText}
+          `;
+          tooltipDiv.style.left=`${upgrade.x + 70}px`;
+          tooltipDiv.style.top=`${upgrade.y - 60}px`;
+          tooltipDiv.style.display='block';
+
+          // Hide tooltip after a delay
+          setTimeout(() => {
+            tooltipDiv.style.display='none';
+          }, 3000);
+        }
+      }
+    });
     treeDiv.appendChild(nodeDiv);
 
     upgrade.prereqs.forEach(prereqId=>{
@@ -1332,11 +1360,11 @@ for(const tierKey in RESEARCH_TREE){
       if(prereq){
         const lineDiv=document.createElement('div');
         lineDiv.className='tree-line';
-        // Draw lines from edge to edge instead of center to center
-        const x1 = prereq.x;
-        const y1 = prereq.y + 30;
-        const x2 = upgrade.x + 120;
-        const y2 = upgrade.y + 30;
+        // Draw lines from bottom of previous to top of next
+        const x1 = prereq.x + 60; // Center X of prereq
+        const y1 = prereq.y + 60; // Bottom of prereq (node height is 60px)
+        const x2 = upgrade.x + 60; // Center X of upgrade
+        const y2 = upgrade.y;      // Top of upgrade
         const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
         const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
         lineDiv.style.left = `${x1}px`;
