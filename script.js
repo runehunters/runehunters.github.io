@@ -462,8 +462,7 @@ function createMap(){
 const map=Array(MAP_HEIGHT).fill(null).map(()=>Array(MAP_WIDTH).fill('g'));
 const buildings = [
 {type: 'b', width: 7, height: 5}, // lab
-{type: 'h', width: 5, height: 5}, // camp
-{type: 'q', width: 5, height: 5}  // quest
+{type: 'h', width: 5, height: 5}  // camp
 ];
 const placedBuildings = [];
 for(const building of buildings){
@@ -516,12 +515,12 @@ this.collider={x:x-10,y:y-10,w:20,h:20};
 function isPositionBlocked(x,y){
 if(x<0||x>=MAP_WIDTH||y<0||y>=MAP_HEIGHT)return true;
 const tileType=game.map[y][x];
-return tileType==='b'||tileType==='h'||tileType==='q'||tileType==='d'||tileType==='w';
+return tileType==='b'||tileType==='h'||tileType==='d'||tileType==='w';
 }
 function isBlockedForObject(x,y){
 if(game.map[y][x] !== 'g') return true;
 // Check buildings
-if(game.map[y][x] === 'b' || game.map[y][x] === 'h' || game.map[y][x] === 'q') return true;
+if(game.map[y][x] === 'b' || game.map[y][x] === 'h') return true;
 // Check distance to other trees and rocks
 for(const obj of game.mapObjects){
 if(Math.abs(obj.x/TILE_SIZE - x) <=1 && Math.abs(obj.y/TILE_SIZE - y) <=1) return true;
@@ -658,7 +657,6 @@ case'g':color='#6b8e4e';break;
 case'p':color='#a89070';break;
 case'b':color='#8b7355';break;
 case'h':color='#7a6a5a';break;
-case'q':color='#8a7a6a';break;
 case'd':color='#d4a574';break;
 default:color='#6b8e4e';
 }
@@ -724,52 +722,13 @@ ctx.strokeStyle='#0F5132';
 ctx.lineWidth=1;
 ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
 }
-if(game.map[y][x]==='q'){
-const top = (y === 0 || game.map[y-1][x] !== 'q');
-const bottom = (y === MAP_HEIGHT-1 || game.map[y+1][x] !== 'q');
-const wallColor = '#708090'; // pale blue
-const roofColor = '#8B4513'; // saddlebrown for thatch
-if (top) {
-ctx.fillStyle=roofColor;
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
-// Add thatch lines
-ctx.strokeStyle='#654321';
-ctx.lineWidth=1;
-for(let i=0; i<5; i++){
-ctx.beginPath();
-ctx.moveTo(tileX + i*6, tileY);
-ctx.lineTo(tileX + i*6 + 8, tileY + TILE_SIZE);
-ctx.stroke();
-}
-} else if (bottom) {
-ctx.fillStyle=wallColor;
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
-// Door
-ctx.fillStyle='#1E3A8A';
-ctx.fillRect(tileX+12, tileY+16, 8, 16);
-} else {
-ctx.fillStyle=wallColor;
-ctx.fillRect(tileX, tileY, TILE_SIZE, TILE_SIZE);
-// Windows
-ctx.fillStyle='rgba(0,0,0,0.4)';
-ctx.fillRect(tileX+4, tileY+8, 6,6);
-ctx.fillRect(tileX+12, tileY+8, 6,6);
-ctx.fillRect(tileX+20, tileY+8, 6,6);
-ctx.fillRect(tileX+4, tileY+18, 6,6);
-ctx.fillRect(tileX+20, tileY+18, 6,6);
-}
-// Outline
-ctx.strokeStyle='#1E3A8A';
-ctx.lineWidth=1;
-ctx.strokeRect(tileX,tileY,TILE_SIZE,TILE_SIZE);
-}
 ctx.fillStyle='#f4e4c1';
 ctx.font='bold 18px Comfortaa';
 ctx.textAlign='center';
 function isRoofTile(y, x, type) {
   return game.map[y][x] === type && (y === 0 || game.map[y-1][x] !== type);
 }
-const buildingTitles = {'b': 'Lab', 'h': 'Camp', 'q': 'Quest'};
+const buildingTitles = {'b': 'Lab', 'h': 'Camp'};
 for(const type in buildingTitles){
   const title = buildingTitles[type];
   const chars = title.split('');
@@ -932,9 +891,6 @@ return{type:'building',name:'Research Laboratory',tileX,tileY};
 }
 if(tileType==='h'){
 return{type:'home',name:'Camp',tileX,tileY};
-}
-if(tileType==='q'){
-return{type:'quest',name:'Quest Room',tileX,tileY};
 }
 if(tileType==='d'){
 return{type:'digsite',name:'Archaeological Dig Site',tileX,tileY};
@@ -1376,9 +1332,10 @@ for(const tierKey in RESEARCH_TREE){
       if(prereq){
         const lineDiv=document.createElement('div');
         lineDiv.className='tree-line';
-        const x1 = prereq.x + 60;
+        // Draw lines from edge to edge instead of center to center
+        const x1 = prereq.x;
         const y1 = prereq.y + 30;
-        const x2 = upgrade.x + 60;
+        const x2 = upgrade.x + 120;
         const y2 = upgrade.y + 30;
         const length = Math.sqrt((x2 - x1) ** 2 + (y2 - y1) ** 2);
         const angle = Math.atan2(y2 - y1, x2 - x1) * 180 / Math.PI;
@@ -1439,6 +1396,20 @@ showResearchTree();
 return;
 }
 }
+function canUnlockQuest(quest, pack) {
+    // Check if quest has prerequisites
+    if(quest.prereqs && quest.prereqs.length > 0) {
+        for(const prereqQuestId of quest.prereqs) {
+            // Find the prerequisite quest in the same pack
+            const prereqQuest = pack.quests.find(q => q.id === prereqQuestId);
+            if(!prereqQuest || !prereqQuest.completed) {
+                return false;
+            }
+        }
+    }
+    return true;
+}
+
 function showQuestBoard(){
 const content=document.getElementById('questBoardContent');
 content.innerHTML='';
@@ -1450,10 +1421,11 @@ packDiv.className=`quest-pack ${!isUnlocked?'locked':''}`;
 packDiv.innerHTML=`<h3>${pack.name} ${!isUnlocked?'🔒':''}</h3>`;
 if(isUnlocked){
 pack.quests.forEach(quest=>{
+const canUnlock = canUnlockQuest(quest, pack);
 const questDiv=document.createElement('div');
-questDiv.className=`quest-item ${quest.completed?'completed':''}`;
+questDiv.className=`quest-item ${quest.completed?'completed':''} ${!canUnlock?'locked':''}`;
 const progressPercent=Math.min(100,(quest.progress/quest.target)*100);
-questDiv.innerHTML=`
+let questHtml=`
 <strong>${quest.name}</strong><br>
 <small>${quest.desc}</small><br>
 <div class="quest-progress">
@@ -1461,8 +1433,18 @@ questDiv.innerHTML=`
 </div>
 <small>Progress: ${quest.progress}/${quest.target}</small><br>
 <small>Reward: ${quest.reward} RP</small>
-${quest.completed?'<br><span style="color:#4a8a4a">✓ Completed!</span>':''}
 `;
+
+if(quest.completed){
+questHtml+=`<br><span style="color:#4a8a4a">✓ Completed!</span>`;
+}else if(!canUnlock && quest.prereqs && quest.prereqs.length > 0){
+questHtml+=`<br><small style="color:#8a6a4a">🔒 Requires: ${quest.prereqs.map(id => {
+const prereqQuest = pack.quests.find(q => q.id === id);
+return prereqQuest ? prereqQuest.name : id;
+}).join(', ')}</small>`;
+}
+
+questDiv.innerHTML=questHtml;
 packDiv.appendChild(questDiv);
 });
 }else{
@@ -1489,9 +1471,12 @@ break;
 }
 quest.progress=newProgress;
 if(quest.progress>=quest.target&&!quest.completed){
+const canUnlock = canUnlockQuest(quest, pack);
+if(canUnlock){
 quest.completed=true;
 game.researchPoints+=quest.reward;
 showMessage(`Quest completed: ${quest.name}! Earned ${quest.reward} RP!`);
+}
 }
 });
 }
@@ -1564,6 +1549,8 @@ document.getElementById('keybindsSection').style.display = 'block';
 document.getElementById('settingsSelectTouch').addEventListener('click',()=>{
 game.controlScheme = 'touch';
 generateDigsites();
+// Reset joystick setup flag to ensure proper initialization
+joystickSetupComplete = false;
 updateJoystickVisibility();
 document.getElementById('keybindsSection').style.display = 'none';
 });
@@ -1667,11 +1654,13 @@ document.getElementById('selectKeyboard').addEventListener('click',()=>{
   game.tutorialStep = 0;
 });
 document.getElementById('selectTouch').addEventListener('click',()=>{
-  game.controlScheme = 'touch';
-  document.getElementById('controlSchemeModal').style.display='none';
-  updateJoystickVisibility();
-  game.tutorialActive = true;
-  game.tutorialStep = 0;
+game.controlScheme = 'touch';
+document.getElementById('controlSchemeModal').style.display='none';
+// Reset joystick setup flag to ensure proper initialization
+joystickSetupComplete = false;
+updateJoystickVisibility();
+game.tutorialActive = true;
+game.tutorialStep = 0;
 });
 function populateKeybinds(){
 document.getElementById('keybind-up1-btn').textContent=game.keybinds.up[0].toUpperCase();
