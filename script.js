@@ -93,28 +93,28 @@ quests:[
 const RESEARCH_TREE={
 tier1:[
 {id:'dig1',name:'Enhanced Digging',cost:90,effect:'Dig 1x2 area',tier:1,unlocked:false,prereqs:[],x:100,y:50},
-{id:'reveal1',name:'Lucky Finds',cost:90,effect:'20% chance to reveal artifacts',tier:1,unlocked:false,prereqs:[],x:350,y:50},
+{id:'reveal1',name:'Lucky Finds',cost:90,effect:'20% of artifacts marked with ?',tier:1,unlocked:false,prereqs:[],x:350,y:50},
 {id:'layers1',name:'Layer Insight',cost:120,effect:'See 2 layers at once',tier:1,unlocked:false,prereqs:[],x:600,y:50}
 ],
 tier2:[
 {id:'dig2',name:'Wider Excavation',cost:150,effect:'Dig 2x2 area',tier:2,unlocked:false,prereqs:['dig1'],x:100,y:150},
-{id:'reveal2',name:'Marked Treasures',cost:180,effect:'30% reveal chance, ! on artifacts',tier:2,unlocked:false,prereqs:['reveal1'],x:350,y:150},
+{id:'reveal2',name:'Marked Treasures',cost:180,effect:'30% of artifacts marked with ?',tier:2,unlocked:false,prereqs:['reveal1'],x:350,y:150},
 {id:'layers2',name:'Deep Vision',cost:180,effect:'See 3 layers at once',tier:2,unlocked:false,prereqs:['layers1'],x:600,y:150}
 ],
 tier3:[
 {id:'dig3',name:'Broad Digging',cost:240,effect:'Dig 3x2 area',tier:3,unlocked:false,prereqs:['dig2'],x:100,y:250},
-{id:'reveal3',name:'Fortune Seeker',cost:300,effect:'40% reveal chance',tier:3,unlocked:false,prereqs:['reveal2'],x:350,y:250},
+{id:'reveal3',name:'Fortune Seeker',cost:300,effect:'40% of artifacts marked with ?',tier:3,unlocked:false,prereqs:['reveal2'],x:350,y:250},
 {id:'layers3',name:'Archaeologist\'s Eye',cost:360,effect:'See 4 layers at once',tier:3,unlocked:false,prereqs:['layers2'],x:600,y:250}
 ],
 tier4:[
 {id:'dig4',name:'Mass Excavation',cost:450,effect:'Dig 3x3 area',tier:4,unlocked:false,prereqs:['dig3'],x:100,y:350},
-{id:'reveal4',name:'Treasure Hunter',cost:600,effect:'50% reveal chance',tier:4,unlocked:false,prereqs:['reveal3'],x:350,y:350},
+{id:'reveal4',name:'Treasure Hunter',cost:600,effect:'50% of artifacts marked with ?',tier:4,unlocked:false,prereqs:['reveal3'],x:350,y:350},
 {id:'layers4',name:'Ancient Secrets',cost:720,effect:'See 5 layers at once',tier:4,unlocked:false,prereqs:['layers3'],x:600,y:350}
 ],
 tier5:[
-{id:'dig5',name:'Ultimate Excavator',cost:900,effect:'Dig 4x3 area',tier:5,unlocked:false,prereqs:['dig4'],x:225,y:450},
-{id:'reveal5',name:'Master Archaeologist',cost:1200,effect:'60% reveal chance',tier:5,unlocked:false,prereqs:['reveal4'],x:450,y:450},
-{id:'victory',name:'Dig Victory',cost:1800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:337,y:550}
+{id:'dig5',name:'Ultimate Excavator',cost:900,effect:'Dig 4x3 area',tier:5,unlocked:false,prereqs:['dig4'],x:100,y:450},
+{id:'reveal5',name:'Master Archaeologist',cost:1200,effect:'60% of artifacts marked with ?',tier:5,unlocked:false,prereqs:['reveal4'],x:350,y:450},
+{id:'victory',name:'Dig Victory',cost:1800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:225,y:550}
 ]
 };
 
@@ -658,6 +658,7 @@ function generateDigsiteContent(digsite){
 const rows=digsite.layers;
 const cols = 15;
 digsite.grid=Array(rows).fill(null).map(()=>Array(cols).fill(null));
+digsite.markedArtifacts=Array(rows).fill(null).map(()=>Array(cols).fill(false));
 digsite.artifactCount=0;
 digsite.dirtCount=0;
 digsite.currentLayer=0;
@@ -676,6 +677,37 @@ placed=true;
 }
 }
 }
+
+// Apply reveal chance upgrades - mark some artifacts with ?
+let revealPercentage = 0;
+if(getResearchUnlocked('reveal5')) revealPercentage = 0.6;
+else if(getResearchUnlocked('reveal4')) revealPercentage = 0.5;
+else if(getResearchUnlocked('reveal3')) revealPercentage = 0.4;
+else if(getResearchUnlocked('reveal2')) revealPercentage = 0.3;
+else if(getResearchUnlocked('reveal1')) revealPercentage = 0.2;
+
+const numToMark = Math.floor(digsite.artifactCount * revealPercentage);
+const markedIndices = new Set();
+
+// Randomly select artifacts to mark
+while(markedIndices.size < numToMark){
+const randomIndex = Math.floor(Math.random() * digsite.artifactCount);
+markedIndices.add(randomIndex);
+}
+
+// Mark the selected artifacts
+let currentIndex = 0;
+for(let y=0; y<rows; y++){
+for(let x=0; x<cols; x++){
+if(digsite.grid[y][x] && digsite.grid[y][x] !== 'dug'){
+if(markedIndices.has(currentIndex)){
+digsite.markedArtifacts[y][x] = true;
+}
+currentIndex++;
+}
+}
+}
+
 digsite.dirtCount=(rows*cols)-digsite.artifactCount;
 digsite.dugCells=Array(rows).fill(null).map(()=>Array(cols).fill(false));
 }
@@ -1045,22 +1077,11 @@ digsite.dugCells[dy][dx]=true;
 dugSomething = true;
 if(cell&&cell!=='dug'){
 const artifact=ARTIFACTS[cell];
-
-// Apply reveal chance upgrades
-let revealChance = 0;
-if(getResearchUnlocked('reveal5')) revealChance = 0.6;
-else if(getResearchUnlocked('reveal4')) revealChance = 0.5;
-else if(getResearchUnlocked('reveal3')) revealChance = 0.4;
-else if(getResearchUnlocked('reveal2')) revealChance = 0.3;
-else if(getResearchUnlocked('reveal1')) revealChance = 0.2;
-
-if(Math.random() < revealChance){
 game.inventory[cell]=(game.inventory[cell]||0)+1;
 digsite.artifactCount--;
 game.questProgress.totalCollected++;
 updateQuestProgress();
 showArtifactInfo(artifact);
-}
 }
 }
 }
@@ -1093,10 +1114,21 @@ showMessage("All artifacts excavated! Return to the lab to document your finding
 }
 function showArtifactInfo(artifact){
 document.getElementById('artifactName').textContent=artifact.name;
-let descriptionText = artifact.description;
+
+// Show 1-2 educational sentences
+let descriptionText = '';
 if(artifact.insights && artifact.insights.length > 0){
-descriptionText += '\n\nEducational Insights:\n• ' + artifact.insights.join('\n• ');
+  // Take first 1-2 insights and format as sentences
+  const numSentences = Math.min(2, artifact.insights.length);
+  for(let i = 0; i < numSentences; i++){
+    descriptionText += artifact.insights[i];
+    if(i < numSentences - 1) descriptionText += ' ';
+    else descriptionText += '.';
+  }
+} else {
+  descriptionText = 'This artifact provides valuable insights into Roman civilization and daily life.';
 }
+
 document.getElementById('artifactDescription').textContent=descriptionText;
 document.getElementById('artifactModal').style.display='flex';
 }
@@ -1370,8 +1402,11 @@ if(totalValue>0){
 }
 
 updateHUD();
-document.getElementById('documentationModal').style.display='flex';
-updateJoystickVisibility();
+// Fix: Delay modal display to prevent freeze
+setTimeout(() => {
+  document.getElementById('documentationModal').style.display='flex';
+  updateJoystickVisibility();
+}, 100);
 }
 function showResearchTree(){
 const content=document.getElementById('researchTreeContent');
@@ -1735,8 +1770,9 @@ document.getElementById('creditsModal').style.display='flex';
 document.getElementById('closeCreditsModal').addEventListener('click',()=>{
 document.getElementById('creditsModal').style.display='none';
 });
-document.getElementById('continueExploringButton').addEventListener('click',()=>{
-document.getElementById('missionCompleteModal').style.display='none';
+document.getElementById('resetProgressButtonEnd').addEventListener('click',()=>{
+localStorage.removeItem('runehunters_save');
+location.reload();
 });
 document.getElementById('closeMissionCompleteModal').addEventListener('click',()=>{
 document.getElementById('missionCompleteModal').style.display='none';
@@ -1747,25 +1783,7 @@ document.getElementById('lateNightModal').style.display='none';
 document.getElementById('closeDocumentationModal').addEventListener('click',()=>{
 document.getElementById('documentationModal').style.display='none';
 });
-document.getElementById('howToPlayButton').addEventListener('click',()=>{
-document.getElementById('settingsModal').style.display='none';
-const moveKeys=game.keybinds.up.filter(k=>k).map(k=>k.toUpperCase()).join('/');
-const interactKeys=game.keybinds.interact.filter(k=>k).map(k=>k.toUpperCase()).join('/');
-const returnKeys=game.keybinds.return.filter(k=>k).map(k=>k.toUpperCase()).join('/');
-document.getElementById('help-move-keys').textContent=moveKeys;
-document.getElementById('help-interact-keys').textContent=interactKeys;
-document.getElementById('help-return-keys').textContent=returnKeys;
-if (game.controlScheme === 'touch') {
-  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use the <strong>on-screen joystick</strong> to move around the world.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5 hidden layers. Only one layer is visible at a time. <strong>Tap tiles</strong> to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = '<strong>Interact / Exit Site:</strong> Center button<br><strong>Secondary Return:</strong> Not used in touch mode';
-} else {
-  document.querySelector('#howToPlayModal .help-section:nth-child(1) p').innerHTML = 'Use <strong id="help-move-keys">WASD/Arrow Keys</strong> to move around the world.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(2) p').innerHTML = 'Dig sites have 5-10 hidden layers. Only one layer is visible at a time. Click tiles to excavate them instantly. Clear all tiles in a layer to reveal the next layer.';
-  document.querySelector('#howToPlayModal .help-section:nth-child(6) p').innerHTML = 'Interact / Exit Site: <strong id="help-interact-keys">E</strong><br>Secondary Return: <strong id="help-return-keys">R</strong>';
-}
-document.getElementById('howToPlayModal').style.display='flex';
-});
+
 document.getElementById('closeHowToPlayModal').addEventListener('click',()=>{
 document.getElementById('howToPlayModal').style.display='none';
 document.getElementById('settingsModal').style.display='flex';
