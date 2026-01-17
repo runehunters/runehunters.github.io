@@ -1753,7 +1753,8 @@ if(!game.tutorialActive)return;
 game.tutorialStep++;
 if(game.tutorialStep>=TUTORIAL_STEPS.length){
 game.tutorialActive=false;
-game.tutorialStep=0;
+game.tutorialStep=TUTORIAL_STEPS.length; // Mark as completed instead of resetting to 0
+saveGame(); // Save completion status
 }
 });
 document.getElementById('controlsButton').addEventListener('click',()=>{
@@ -1859,8 +1860,11 @@ document.getElementById('selectKeyboard').addEventListener('click',()=>{
   game.controlScheme = 'keyboard';
   document.getElementById('controlSchemeModal').style.display='none';
   updateJoystickVisibility();
-  game.tutorialActive = true;
-  game.tutorialStep = 0;
+  // Only start tutorial if not already completed
+  if(game.tutorialStep < TUTORIAL_STEPS.length){
+    game.tutorialActive = true;
+    game.tutorialStep = 0;
+  }
 });
 document.getElementById('selectTouch').addEventListener('click',()=>{
 game.controlScheme = 'touch';
@@ -1868,8 +1872,11 @@ document.getElementById('controlSchemeModal').style.display='none';
 // Reset joystick setup flag to ensure proper initialization
 joystickSetupComplete = false;
 updateJoystickVisibility();
-game.tutorialActive = true;
-game.tutorialStep = 0;
+// Only start tutorial if not already completed
+if(game.tutorialStep < TUTORIAL_STEPS.length){
+  game.tutorialActive = true;
+  game.tutorialStep = 0;
+}
 });
 function populateKeybinds(){
 document.getElementById('keybind-up1-btn').textContent=game.keybinds.up[0].toUpperCase();
