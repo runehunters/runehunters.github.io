@@ -455,6 +455,72 @@ function showControlSchemeSelector() {
   }
   updateJoystickVisibility();
 }
+
+function resetGame() {
+  // Clear localStorage
+  localStorage.removeItem('runehunters_save');
+
+  // Reset game object to initial state
+  game = {
+    state: 'town',
+    scene: 'overworld',
+    player: {x: (MAP_WIDTH/2)*TILE_SIZE, y: (MAP_HEIGHT/2)*TILE_SIZE, speed: 8, dx: 0, dy: 1, walkFrame: 0, walkCounter: 0, isWalking: false},
+    map: [],
+    mapObjects: [],
+    ambianceElements: [],
+    backgroundElements: [],
+    digsites: [],
+    paths: [],
+    currentDigsite: null,
+    inventory: {},
+    documentedArtifacts: {},
+    researchPoints: 0,
+    time: {hour: 9, minute: 0, day: 1, frameCounter: 0},
+    keys: {},
+    keybinds: {up: ['w','arrowup'], down: ['s','arrowdown'], left: ['a','arrowleft'], right: ['d','arrowright'], interact: ['e',''], return: ['r','']},
+    tutorialActive: false,
+    tutorialStep: 0,
+    offsetX: 0,
+    offsetY: 0,
+    isNight: false,
+    nightOpacity: 0,
+    timeFrozen: false,
+    lateNightWarningShown: false,
+    labPopupShown: false,
+    questProgress: {totalCollected: 0, totalDigsites: 0},
+    currentKeybindChange: null,
+    currentKeybindSlot: null,
+    controlScheme: 'keyboard',
+    zoomScale: 1.0,
+    interactPressed: false
+  };
+
+  // Reset research tree
+  for (const tierKey in RESEARCH_TREE) {
+    RESEARCH_TREE[tierKey].forEach(upgrade => {
+      upgrade.unlocked = false;
+    });
+  }
+
+  // Reset quests
+  for (const packKey in QUEST_PACKS) {
+    QUEST_PACKS[packKey].quests.forEach(quest => {
+      quest.completed = false;
+      quest.progress = 0;
+    });
+  }
+
+  // Reinitialize game world
+  game.map = createMap();
+  generateMapObjects();
+  generateAmbiance();
+  generateBackgroundElements();
+  generateDigsites();
+
+  // Update UI
+  updateHUD();
+  updateJoystickVisibility();
+}
 let game={
 state:'town',
 scene:'overworld',
@@ -1737,8 +1803,9 @@ document.getElementById('settingsModal').style.display='none';
 document.getElementById('confirmModal').style.display='flex';
 });
 document.getElementById('confirmResetBtn').addEventListener('click',()=>{
-localStorage.removeItem('runehunters_save');
-location.reload();
+resetGame();
+document.getElementById('confirmModal').style.display='none';
+showMessage("All progress has been reset!");
 });
 document.getElementById('cancelResetBtn').addEventListener('click',()=>{
 document.getElementById('confirmModal').style.display='none';
@@ -1771,8 +1838,8 @@ document.getElementById('closeCreditsModal').addEventListener('click',()=>{
 document.getElementById('creditsModal').style.display='none';
 });
 document.getElementById('resetProgressButtonEnd').addEventListener('click',()=>{
-localStorage.removeItem('runehunters_save');
-location.reload();
+resetGame();
+showMessage("All progress has been reset!");
 });
 document.getElementById('closeMissionCompleteModal').addEventListener('click',()=>{
 document.getElementById('missionCompleteModal').style.display='none';
