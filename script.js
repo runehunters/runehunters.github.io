@@ -92,7 +92,7 @@ quests:[
 
 const RESEARCH_TREE={
 tier1:[
-{id:'dig1',name:'Enhanced Digging',cost:90,effect:'Dig 1x2 area',tier:1,unlocked:false,prereqs:[],x:100,y:50},
+{id:'dig1',name:'Enhanced Digging',cost:90,effect:'Dig 2x1 area',tier:1,unlocked:false,prereqs:[],x:100,y:50},
 {id:'reveal1',name:'Lucky Finds',cost:90,effect:'20% of artifacts marked with ?',tier:1,unlocked:false,prereqs:[],x:350,y:50},
 {id:'layers1',name:'Layer Insight',cost:120,effect:'See 2 layers at once',tier:1,unlocked:false,prereqs:[],x:600,y:50}
 ],
@@ -114,7 +114,7 @@ tier4:[
 tier5:[
 {id:'dig5',name:'Ultimate Excavator',cost:900,effect:'Dig 4x3 area',tier:5,unlocked:false,prereqs:['dig4'],x:100,y:450},
 {id:'reveal5',name:'Master Archaeologist',cost:1200,effect:'60% of artifacts marked with ?',tier:5,unlocked:false,prereqs:['reveal4'],x:350,y:450},
-{id:'victory',name:'Dig Victory',cost:1800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:225,y:550}
+{id:'victory',name:'Dig Victory',cost:1800,effect:'FINAL: Mission Complete!',tier:5,unlocked:false,prereqs:['dig5','reveal5','layers4'],x:350,y:550}
 ]
 };
 
@@ -685,7 +685,7 @@ game.map[y][x]='g';
 }
 game.digsites=[];
 const existingDigsites=game.digsites.filter(d=>d.completed===false);
-const newSitesNeeded=4-existingDigsites.length;
+const newSitesNeeded=6-existingDigsites.length;
 for(let i=0;i<newSitesNeeded;i++){
 let placed=false;
 let attempts=0;
@@ -1126,7 +1126,7 @@ if(getResearchUnlocked('dig5')) digArea = {width: 4, height: 3};
 else if(getResearchUnlocked('dig4')) digArea = {width: 3, height: 3};
 else if(getResearchUnlocked('dig3')) digArea = {width: 3, height: 2};
 else if(getResearchUnlocked('dig2')) digArea = {width: 2, height: 2};
-else if(getResearchUnlocked('dig1')) digArea = {width: 1, height: 2};
+else if(getResearchUnlocked('dig1')) digArea = {width: 2, height: 1};
 
 // Calculate dig area centered on clicked cell
 const startDigX = Math.max(0, gridX - Math.floor((digArea.width - 1) / 2));
